@@ -5,8 +5,6 @@ use std::{
 
 use octorust::Client;
 
-use crate::octorust::issues::Issues;
-
 fn url_to_vars(url: &String) -> Result<(String, String), io::Error> {
     if let Some(pos) = url.find('/') {
         let owner = url[..pos].to_string();
@@ -20,7 +18,10 @@ fn url_to_vars(url: &String) -> Result<(String, String), io::Error> {
     }
 }
 
-pub fn get_issues_list(github_client: &Client, repo_info: &String) {
+pub async fn get_issues_list(
+    github_client: &Client,
+    repo_info: &String,
+) -> Vec<octorust::types::IssueSimple> {
     let state = octorust::types::IssuesListState::Open;
     let sort = octorust::types::IssuesListSort::Created;
 
@@ -32,6 +33,30 @@ pub fn get_issues_list(github_client: &Client, repo_info: &String) {
         }
     };
 
-	println!("Owner: {owner}; Repo: {repo}");
+    let issues = github_client
+        .issues()
+        .list_for_repo(
+            owner.trim(),
+            repo.trim(),
+            "",
+            state,
+            "*",
+            "",
+            "",
+            "",
+            sort,
+            octorust::types::Order::Noop,
+            None,
+            100,
+            1,
+        )
+        .await;
 
+    return match issues {
+        Ok(info) => info.body,
+        Err(message) => {
+            eprintln!("Error: {message}");
+            process::exit(1);
+        }
+    };
 }
