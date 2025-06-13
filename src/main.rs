@@ -1,4 +1,5 @@
 use clap::Parser;
+use octorust::{self, auth::Credentials, Client};
 use std::process;
 
 mod cli_parse;
@@ -17,4 +18,17 @@ fn main() {
     };
 
     let args: Args = Args::parse();
+
+    let github_token = match std::env::var("GITHUB_TOKEN") {
+        Ok(token) => token,
+        Err(_) => {
+            eprintln!("Error: GITHUB_TOKEN enviroment variable not set");
+            process::exit(1);
+        }
+    };
+
+    let github_client: Client =
+        Client::new("github-cli".to_string(), Credentials::Token(github_token))
+            .expect("Failed to create Github client");
+
 }
