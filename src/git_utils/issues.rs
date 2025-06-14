@@ -4,6 +4,7 @@ use std::{
 };
 
 use octorust::Client;
+use octorust::types;
 
 fn url_to_vars(url: &String) -> Result<(String, String), io::Error> {
     if let Some(pos) = url.find('/') {
@@ -21,9 +22,14 @@ fn url_to_vars(url: &String) -> Result<(String, String), io::Error> {
 pub async fn get_issues_list(
     github_client: &Client,
     repo_info: &String,
-) -> Vec<octorust::types::IssueSimple> {
-    let state = octorust::types::IssuesListState::Open;
-    let sort = octorust::types::IssuesListSort::Created;
+    creator: &String,
+    assignee: &String,
+    state: &types::IssuesListState,
+    labels: &String,
+    numb_of_page: &i64,
+    iss_on_page: &i64,
+) -> Vec<types::IssueSimple> {
+    let sort = types::IssuesListSort::Created;
 
     let (owner, repo) = match url_to_vars(repo_info) {
         Ok(info) => info,
@@ -39,16 +45,16 @@ pub async fn get_issues_list(
             owner.trim(),
             repo.trim(),
             "",
-            state,
-            "*",
+            state.clone(),
+            assignee,
+            creator,
             "",
-            "",
-            "",
+			labels, 
             sort,
-            octorust::types::Order::Noop,
+            types::Order::Noop,
             None,
-            100,
-            1,
+            iss_on_page.clone(),
+            numb_of_page.clone(),
         )
         .await;
 
