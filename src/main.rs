@@ -35,7 +35,14 @@ async fn main() {
             .expect("Failed to create Github client");
 
     match args.command {
-        CliCommand::IssuesList => {
+        CliCommand::IssuesList {
+            creator,
+            assignee,
+            state,
+            labels,
+            numb_of_page,
+            iss_on_page,
+        } => {
             let list_issues = issues::get_issues_list(&github_client, &repo_info).await;
             println!("All Issues from first page: {}", list_issues.len());
             println!();
