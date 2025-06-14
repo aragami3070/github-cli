@@ -44,7 +44,7 @@ async fn main() {
             numb_of_page,
             iss_on_page,
         } => {
-            let inp_state = match set_state(state){
+            let inp_state = match set_state(&state){
 				Ok(res) => res,
 				Err(message) => {
 					eprintln!("Error: {message}");
@@ -63,7 +63,7 @@ async fn main() {
                 &iss_on_page,
             )
             .await;
-            println!("All Issues from first page: {}", list_issues.len());
+            println!("{} {} Issues from {} page:", list_issues.len(), state, numb_of_page);
             println!();
             for issue in list_issues {
                 println!("Issue{}: {};", issue.number, issue.title);
