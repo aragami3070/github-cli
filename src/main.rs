@@ -44,13 +44,13 @@ async fn main() {
             numb_of_page,
             iss_on_page,
         } => {
-            let inp_state = match set_state(&state){
-				Ok(res) => res,
-				Err(message) => {
-					eprintln!("Error: {message}");
-					process::exit(1);
-				}
-			};
+            let inp_state = match set_state(&state) {
+                Ok(res) => res,
+                Err(message) => {
+                    eprintln!("Error: {message}");
+                    process::exit(1);
+                }
+            };
 
             let list_issues = issues::get_issues_list(
                 &github_client,
@@ -63,7 +63,12 @@ async fn main() {
                 &iss_on_page,
             )
             .await;
-            println!("{} {} Issues from {} page:", list_issues.len(), state, numb_of_page);
+            println!(
+                "{} {} Issues from {} page:",
+                list_issues.len(),
+                state,
+                numb_of_page
+            );
             println!();
             for issue in list_issues {
                 println!("Issue{}: {};", issue.number, issue.title);

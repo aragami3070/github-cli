@@ -3,8 +3,8 @@ use std::{
     process,
 };
 
-use octorust::Client;
 use octorust::types;
+use octorust::Client;
 
 fn url_to_vars(url: &String) -> Result<(String, String), io::Error> {
     if let Some(pos) = url.find('/') {
@@ -49,7 +49,7 @@ pub async fn get_issues_list(
             assignee,
             creator,
             "",
-			labels, 
+            labels,
             sort,
             types::Order::Noop,
             None,

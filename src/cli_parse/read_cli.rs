@@ -42,6 +42,9 @@ pub fn set_state(state: &String) -> Result<types::IssuesListState, io::Error> {
     } else if state == "closed" {
         return Ok(types::IssuesListState::Closed);
     } else {
-		return Err(io::Error::new(io::ErrorKind::InvalidData, "Bad input. State can be only 'open', 'all', 'closed'"));
+        return Err(io::Error::new(
+            io::ErrorKind::InvalidData,
+            "Bad input. State can be only 'open', 'all', 'closed'",
+        ));
     }
 }
