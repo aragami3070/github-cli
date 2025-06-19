@@ -3,7 +3,7 @@ use std::{
     process,
 };
 
-use octorust::types;
+use octorust::types::{self, IssuesCreateRequest, IssuesCreateRequestLabelsOneOf, TitleOneOf};
 use octorust::Client;
 
 fn url_to_vars(url: &String) -> Result<(String, String), io::Error> {
@@ -60,6 +60,53 @@ pub async fn get_issues_list(
 
     return match issues {
         Ok(info) => info.body,
+        Err(message) => {
+            eprintln!("Error: {message}");
+            process::exit(1);
+        }
+    };
+}
+
+pub async fn create_issue(
+    github_client: &Client,
+    repo_info: &String,
+    title: &String,
+    body: &String,
+    assignee: &String,
+    assignees: &Vec<String>,
+    labels: &Vec<String>,
+) -> String {
+    let (owner, repo) = match url_to_vars(repo_info) {
+        Ok(info) => info,
+        Err(message) => {
+            eprintln!("Error: {message}");
+            process::exit(1);
+        }
+    };
+
+    let new_title = TitleOneOf::String(title.clone());
+
+    let new_labels = labels
+        .into_iter()
+        .map(|s| IssuesCreateRequestLabelsOneOf::String(s.into()))
+        .collect();
+
+    let request = IssuesCreateRequest {
+        title: new_title,
+        body: body.clone(),
+        assignee: assignee.clone(),
+        assignees: assignees.clone(),
+        labels: new_labels,
+        milestone: None,
+    };
+
+    let new_issue = github_client
+        .issues()
+        .create(owner.trim(), repo.trim(), &request)
+        .await;
+
+    return match new_issue {
+        Ok(_) => "Success".to_string(),
         Err(message) => {
             eprintln!("Error: {message}");
             process::exit(1);
