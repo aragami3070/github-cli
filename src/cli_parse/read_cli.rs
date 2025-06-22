@@ -40,14 +40,11 @@ pub enum CliCommand {
         /// Issue body (optional)
         #[clap(long, short, default_value = "")]
         body: String,
-        /// Name of a user. (optional)
-        #[clap(long, short, default_value = "")]
-        assignee: String,
         /// A list of comma separated label names. Example: `aragami3070,danilasar` (optional)
         #[clap(long, short, default_value = "")]
         assignees: String,
         /// A list of comma separated label names. Example: `bug,ui,@high` (optional)
-        #[clap(long, short, default_value = "")]
+        #[clap(long, short, default_value = "enhancement")]
         labels: String,
     },
 }
