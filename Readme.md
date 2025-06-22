@@ -29,6 +29,10 @@ github-cli --help
 github-cli issues-list --help
 ```
 
+**Issue create man page**
+```bash
+github-cli issue-create --help
+```
 
 ## Some things
 Дабы начать потихоньку учить Rust и тратить меньше времени на работу с ui github-а, решил сделать github-cli с возможностью работать с issues и pull requests из терминала. (не генирация n-ого количества issue и pull request, а именно создание, редактирование, апрувы и прочее).
