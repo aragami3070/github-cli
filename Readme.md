@@ -39,14 +39,17 @@ github-cli issues-list --help
 
 - [x] Сделать автораспознование гит репозитория
 - [x] Сделать получение всех issues
-- [ ] Сделать получение выбор issue через fzf или аналоги из списка всех issues
-- [ ] Сделать создание issue
+- [ ] Сделать выбор issue через fzf или аналоги из списка всех issues
+- [x] Сделать создание issue
 - [ ] Сделать закрытие issue
 - [ ] Сделать редактирование issue
 - [ ] Сделать получение всех pull requests
-- [ ] Сделать получение выбор pull request через fzf или аналоги из списка всех pull requests
+- [ ] Сделать выбор pull request через fzf или аналоги из списка всех pull requests
 - [ ] Сделать создание pull request
 - [ ] Сделать апрув pull request
 - [ ] Сделать merge pull request
 - [ ] Сделать редактирование pull request
 - [ ] Сделать создание репозитория
+- [ ] Добавить TUI через ratatui на issues
+- [ ] Добавить TUI через ratatui на pull requests
+- [ ] Добавить TUI через ratatui на репозитории
