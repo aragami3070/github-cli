@@ -32,6 +32,24 @@ pub enum CliCommand {
         #[clap(long, short, default_value = "30", value_parser = clap::value_parser!(i64).range(1..=100))]
         iss_on_page: i64,
     },
+    /// Create issue
+    IssueCreate {
+        /// Issue title
+        #[clap(long, short)]
+        title: String,
+        /// Issue body (optional)
+        #[clap(long, short, default_value = "")]
+        body: String,
+        /// Name of a user. (optional)
+        #[clap(long, short, default_value = "")]
+        assignee: String,
+        /// A list of comma separated label names. Example: `aragami3070,danilasar` (optional)
+        #[clap(long, short, default_value = "")]
+        assignees: String,
+        /// A list of comma separated label names. Example: `bug,ui,@high` (optional)
+        #[clap(long, short, default_value = "")]
+        labels: String,
+    },
 }
 
 pub fn set_state(state: &String) -> Result<types::IssuesListState, io::Error> {
