@@ -67,13 +67,46 @@ pub async fn get_issues_list(
     };
 }
 
+fn create_request(
+    title: &String,
+    body: &String,
+    assignees: &mut Vec<String>,
+    labels: &Vec<String>,
+) -> IssuesCreateRequest {
+    let new_title = TitleOneOf::String(title.clone());
+
+    let new_labels = labels
+        .into_iter()
+        .map(|s| IssuesCreateRequestLabelsOneOf::String(s.into()))
+        .collect();
+
+    if assignees.len() == 0 {
+        IssuesCreateRequest {
+            title: new_title,
+            body: body.clone(),
+            assignee: String::new(),
+            assignees: Vec::new(),
+            labels: new_labels,
+            milestone: None,
+        }
+    } else {
+        IssuesCreateRequest {
+            title: new_title,
+            body: body.clone(),
+            assignee: String::new(),
+            assignees: assignees.clone(),
+            labels: new_labels,
+            milestone: None,
+        }
+    }
+}
+
 pub async fn create_issue(
     github_client: &Client,
     repo_info: &String,
     title: &String,
     body: &String,
-    assignee: &String,
-    assignees: &Vec<String>,
+    assignees: &mut Vec<String>,
     labels: &Vec<String>,
 ) -> String {
     let (owner, repo) = match url_to_vars(repo_info) {
@@ -84,21 +117,7 @@ pub async fn create_issue(
         }
     };
 
-    let new_title = TitleOneOf::String(title.clone());
-
-    let new_labels = labels
-        .into_iter()
-        .map(|s| IssuesCreateRequestLabelsOneOf::String(s.into()))
-        .collect();
-
-    let request = IssuesCreateRequest {
-        title: new_title,
-        body: body.clone(),
-        assignee: assignee.clone(),
-        assignees: assignees.clone(),
-        labels: new_labels,
-        milestone: None,
-    };
+    let request = create_request(title, body, assignees, labels);
 
     let new_issue = github_client
         .issues()
