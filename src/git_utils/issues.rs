@@ -70,7 +70,7 @@ pub async fn get_issues_list(
 fn get_create_request(
     title: &String,
     body: &String,
-    assignees: &mut Vec<String>,
+    assignees: &Vec<String>,
     labels: &Vec<String>,
 ) -> IssuesCreateRequest {
     let new_title = TitleOneOf::String(title.clone());
@@ -106,7 +106,7 @@ pub async fn create_issue(
     repo_info: &String,
     title: &String,
     body: &String,
-    assignees: &mut Vec<String>,
+    assignees: &Vec<String>,
     labels: &Vec<String>,
 ) -> String {
     let (owner, repo) = match url_to_vars(repo_info) {
@@ -132,3 +132,5 @@ pub async fn create_issue(
         }
     };
 }
+
+

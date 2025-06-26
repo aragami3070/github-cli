@@ -83,9 +83,9 @@ async fn main() {
             labels,
         } => {
             let labels_list: Vec<String> = labels.split(",").map(|s| s.to_string()).collect();
-			let mut assignees_list: Vec<String> = assignees.split(",").map(|s| s.to_string()).collect();
+			let assignees_list: Vec<String> = assignees.split(",").map(|s| s.to_string()).collect();
 
-			let result = issues::create_issue(&github_client, &repo_info, &title, &body, &mut assignees_list, &labels_list).await;
+			let result = issues::create_issue(&github_client, &repo_info, &title, &body, &assignees_list, &labels_list).await;
 
 			println!("{result}");
         }
