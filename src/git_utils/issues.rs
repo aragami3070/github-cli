@@ -3,7 +3,10 @@ use std::{
     process,
 };
 
-use octorust::types::{self, IssuesCreateRequest, IssuesCreateRequestLabelsOneOf, TitleOneOf};
+use octorust::types::{
+    self, IssuesCreateRequest, IssuesCreateRequestLabelsOneOf, IssuesUpdateRequest, State,
+    TitleOneOf,
+};
 use octorust::Client;
 
 fn url_to_vars(url: &String) -> Result<(String, String), io::Error> {
@@ -80,24 +83,17 @@ fn get_create_request(
         .map(|s| IssuesCreateRequestLabelsOneOf::String(s.into()))
         .collect();
 
-    if assignees.len() == 0 {
-        IssuesCreateRequest {
-            title: new_title,
-            body: body.clone(),
-            assignee: String::new(),
-            assignees: Vec::new(),
-            labels: new_labels,
-            milestone: None,
-        }
-    } else {
-        IssuesCreateRequest {
-            title: new_title,
-            body: body.clone(),
-            assignee: String::new(),
-            assignees: assignees.clone(),
-            labels: new_labels,
-            milestone: None,
-        }
+    IssuesCreateRequest {
+        title: new_title,
+        body: body.clone(),
+        assignee: String::new(),
+        assignees: if assignees.is_empty() {
+			Vec::new()
+		} else {
+			assignees.clone()
+		},
+        labels: new_labels,
+        milestone: None,
     }
 }
 
@@ -132,5 +128,4 @@ pub async fn create_issue(
         }
     };
 }
-
 
