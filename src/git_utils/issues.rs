@@ -67,7 +67,7 @@ pub async fn get_issues_list(
     };
 }
 
-fn create_request(
+fn get_create_request(
     title: &String,
     body: &String,
     assignees: &mut Vec<String>,
@@ -117,7 +117,7 @@ pub async fn create_issue(
         }
     };
 
-    let request = create_request(title, body, assignees, labels);
+    let request = get_create_request(title, body, assignees, labels);
 
     let new_issue = github_client
         .issues()
