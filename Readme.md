@@ -41,19 +41,27 @@ github-cli issue-create --help
 
 ## Roadmap
 
+### issue
 - [x] Сделать автораспознование гит репозитория
 - [x] Сделать получение всех issues
 - [ ] Сделать выбор issue через fzf или аналоги из списка всех issues
 - [x] Сделать создание issue
-- [ ] Сделать закрытие issue
+- [x] Сделать закрытие issue
 - [ ] Сделать редактирование issue
+- [ ] Сделать создание комментария в issue
+
+### pull request
 - [ ] Сделать получение всех pull requests
 - [ ] Сделать выбор pull request через fzf или аналоги из списка всех pull requests
 - [ ] Сделать создание pull request
 - [ ] Сделать апрув pull request
 - [ ] Сделать merge pull request
 - [ ] Сделать редактирование pull request
+
+### repository
 - [ ] Сделать создание репозитория
+
+### tui
 - [ ] Добавить TUI через ratatui на issues
 - [ ] Добавить TUI через ratatui на pull requests
 - [ ] Добавить TUI через ratatui на репозитории
