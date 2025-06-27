@@ -47,6 +47,15 @@ pub enum CliCommand {
         #[clap(long, short, default_value = "enhancement")]
         labels: String,
     },
+    /// Close issue
+    IssueClose {
+        /// Close issue with number
+        #[clap(long, short, default_value = "1")]
+        number: i64,
+        /// Close with comment (TODO: WORK IN PROGRESS)
+        #[clap(long, short, default_value = "")]
+        comment: String,
+    },
 }
 
 pub fn set_state(state: &String) -> Result<types::IssuesListState, io::Error> {
