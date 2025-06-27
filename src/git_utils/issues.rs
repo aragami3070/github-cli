@@ -201,6 +201,11 @@ pub async fn close_issue(
         }
     };
 
+    if comment != "" {
+        let new_comment = create_comment(github_client, repo_info, issue_number, comment).await;
+        println!("{new_comment}");
+    }
+
     let request = get_update_request(None, None, None, None, &State::Closed);
 
     let close = github_client
