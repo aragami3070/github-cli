@@ -52,7 +52,7 @@ pub enum CliCommand {
         /// Close issue with number
         #[clap(long, short, default_value = "1")]
         number: i64,
-        /// Close with comment (TODO: WORK IN PROGRESS)
+        /// Close with comment
         #[clap(long, short, default_value = "")]
         comment: String,
     },
