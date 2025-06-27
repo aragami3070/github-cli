@@ -158,3 +158,32 @@ fn get_update_request(
     }
 }
 
+pub async fn close_issue(
+    github_client: &Client,
+    repo_info: &String,
+    issue_number: &i64,
+    comment: &String,
+) -> String {
+    let (owner, repo) = match url_to_vars(repo_info) {
+        Ok(info) => info,
+        Err(message) => {
+            eprintln!("Error: {message}");
+            process::exit(1);
+        }
+    };
+
+    let request = get_update_request(None, None, None, None, &State::Closed);
+
+    let close = github_client
+        .issues()
+        .update(owner.trim(), repo.trim(), issue_number.clone(), &request)
+        .await;
+
+    return match close {
+        Ok(_) => "Success".to_string(),
+        Err(message) => {
+            eprintln!("Error: {message}");
+            process::exit(1);
+        }
+    };
+}
