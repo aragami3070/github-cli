@@ -1,6 +1,5 @@
 use std::{
-    io::{self, ErrorKind},
-    process,
+    io::{self, ErrorKind}, option, process
 };
 
 use octorust::types::{
@@ -88,10 +87,10 @@ fn get_create_request(
         body: body.clone(),
         assignee: String::new(),
         assignees: if assignees.is_empty() {
-			Vec::new()
-		} else {
-			assignees.clone()
-		},
+            Vec::new()
+        } else {
+            assignees.clone()
+        },
         labels: new_labels,
         milestone: None,
     }
@@ -127,5 +126,35 @@ pub async fn create_issue(
             process::exit(1);
         }
     };
+}
+
+fn get_update_request(
+    title: Option<&String>,
+    body: Option<&String>,
+    assignees: Option<&Vec<String>>,
+    labels: Option<&Vec<String>>,
+    state: &State,
+) -> IssuesUpdateRequest {
+    let new_title = title.map(|t| TitleOneOf::String(t.to_string()));
+
+    let new_labels = {
+        labels
+            .map(|l| {
+                l.into_iter()
+                    .map(|s| IssuesCreateRequestLabelsOneOf::String(s.into()))
+                    .collect()
+            })
+            .unwrap()
+    };
+
+    IssuesUpdateRequest {
+        title: new_title,
+        body: body.map(|b| b.to_string()).unwrap(),
+        assignee: String::new(),
+        assignees: assignees.map(|a| a.to_vec()).unwrap(),
+        labels: new_labels,
+        milestone: None,
+        state: Some(state.clone()),
+    }
 }
 
