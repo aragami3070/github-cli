@@ -99,6 +99,7 @@ async fn main() {
         }
         CliCommand::IssueClose { number, comment } => {
             let result = issues::close_issue(&github_client, &repo_info, &number, &comment).await;
+
             println!("{result}");
         }
     }

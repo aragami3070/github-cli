@@ -1,5 +1,6 @@
 use std::{
-    io::{self, ErrorKind}, option, process
+    io::{self, ErrorKind},
+    option, process,
 };
 
 use octorust::types::{
@@ -137,21 +138,19 @@ fn get_update_request(
 ) -> IssuesUpdateRequest {
     let new_title = title.map(|t| TitleOneOf::String(t.to_string()));
 
-    let new_labels = {
-        labels
-            .map(|l| {
-                l.into_iter()
-                    .map(|s| IssuesCreateRequestLabelsOneOf::String(s.into()))
-                    .collect()
-            })
-            .unwrap()
+    let new_labels = match labels {
+        Some(l) => l
+            .iter()
+            .map(|s| IssuesCreateRequestLabelsOneOf::String(s.to_string()))
+            .collect(),
+        None => Vec::new(),
     };
 
     IssuesUpdateRequest {
         title: new_title,
-        body: body.map(|b| b.to_string()).unwrap(),
+        body: body.map(|b| b.to_string()).unwrap_or_default(),
         assignee: String::new(),
-        assignees: assignees.map(|a| a.to_vec()).unwrap(),
+        assignees: assignees.map(|a| a.to_vec()).unwrap_or_default(),
         labels: new_labels,
         milestone: None,
         state: Some(state.clone()),
