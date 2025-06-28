@@ -1,7 +1,7 @@
 use std::io;
 
 use clap::{Parser, Subcommand};
-use octorust::types;
+use octorust::types::{self, State};
 
 #[derive(Parser)]
 pub struct Args {
@@ -47,18 +47,39 @@ pub enum CliCommand {
         #[clap(long, short, default_value = "enhancement")]
         labels: String,
     },
+    /// Update issue
+    IssueUpdate {
+        /// Update issue with number
+        #[clap(long, short)]
+        number: i64,
+        /// Issue title
+        #[clap(long, short, default_value = "None")]
+        title: String,
+        /// Issue body (optional)
+        #[clap(long, short, default_value = "None")]
+        body: String,
+        /// A list of comma separated assignee names. Example: `aragami3070,danilasar` (optional)
+        #[clap(long, short, default_value = None)]
+        assignees: Option<String>,
+        /// Indicates the state of the issues to return. Can be either `open` or `closed`(optional)
+        #[clap(long, short, default_value = "open")]
+        state: String,
+        /// A list of comma separated label names. Example: `bug,ui,@high` (optional)
+        #[clap(long, short, default_value = None)]
+        labels: Option<String>,
+    },
     /// Close issue
     IssueClose {
         /// Close issue with number
-        #[clap(long, short, default_value = "1")]
+        #[clap(long, short)]
         number: i64,
-        /// Close with comment
+        /// Close with comment (optional)
         #[clap(long, short, default_value = "")]
         comment: String,
     },
 }
 
-pub fn set_state(state: &String) -> Result<types::IssuesListState, io::Error> {
+pub fn set_issues_list_state(state: &String) -> Result<types::IssuesListState, io::Error> {
     if state == "open" {
         return Ok(types::IssuesListState::Open);
     } else if state == "all" {
@@ -70,5 +91,26 @@ pub fn set_state(state: &String) -> Result<types::IssuesListState, io::Error> {
             io::ErrorKind::InvalidData,
             "Bad input. State can be only 'open', 'all', 'closed'",
         ));
+    }
+}
+
+pub fn set_state(state: &String) -> Result<State, io::Error> {
+    if state == "open" {
+        return Ok(State::Open);
+    } else if state == "closed" {
+        return Ok(State::Closed);
+    } else {
+        return Err(io::Error::new(
+            io::ErrorKind::InvalidData,
+            "Bad input. State can be only 'open' or 'closed'",
+        ));
+    }
+}
+
+pub fn set_option_string(some_string: &String) -> Option<&String> {
+    if some_string == "None" {
+        return  None;
+    } else {
+        return Some(some_string);
     }
 }
