@@ -71,7 +71,7 @@ pub enum CliCommand {
     /// Close issue
     IssueClose {
         /// Close issue with number
-        #[clap(long, short, default_value = "1")]
+        #[clap(long, short)]
         number: i64,
         /// Close with comment (optional)
         #[clap(long, short, default_value = "")]
