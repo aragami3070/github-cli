@@ -106,3 +106,11 @@ pub fn set_state(state: &String) -> Result<State, io::Error> {
         ));
     }
 }
+
+pub fn set_option_string(some_string: &String) -> Option<&String> {
+    if some_string == "None" {
+        return  None;
+    } else {
+        return Some(some_string);
+    }
+}
