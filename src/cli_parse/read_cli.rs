@@ -62,7 +62,7 @@ pub enum CliCommand {
         #[clap(long, short, default_value = None)]
         assignees: Option<String>,
         /// Indicates the state of the issues to return. Can be either `open` or `closed`(optional)
-        #[clap(long, short, default_value = "opened")]
+        #[clap(long, short, default_value = "open")]
         state: String,
         /// A list of comma separated label names. Example: `bug,ui,@high` (optional)
         #[clap(long, short, default_value = None)]
