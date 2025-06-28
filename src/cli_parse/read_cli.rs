@@ -1,7 +1,7 @@
 use std::io;
 
 use clap::{Parser, Subcommand};
-use octorust::types;
+use octorust::types::{self, State};
 
 #[derive(Parser)]
 pub struct Args {
@@ -47,12 +47,33 @@ pub enum CliCommand {
         #[clap(long, short, default_value = "enhancement")]
         labels: String,
     },
+    /// Update issue
+    IssueUpdate {
+        /// Update issue with number
+        #[clap(long, short)]
+        number: i64,
+        /// Issue title
+        #[clap(long, short, default_value = "None")]
+        title: String,
+        /// Issue body (optional)
+        #[clap(long, short, default_value = "None")]
+        body: String,
+        /// A list of comma separated assignee names. Example: `aragami3070,danilasar` (optional)
+        #[clap(long, short, default_value = None)]
+        assignees: Option<String>,
+        /// Indicates the state of the issues to return. Can be either `open` or `closed`(optional)
+        #[clap(long, short, default_value = "opened")]
+        state: String,
+        /// A list of comma separated label names. Example: `bug,ui,@high` (optional)
+        #[clap(long, short, default_value = None)]
+        labels: Option<String>,
+    },
     /// Close issue
     IssueClose {
         /// Close issue with number
         #[clap(long, short, default_value = "1")]
         number: i64,
-        /// Close with comment
+        /// Close with comment (optional)
         #[clap(long, short, default_value = "")]
         comment: String,
     },
@@ -72,3 +93,4 @@ pub fn set_issues_list_state(state: &String) -> Result<types::IssuesListState, i
         ));
     }
 }
+
