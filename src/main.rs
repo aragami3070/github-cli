@@ -6,10 +6,13 @@ mod cli_parse;
 mod git_utils;
 
 use crate::cli_parse::read_cli::set_issues_list_state;
+use crate::cli_parse::read_cli::set_option_string;
+use crate::cli_parse::read_cli::set_state;
 use crate::cli_parse::read_cli::Args;
 use crate::cli_parse::read_cli::CliCommand;
 use crate::git_utils::get_repo_info::get_current_repo;
 use crate::git_utils::issues;
+use crate::git_utils::issues::update_issue;
 
 #[tokio::main]
 async fn main() {
@@ -99,6 +102,47 @@ async fn main() {
         }
         CliCommand::IssueClose { number, comment } => {
             let result = issues::close_issue(&github_client, &repo_info, &number, &comment).await;
+
+            println!("{result}");
+        }
+        CliCommand::IssueUpdate {
+            number,
+            title,
+            body,
+            assignees,
+            state,
+            labels,
+        } => {
+            let new_state = match set_state(&state) {
+                Ok(s) => s,
+                Err(message) => {
+                    eprintln!("Error: {message}");
+                    process::exit(1);
+                }
+            };
+
+            let labels_list: Vec<String> = match labels {
+                Some(l) => l.split(",").map(|s| s.to_string()).collect(),
+                None => Vec::new(),
+            };
+            let assignees_list: Vec<String> = match assignees {
+                Some(a) => a.split(",").map(|s| s.to_string()).collect(),
+                None => Vec::new(),
+            };
+
+            let new_body: Option<&String> = set_option_string(&body);
+            let new_title: Option<&String> = set_option_string(&title);
+
+            let result = update_issue(
+                &github_client,
+                &repo_info,
+                &number,
+                new_title,
+                new_body,
+                &assignees_list,
+                &labels_list,
+                &new_state,
+            ).await;
 
             println!("{result}");
         }
