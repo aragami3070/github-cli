@@ -58,7 +58,7 @@ pub enum CliCommand {
     },
 }
 
-pub fn set_state(state: &String) -> Result<types::IssuesListState, io::Error> {
+pub fn set_issues_list_state(state: &String) -> Result<types::IssuesListState, io::Error> {
     if state == "open" {
         return Ok(types::IssuesListState::Open);
     } else if state == "all" {

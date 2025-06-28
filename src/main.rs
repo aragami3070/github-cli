@@ -5,7 +5,7 @@ use std::process;
 mod cli_parse;
 mod git_utils;
 
-use crate::cli_parse::read_cli::set_state;
+use crate::cli_parse::read_cli::set_issues_list_state;
 use crate::cli_parse::read_cli::Args;
 use crate::cli_parse::read_cli::CliCommand;
 use crate::git_utils::get_repo_info::get_current_repo;
@@ -44,7 +44,7 @@ async fn main() {
             numb_of_page,
             iss_on_page,
         } => {
-            let inp_state = match set_state(&state) {
+            let inp_state = match set_issues_list_state(&state) {
                 Ok(res) => res,
                 Err(message) => {
                     eprintln!("Error: {message}");
