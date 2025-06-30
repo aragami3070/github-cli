@@ -41,6 +41,9 @@ github-cli issue-create --help
 
 ## Roadmap
 
+### common
+- [x] Сделать создание комментария в issue/pull request
+
 ### issue
 - [x] Сделать автораспознование гит репозитория
 - [x] Сделать получение всех issues
@@ -48,7 +51,6 @@ github-cli issue-create --help
 - [x] Сделать создание issue
 - [x] Сделать закрытие issue
 - [x] Сделать редактирование issue
-- [ ] Сделать создание комментария в issue
 
 ### pull request
 - [ ] Сделать получение всех pull requests
