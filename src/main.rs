@@ -5,9 +5,9 @@ use std::process;
 mod cli_parse;
 mod git_utils;
 
-use crate::cli_parse::read_cli::set_issues_list_state;
-use crate::cli_parse::read_cli::set_option_string;
-use crate::cli_parse::read_cli::set_state;
+use crate::cli_parse::set_vars::set_issues_list_state;
+use crate::cli_parse::set_vars::set_option_string;
+use crate::cli_parse::set_vars::set_state;
 use crate::cli_parse::read_cli::Args;
 use crate::cli_parse::read_cli::CliCommand;
 use crate::cli_parse::read_cli::IssueCommand;
