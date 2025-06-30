@@ -11,8 +11,27 @@ pub struct Args {
 
 #[derive(Subcommand)]
 pub enum CliCommand {
+	/// Work with issues
+	Issue {
+		#[command(subcommand)]
+		subcommand: IssueCommand
+	},
+	
+	/// Create new comment for issue/pull request
+	CreateComment {
+        /// Create comment for issue/pull request with number
+        #[clap(long, short)]
+        number: i64,
+        /// Comment body (optional)
+        #[clap(long, short, default_value = "")]
+        body: String,
+	}
+}
+
+#[derive(Subcommand)]
+pub enum IssueCommand {
     /// Get list of issues
-    IssuesList {
+    List {
         /// The user that created the issues (optional)
         #[clap(long, short, default_value = "")]
         creator: String,
@@ -33,7 +52,7 @@ pub enum CliCommand {
         iss_on_page: i64,
     },
     /// Create issue
-    IssueCreate {
+    Create {
         /// Issue title
         #[clap(long, short)]
         title: String,
@@ -48,7 +67,7 @@ pub enum CliCommand {
         labels: String,
     },
     /// Update issue
-    IssueUpdate {
+    Update {
         /// Update issue with number
         #[clap(long, short)]
         number: i64,
@@ -69,7 +88,7 @@ pub enum CliCommand {
         labels: Option<String>,
     },
     /// Close issue
-    IssueClose {
+    Close {
         /// Close issue with number
         #[clap(long, short)]
         number: i64,
@@ -77,15 +96,6 @@ pub enum CliCommand {
         #[clap(long, short, default_value = "")]
         comment: String,
     },
-	/// Create new comment for issue/pull request
-	CreateComment {
-        /// Create comment for issue/pull request with number
-        #[clap(long, short)]
-        number: i64,
-        /// Comment body (optional)
-        #[clap(long, short, default_value = "")]
-        body: String,
-	}
 }
 
 pub fn set_issues_list_state(state: &String) -> Result<types::IssuesListState, io::Error> {
