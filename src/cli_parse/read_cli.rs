@@ -13,16 +13,12 @@ pub enum CliCommand {
 		#[command(subcommand)]
 		subcommand: IssueCommand
 	},
-	
-	/// Create new comment for issue/pull request
-	CreateComment {
-        /// Create comment for issue/pull request with number
-        #[clap(long, short)]
-        number: i64,
-        /// Comment body (optional)
-        #[clap(long, short, default_value = "")]
-        body: String,
-	}
+
+	/// Work with comment
+	Comment {
+		#[command(subcommand)]
+		subcommand: CommentCommand
+	},
 }
 
 #[derive(Subcommand)]
@@ -48,6 +44,7 @@ pub enum IssueCommand {
         #[clap(long, short, default_value = "30", value_parser = clap::value_parser!(i64).range(1..=100))]
         iss_on_page: i64,
     },
+
     /// Create issue
     Create {
         /// Issue title
@@ -63,6 +60,7 @@ pub enum IssueCommand {
         #[clap(long, short, default_value = "enhancement")]
         labels: String,
     },
+
     /// Update issue
     Update {
         /// Update issue with number
@@ -84,6 +82,7 @@ pub enum IssueCommand {
         #[clap(long, short, default_value = None)]
         labels: Option<String>,
     },
+
     /// Close issue
     Close {
         /// Close issue with number
@@ -93,4 +92,17 @@ pub enum IssueCommand {
         #[clap(long, short, default_value = "")]
         comment: String,
     },
+}
+
+#[derive(Subcommand)]
+pub enum CommentCommand {
+	/// Create new comment for issue/pull request
+	Create{
+        /// Create comment for issue/pull request with number
+        #[clap(long, short)]
+        number: i64,
+        /// Comment body (optional)
+        #[clap(long, short, default_value = "")]
+        body: String,
+	}
 }

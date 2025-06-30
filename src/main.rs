@@ -5,12 +5,13 @@ use std::process;
 mod cli_parse;
 mod git_utils;
 
+use crate::cli_parse::read_cli::Args;
+use crate::cli_parse::read_cli::CliCommand;
+use crate::cli_parse::read_cli::CommentCommand;
+use crate::cli_parse::read_cli::IssueCommand;
 use crate::cli_parse::set_vars::set_issues_list_state;
 use crate::cli_parse::set_vars::set_option_string;
 use crate::cli_parse::set_vars::set_state;
-use crate::cli_parse::read_cli::Args;
-use crate::cli_parse::read_cli::CliCommand;
-use crate::cli_parse::read_cli::IssueCommand;
 use crate::git_utils::common::create_comment;
 use crate::git_utils::get_repo_info::get_current_repo;
 use crate::git_utils::issues;
@@ -162,12 +163,13 @@ async fn main() {
                 println!("{result}");
             }
         },
+        CliCommand::Comment { subcommand } => match subcommand {
+            CommentCommand::Create { number, body } => {
+                let repo_info: String = get_repo();
+                let result = create_comment(&github_client, &repo_info, &number, &body).await;
 
-        CliCommand::CreateComment { number, body } => {
-            let repo_info: String = get_repo();
-            let result = create_comment(&github_client, &repo_info, &number, &body).await;
-
-            println!("{result}");
-        }
+                println!("{result}");
+            }
+        },
     }
 }
