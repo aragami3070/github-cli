@@ -10,6 +10,7 @@ use crate::cli_parse::read_cli::set_option_string;
 use crate::cli_parse::read_cli::set_state;
 use crate::cli_parse::read_cli::Args;
 use crate::cli_parse::read_cli::CliCommand;
+use crate::git_utils::common::create_comment;
 use crate::git_utils::get_repo_info::get_current_repo;
 use crate::git_utils::issues;
 use crate::git_utils::issues::update_issue;
@@ -146,5 +147,10 @@ async fn main() {
 
             println!("{result}");
         }
+		CliCommand::CreateComment { number, body } => {
+			let result = create_comment(&github_client, &repo_info, &number, &body).await;
+
+			println!("{result}");
+		}
     }
 }
