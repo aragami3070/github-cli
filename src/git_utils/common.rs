@@ -1,9 +1,23 @@
-use std::process;
+use std::{
+    io::{self, ErrorKind},
+    process,
+};
 
 use octorust::types::PullsUpdateReviewRequest;
 use octorust::Client;
 
-use crate::git_utils::issues::url_to_vars;
+pub fn url_to_vars(url: &String) -> Result<(String, String), io::Error> {
+    if let Some(pos) = url.find('/') {
+        let owner = url[..pos].to_string();
+        let repo = url[pos + 1..].to_string();
+        return Ok((owner, repo));
+    } else {
+        return Err(io::Error::new(
+            ErrorKind::InvalidData,
+            "This url isn't valid",
+        ));
+    }
+}
 
 pub async fn create_comment(
     github_client: &Client,

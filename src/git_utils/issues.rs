@@ -1,7 +1,4 @@
-use std::{
-    io::{self, ErrorKind},
-    process,
-};
+use std::process;
 
 use octorust::types::{
     self, IssuesCreateRequest, IssuesCreateRequestLabelsOneOf, IssuesUpdateRequest, State,
@@ -9,20 +6,7 @@ use octorust::types::{
 };
 use octorust::Client;
 
-use crate::git_utils::common::create_comment;
-
-fn url_to_vars(url: &String) -> Result<(String, String), io::Error> {
-    if let Some(pos) = url.find('/') {
-        let owner = url[..pos].to_string();
-        let repo = url[pos + 1..].to_string();
-        return Ok((owner, repo));
-    } else {
-        return Err(io::Error::new(
-            ErrorKind::InvalidData,
-            "This url isn't valid",
-        ));
-    }
-}
+use crate::git_utils::common::{create_comment, url_to_vars};
 
 pub async fn get_issues_list(
     github_client: &Client,
