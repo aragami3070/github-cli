@@ -147,7 +147,7 @@ async fn main() {
 
             println!("{result}");
         }
-		CliCommand::IssueComment { number, body } => {
+		CliCommand::CreateComment { number, body } => {
 			let result = create_comment(&github_client, &repo_info, &number, &body).await;
 
 			println!("{result}");

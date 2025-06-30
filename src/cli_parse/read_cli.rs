@@ -77,9 +77,9 @@ pub enum CliCommand {
         #[clap(long, short, default_value = "")]
         comment: String,
     },
-	/// Create new comment for issue
-	IssueComment {
-        /// Create comment for issue with number
+	/// Create new comment for issue/pull request
+	CreateComment {
+        /// Create comment for issue/pull request with number
         #[clap(long, short)]
         number: i64,
         /// Comment body (optional)
