@@ -77,6 +77,15 @@ pub enum CliCommand {
         #[clap(long, short, default_value = "")]
         comment: String,
     },
+	/// Create new comment for issue
+	IssueComment {
+        /// Create comment for issue with number
+        #[clap(long, short)]
+        number: i64,
+        /// Comment body (optional)
+        #[clap(long, short, default_value = "")]
+        body: String,
+	}
 }
 
 pub fn set_issues_list_state(state: &String) -> Result<types::IssuesListState, io::Error> {
