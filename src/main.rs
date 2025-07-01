@@ -9,6 +9,7 @@ use crate::cli_parse::read_cli::Args;
 use crate::cli_parse::read_cli::CliCommand;
 use crate::cli_parse::read_cli::CommentCommand;
 use crate::cli_parse::read_cli::IssueCommand;
+use crate::cli_parse::read_cli::RepoCommand;
 use crate::cli_parse::set_vars::set_issues_list_state;
 use crate::cli_parse::set_vars::set_option_string;
 use crate::cli_parse::set_vars::set_state;
@@ -16,6 +17,7 @@ use crate::git_utils::common::create_comment;
 use crate::git_utils::get_repo_info::get_current_repo;
 use crate::git_utils::issues;
 use crate::git_utils::issues::update_issue;
+use crate::git_utils::repos::create_repo_for_authenticated_user;
 
 fn get_repo() -> String {
     return match get_current_repo() {
@@ -169,6 +171,51 @@ async fn main() {
                 let result = create_comment(&github_client, &repo_info, &number, &body).await;
 
                 println!("{result}");
+            }
+        },
+
+        CliCommand::Repo { subcommand } => match subcommand {
+            RepoCommand::CreateRepoForAuthenticatedUser {
+                allow_auto_merge,
+                allow_merge_commit,
+                allow_rebase_merge,
+                allow_squash_merge,
+                auto_init,
+                delete_branch_on_merge,
+                description,
+                gitignore_template,
+                has_issues,
+                has_projects,
+                has_wiki,
+                homepage,
+                is_template,
+                license_template,
+                name,
+                private,
+                team_id,
+            } => {
+                let result = create_repo_for_authenticated_user(
+                    &github_client,
+                    allow_auto_merge,
+                    allow_merge_commit,
+                    allow_rebase_merge,
+                    allow_squash_merge,
+                    auto_init,
+                    delete_branch_on_merge,
+                    &description,
+                    &gitignore_template,
+                    has_issues,
+                    has_projects,
+                    has_wiki,
+                    &homepage,
+                    is_template,
+                    &license_template,
+                    &name,
+                    private,
+                    &team_id,
+                ).await;
+
+				println!("{result}");
             }
         },
     }
