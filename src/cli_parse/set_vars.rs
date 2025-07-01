@@ -1,5 +1,7 @@
 use std::io;
+use std::process;
 
+use crate::git_utils::get_repo_info::get_current_repo;
 use octorust::types::{self, State};
 
 pub fn set_issues_list_state(state: &String) -> Result<types::IssuesListState, io::Error> {
@@ -32,8 +34,18 @@ pub fn set_state(state: &String) -> Result<State, io::Error> {
 
 pub fn set_option_string(some_string: &String) -> Option<&String> {
     if some_string == "None" {
-        return  None;
+        return None;
     } else {
         return Some(some_string);
     }
+}
+
+pub fn set_repo() -> String {
+    return match get_current_repo() {
+        Ok(repo_url) => repo_url,
+        Err(e) => {
+            eprintln!("Error: {e}");
+            process::exit(1);
+        }
+    };
 }

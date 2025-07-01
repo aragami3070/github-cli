@@ -13,21 +13,12 @@ use crate::cli_parse::read_cli::RepoCommand;
 use crate::cli_parse::set_vars::set_issues_list_state;
 use crate::cli_parse::set_vars::set_option_string;
 use crate::cli_parse::set_vars::set_state;
+use crate::cli_parse::set_vars::set_repo;
 use crate::git_utils::common::create_comment;
-use crate::git_utils::get_repo_info::get_current_repo;
 use crate::git_utils::issues;
 use crate::git_utils::issues::update_issue;
 use crate::git_utils::repos::create_repo_for_authenticated_user;
 
-fn get_repo() -> String {
-    return match get_current_repo() {
-        Ok(repo_url) => repo_url,
-        Err(e) => {
-            eprintln!("Error: {e}");
-            process::exit(1);
-        }
-    };
-}
 
 #[tokio::main]
 async fn main() {
@@ -55,7 +46,7 @@ async fn main() {
                 numb_of_page,
                 iss_on_page,
             } => {
-                let repo_info: String = get_repo();
+                let repo_info: String = set_repo();
                 let inp_state = match set_issues_list_state(&state) {
                     Ok(res) => res,
                     Err(message) => {
@@ -95,7 +86,7 @@ async fn main() {
                 assignees,
                 labels,
             } => {
-                let repo_info: String = get_repo();
+                let repo_info: String = set_repo();
                 let labels_list: Vec<String> = labels.split(",").map(|s| s.to_string()).collect();
                 let assignees_list: Vec<String> =
                     assignees.split(",").map(|s| s.to_string()).collect();
@@ -114,7 +105,7 @@ async fn main() {
             }
 
             IssueCommand::Close { number, comment } => {
-                let repo_info: String = get_repo();
+                let repo_info: String = set_repo();
                 let result =
                     issues::close_issue(&github_client, &repo_info, &number, &comment).await;
 
@@ -129,7 +120,7 @@ async fn main() {
                 state,
                 labels,
             } => {
-                let repo_info: String = get_repo();
+                let repo_info: String = set_repo();
                 let new_state = match set_state(&state) {
                     Ok(s) => s,
                     Err(message) => {
@@ -167,7 +158,7 @@ async fn main() {
         },
         CliCommand::Comment { subcommand } => match subcommand {
             CommentCommand::Create { number, body } => {
-                let repo_info: String = get_repo();
+                let repo_info: String = set_repo();
                 let result = create_comment(&github_client, &repo_info, &number, &body).await;
 
                 println!("{result}");
