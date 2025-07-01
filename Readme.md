@@ -24,29 +24,19 @@ ln --symbolic path/to/this/project/target/debug/github-cli path/to/bin/github-cl
 github-cli --help
 ```
 
-**Issues list man page**
+**Issues man page**
 ```bash
-github-cli issues-list --help
+github-cli issue --help
 ```
 
-**Issue create man page**
+**Comment man page**
 ```bash
-github-cli issue-create --help
+github-cli comment --help
 ```
 
-**Issue update man page**
+**Repo man page**
 ```bash
-github-cli issue-update --help
-```
-
-**Issue Close man page**
-```bash
-github-cli issue-close --help
-```
-
-**Create comment man page**
-```bash
-github-cli create-comment --help
+github-cli repo --help
 ```
 
 ## Some things
@@ -76,7 +66,17 @@ github-cli create-comment --help
 - [ ] Сделать редактирование pull request
 
 ### repository
-- [ ] Сделать создание репозитория
+- [x] Сделать создание своего репозитория
+- [ ] Сделать создание репозитория в огрнизации
+- [ ] Сделать создание fork репозитория
+- [ ] Сделать создание репозитория от шаблона
+- [ ] Сделать создание релиза
+- [ ] Сделать получение списка репозиториев организации
+- [ ] Сделать получение списка репозиториев пользователя
+- [ ] Сделать получение релиза по tag
+- [ ] Сделать получение релиза по id
+- [ ] Сделать получение последнего релиза
+
 
 ### tui
 - [ ] Добавить TUI через ratatui на issues

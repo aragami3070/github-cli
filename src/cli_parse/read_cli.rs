@@ -1,9 +1,7 @@
-use std::io;
-
 use clap::{Parser, Subcommand};
-use octorust::types::{self, State};
 
 #[derive(Parser)]
+#[command(version, about)]
 pub struct Args {
     #[clap(subcommand)]
     pub command: CliCommand,
@@ -11,8 +9,29 @@ pub struct Args {
 
 #[derive(Subcommand)]
 pub enum CliCommand {
+    /// Work with issues
+    Issue {
+        #[command(subcommand)]
+        subcommand: IssueCommand,
+    },
+
+    /// Work with comment
+    Comment {
+        #[command(subcommand)]
+        subcommand: CommentCommand,
+    },
+
+    /// Work with repos
+	Repo {
+        #[command(subcommand)]
+        subcommand: RepoCommand,
+	}
+}
+
+#[derive(Subcommand)]
+pub enum IssueCommand {
     /// Get list of issues
-    IssuesList {
+    List {
         /// The user that created the issues (optional)
         #[clap(long, short, default_value = "")]
         creator: String,
@@ -32,8 +51,9 @@ pub enum CliCommand {
         #[clap(long, short, default_value = "30", value_parser = clap::value_parser!(i64).range(1..=100))]
         iss_on_page: i64,
     },
+
     /// Create issue
-    IssueCreate {
+    Create {
         /// Issue title
         #[clap(long, short)]
         title: String,
@@ -47,8 +67,9 @@ pub enum CliCommand {
         #[clap(long, short, default_value = "enhancement")]
         labels: String,
     },
+
     /// Update issue
-    IssueUpdate {
+    Update {
         /// Update issue with number
         #[clap(long, short)]
         number: i64,
@@ -68,8 +89,9 @@ pub enum CliCommand {
         #[clap(long, short, default_value = None)]
         labels: Option<String>,
     },
+
     /// Close issue
-    IssueClose {
+    Close {
         /// Close issue with number
         #[clap(long, short)]
         number: i64,
@@ -77,49 +99,58 @@ pub enum CliCommand {
         #[clap(long, short, default_value = "")]
         comment: String,
     },
-	/// Create new comment for issue/pull request
-	CreateComment {
+}
+
+#[derive(Subcommand)]
+pub enum CommentCommand {
+    /// Create new comment for issue/pull request
+    Create {
         /// Create comment for issue/pull request with number
         #[clap(long, short)]
         number: i64,
         /// Comment body (optional)
         #[clap(long, short, default_value = "")]
         body: String,
-	}
+    },
 }
 
-pub fn set_issues_list_state(state: &String) -> Result<types::IssuesListState, io::Error> {
-    if state == "open" {
-        return Ok(types::IssuesListState::Open);
-    } else if state == "all" {
-        return Ok(types::IssuesListState::All);
-    } else if state == "closed" {
-        return Ok(types::IssuesListState::Closed);
-    } else {
-        return Err(io::Error::new(
-            io::ErrorKind::InvalidData,
-            "Bad input. State can be only 'open', 'all', 'closed'",
-        ));
-    }
-}
-
-pub fn set_state(state: &String) -> Result<State, io::Error> {
-    if state == "open" {
-        return Ok(State::Open);
-    } else if state == "closed" {
-        return Ok(State::Closed);
-    } else {
-        return Err(io::Error::new(
-            io::ErrorKind::InvalidData,
-            "Bad input. State can be only 'open' or 'closed'",
-        ));
-    }
-}
-
-pub fn set_option_string(some_string: &String) -> Option<&String> {
-    if some_string == "None" {
-        return  None;
-    } else {
-        return Some(some_string);
-    }
+#[derive(Subcommand)]
+pub enum RepoCommand {
+    /// Create new repo in your ownership
+    CreateRepoForAuthenticatedUser {
+        #[clap(long, default_value = None)]
+        allow_auto_merge: Option<bool>,
+        #[clap(long, default_value = None)]
+        allow_merge_commit: Option<bool>,
+        #[clap(long, default_value = None)]
+        allow_rebase_merge: Option<bool>,
+        #[clap(long, default_value = None)]
+        allow_squash_merge: Option<bool>,
+        #[clap(long, default_value = None)]
+        auto_init: Option<bool>,
+        #[clap(long, default_value = None)]
+        delete_branch_on_merge: Option<bool>,
+        #[clap(long, default_value = "")]
+        description: String,
+        #[clap(long, default_value = "")]
+        gitignore_template: String,
+        #[clap(long, default_value = None)]
+        has_issues: Option<bool>,
+        #[clap(long, default_value = None)]
+        has_projects: Option<bool>,
+        #[clap(long, default_value = None)]
+        has_wiki: Option<bool>,
+        #[clap(long, default_value = "")]
+        homepage: String,
+        #[clap(long, default_value = None)]
+        is_template: Option<bool>,
+        #[clap(long, default_value = "")]
+        license_template: String,
+        #[clap(long)]
+        name: String,
+        #[clap(long, default_value = None)]
+        private: Option<bool>,
+        #[clap(long, default_value = "1")]
+        team_id: i64,
+    },
 }
