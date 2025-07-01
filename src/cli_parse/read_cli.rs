@@ -8,17 +8,23 @@ pub struct Args {
 
 #[derive(Subcommand)]
 pub enum CliCommand {
-	/// Work with issues
-	Issue {
-		#[command(subcommand)]
-		subcommand: IssueCommand
-	},
+    /// Work with issues
+    Issue {
+        #[command(subcommand)]
+        subcommand: IssueCommand,
+    },
 
-	/// Work with comment
-	Comment {
-		#[command(subcommand)]
-		subcommand: CommentCommand
-	},
+    /// Work with comment
+    Comment {
+        #[command(subcommand)]
+        subcommand: CommentCommand,
+    },
+
+    /// Work with repos
+	Repo {
+        #[command(subcommand)]
+        subcommand: RepoCommand,
+	}
 }
 
 #[derive(Subcommand)]
@@ -96,13 +102,54 @@ pub enum IssueCommand {
 
 #[derive(Subcommand)]
 pub enum CommentCommand {
-	/// Create new comment for issue/pull request
-	Create{
+    /// Create new comment for issue/pull request
+    Create {
         /// Create comment for issue/pull request with number
         #[clap(long, short)]
         number: i64,
         /// Comment body (optional)
         #[clap(long, short, default_value = "")]
         body: String,
-	}
+    },
+}
+
+#[derive(Subcommand)]
+pub enum RepoCommand {
+    /// Create new repo in your ownership
+    CreateRepoForAuthenticatedUser {
+        #[clap(long, default_value = None)]
+        allow_auto_merge: Option<bool>,
+        #[clap(long, default_value = None)]
+        allow_merge_commit: Option<bool>,
+        #[clap(long, default_value = None)]
+        allow_rebase_merge: Option<bool>,
+        #[clap(long, default_value = None)]
+        allow_squash_merge: Option<bool>,
+        #[clap(long, default_value = None)]
+        auto_init: Option<bool>,
+        #[clap(long, default_value = None)]
+        delete_branch_on_merge: Option<bool>,
+        #[clap(long, default_value = "")]
+        description: String,
+        #[clap(long, default_value = "")]
+        gitignore_template: String,
+        #[clap(long, default_value = None)]
+        has_issues: Option<bool>,
+        #[clap(long, default_value = None)]
+        has_projects: Option<bool>,
+        #[clap(long, default_value = None)]
+        has_wiki: Option<bool>,
+        #[clap(long, default_value = "")]
+        homepage: String,
+        #[clap(long, default_value = None)]
+        is_template: Option<bool>,
+        #[clap(long, default_value = "")]
+        license_template: String,
+        #[clap(long)]
+        name: String,
+        #[clap(long, default_value = None)]
+        private: Option<bool>,
+        #[clap(long, default_value = "1")]
+        team_id: i64,
+    },
 }
