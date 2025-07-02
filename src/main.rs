@@ -15,7 +15,7 @@ use crate::cli_parse::set_vars::set_option_string;
 use crate::cli_parse::set_vars::set_repo;
 use crate::cli_parse::set_vars::set_state;
 use crate::cli_parse::set_vars::set_visibility;
-use crate::git_utils::common::create_comment;
+use crate::git_utils::comments;
 use crate::git_utils::issues;
 use crate::git_utils::repos;
 
@@ -158,7 +158,7 @@ async fn main() {
         CliCommand::Comment { subcommand } => match subcommand {
             CommentCommand::Create { number, body } => {
                 let repo_info: String = set_repo();
-                let result = create_comment(&github_client, &repo_info, &number, &body).await;
+                let result = comments::create(&github_client, &repo_info, &number, &body).await;
 
                 println!("{result}");
             }

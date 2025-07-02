@@ -6,7 +6,8 @@ use octorust::types::{
 };
 use octorust::Client;
 
-use crate::git_utils::common::{create_comment, url_to_vars};
+use crate::git_utils::common::url_to_vars;
+use crate::git_utils::comments;
 
 pub async fn get_list(
     github_client: &Client,
@@ -158,7 +159,7 @@ pub async fn close(
     };
 
     if comment != "" {
-        let new_comment = create_comment(github_client, repo_info, issue_number, comment).await;
+        let new_comment = comments::create(github_client, repo_info, issue_number, comment).await;
         println!("{new_comment}");
     }
 
