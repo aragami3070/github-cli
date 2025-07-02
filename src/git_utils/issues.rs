@@ -6,9 +6,10 @@ use octorust::types::{
 };
 use octorust::Client;
 
-use crate::git_utils::common::{create_comment, url_to_vars};
+use crate::git_utils::common::url_to_vars;
+use crate::git_utils::comments;
 
-pub async fn get_issues_list(
+pub async fn get_list(
     github_client: &Client,
     repo_info: &String,
     creator: &String,
@@ -83,7 +84,7 @@ fn get_create_request(
     }
 }
 
-pub async fn create_issue(
+pub async fn create(
     github_client: &Client,
     repo_info: &String,
     title: &String,
@@ -143,7 +144,7 @@ fn get_update_request(
     }
 }
 
-pub async fn close_issue(
+pub async fn close(
     github_client: &Client,
     repo_info: &String,
     issue_number: &i64,
@@ -158,7 +159,7 @@ pub async fn close_issue(
     };
 
     if comment != "" {
-        let new_comment = create_comment(github_client, repo_info, issue_number, comment).await;
+        let new_comment = comments::create(github_client, repo_info, issue_number, comment).await;
         println!("{new_comment}");
     }
 
@@ -178,7 +179,7 @@ pub async fn close_issue(
     };
 }
 
-pub async fn update_issue(
+pub async fn update(
     github_client: &Client,
     repo_info: &String,
     issue_number: &i64,

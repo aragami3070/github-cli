@@ -12,13 +12,12 @@ use crate::cli_parse::read_cli::IssueCommand;
 use crate::cli_parse::read_cli::RepoCommand;
 use crate::cli_parse::set_vars::set_issues_list_state;
 use crate::cli_parse::set_vars::set_option_string;
-use crate::cli_parse::set_vars::set_state;
 use crate::cli_parse::set_vars::set_repo;
-use crate::git_utils::common::create_comment;
+use crate::cli_parse::set_vars::set_state;
+use crate::cli_parse::set_vars::set_visibility;
+use crate::git_utils::comments;
 use crate::git_utils::issues;
-use crate::git_utils::issues::update_issue;
-use crate::git_utils::repos::create_repo_for_authenticated_user;
-
+use crate::git_utils::repos;
 
 #[tokio::main]
 async fn main() {
@@ -55,7 +54,7 @@ async fn main() {
                     }
                 };
 
-                let list_issues = issues::get_issues_list(
+                let list_issues = issues::get_list(
                     &github_client,
                     &repo_info,
                     &creator,
@@ -91,7 +90,7 @@ async fn main() {
                 let assignees_list: Vec<String> =
                     assignees.split(",").map(|s| s.to_string()).collect();
 
-                let result = issues::create_issue(
+                let result = issues::create(
                     &github_client,
                     &repo_info,
                     &title,
@@ -107,7 +106,7 @@ async fn main() {
             IssueCommand::Close { number, comment } => {
                 let repo_info: String = set_repo();
                 let result =
-                    issues::close_issue(&github_client, &repo_info, &number, &comment).await;
+                    issues::close(&github_client, &repo_info, &number, &comment).await;
 
                 println!("{result}");
             }
@@ -141,7 +140,7 @@ async fn main() {
                 let new_body: Option<&String> = set_option_string(&body);
                 let new_title: Option<&String> = set_option_string(&title);
 
-                let result = update_issue(
+                let result = issues::update(
                     &github_client,
                     &repo_info,
                     &number,
@@ -159,14 +158,14 @@ async fn main() {
         CliCommand::Comment { subcommand } => match subcommand {
             CommentCommand::Create { number, body } => {
                 let repo_info: String = set_repo();
-                let result = create_comment(&github_client, &repo_info, &number, &body).await;
+                let result = comments::create(&github_client, &repo_info, &number, &body).await;
 
                 println!("{result}");
             }
         },
 
         CliCommand::Repo { subcommand } => match subcommand {
-            RepoCommand::CreateRepoForAuthenticatedUser {
+            RepoCommand::CreateForAuthenticatedUser {
                 allow_auto_merge,
                 allow_merge_commit,
                 allow_rebase_merge,
@@ -183,9 +182,8 @@ async fn main() {
                 license_template,
                 name,
                 private,
-                team_id,
             } => {
-                let result = create_repo_for_authenticated_user(
+                let result = repos::create_for_authenticated_user(
                     &github_client,
                     allow_auto_merge,
                     allow_merge_commit,
@@ -203,10 +201,63 @@ async fn main() {
                     &license_template,
                     &name,
                     private,
-                    &team_id,
-                ).await;
+                )
+                .await;
 
-				println!("{result}");
+                println!("{result}");
+            }
+
+            RepoCommand::CreateInOrg {
+                allow_auto_merge,
+                allow_merge_commit,
+                allow_rebase_merge,
+                allow_squash_merge,
+                auto_init,
+                delete_branch_on_merge,
+                description,
+                gitignore_template,
+                has_issues,
+                has_projects,
+                has_wiki,
+                homepage,
+                is_template,
+                license_template,
+                name,
+                org,
+                team_name,
+                visibility,
+            } => {
+                let new_visibility = match set_visibility(&visibility) {
+                    Ok(v) => v,
+                    Err(message) => {
+                        eprintln!("Error: {message}");
+                        process::exit(1);
+                    }
+                };
+                let result = repos::create_in_org(
+                    &github_client,
+                    &org,
+                    allow_auto_merge,
+                    allow_merge_commit,
+                    allow_rebase_merge,
+                    allow_squash_merge,
+                    auto_init,
+                    delete_branch_on_merge,
+                    &description,
+                    &gitignore_template,
+                    has_issues,
+                    has_projects,
+                    has_wiki,
+                    &homepage,
+                    is_template,
+                    &license_template,
+                    &name,
+                    &team_name,
+                    Some(new_visibility),
+                )
+                .await;
+
+                println!("{result}");
             }
         },
     }

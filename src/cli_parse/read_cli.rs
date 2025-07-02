@@ -117,7 +117,7 @@ pub enum CommentCommand {
 #[derive(Subcommand)]
 pub enum RepoCommand {
     /// Create new repo in your ownership
-    CreateRepoForAuthenticatedUser {
+    CreateForAuthenticatedUser {
         #[clap(long, default_value = None)]
         allow_auto_merge: Option<bool>,
         #[clap(long, default_value = None)]
@@ -150,7 +150,45 @@ pub enum RepoCommand {
         name: String,
         #[clap(long, default_value = None)]
         private: Option<bool>,
-        #[clap(long, default_value = "1")]
-        team_id: i64,
+    },
+    /// Create new repo in your ownership
+    CreateInOrg {
+        #[clap(long, default_value = None)]
+        allow_auto_merge: Option<bool>,
+        #[clap(long, default_value = None)]
+        allow_merge_commit: Option<bool>,
+        #[clap(long, default_value = None)]
+        allow_rebase_merge: Option<bool>,
+        #[clap(long, default_value = None)]
+        allow_squash_merge: Option<bool>,
+        #[clap(long, default_value = None)]
+        auto_init: Option<bool>,
+        #[clap(long, default_value = None)]
+        delete_branch_on_merge: Option<bool>,
+        #[clap(long, default_value = "")]
+        description: String,
+        #[clap(long, default_value = "")]
+        gitignore_template: String,
+        #[clap(long, default_value = None)]
+        has_issues: Option<bool>,
+        #[clap(long, default_value = None)]
+        has_projects: Option<bool>,
+        #[clap(long, default_value = None)]
+        has_wiki: Option<bool>,
+        #[clap(long, default_value = "")]
+        homepage: String,
+        #[clap(long, default_value = None)]
+        is_template: Option<bool>,
+        #[clap(long, default_value = "")]
+        license_template: String,
+        #[clap(long)]
+        name: String,
+        #[clap(long)]
+        org: String,
+        #[clap(long)]
+        team_name: String,
+		/// Can be 'public', 'private' and 'internal' for Enterprises
+        #[clap(long, default_value = "public")]
+        visibility: String,
     },
 }
