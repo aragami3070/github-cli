@@ -3,7 +3,7 @@ use std::io::ErrorKind;
 use std::process;
 
 use crate::git_utils::get_repo_info::get_current_repo;
-use octorust::types::{self, State};
+use octorust::types::{self, ReposListOrgSort, State};
 use octorust::types::{ReposCreateInOrgRequestVisibility, ReposListOrgType};
 
 pub fn set_issues_list_state(state: &String) -> Result<types::IssuesListState, io::Error> {
@@ -71,6 +71,19 @@ pub fn set_repos_list_org_type(type_value: &String) -> Result<ReposListOrgType, 
 		_ => Err(io::Error::new(
             ErrorKind::InvalidData,
             "Bad input. Type can be only 'all', 'forks', 'internal', 'member', 'private', 'public' or 'sources'",
+        )),
+	};
+}
+
+pub fn set_repos_list_org_sort(sort_value: &String) -> Result<ReposListOrgSort, io::Error> {
+    return match sort_value.trim() {
+		"created" => Ok(ReposListOrgSort::Created),
+		"fullname" => Ok(ReposListOrgSort::FullName),
+		"pushed" => Ok(ReposListOrgSort::Pushed),
+		"updated" => Ok(ReposListOrgSort::Updated),
+		_ => Err(io::Error::new(
+            ErrorKind::InvalidData,
+            "Bad input. Sort can be only 'created', 'fullname', 'pushed', or 'updated'",
         )),
 	};
 }
