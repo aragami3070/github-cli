@@ -1,6 +1,9 @@
 use std::process;
 
-use octorust::{types::ReposCreateRequest, Client};
+use octorust::{
+    types::{ReposCreateRequest},
+    Client,
+};
 
 pub async fn create_repo_for_authenticated_user(
     github_client: &Client,
@@ -20,37 +23,38 @@ pub async fn create_repo_for_authenticated_user(
     license_template: &String,
     name: &String,
     private: Option<bool>,
-    team_id: &i64,
 ) -> String {
-
     let request = ReposCreateRequest {
-		allow_auto_merge: allow_auto_merge,
-		allow_merge_commit: allow_merge_commit,
-		allow_rebase_merge: allow_rebase_merge,
-		allow_squash_merge: allow_squash_merge,
-		auto_init: auto_init,
-		delete_branch_on_merge: delete_branch_on_merge,
-		description: description.clone(),
-		gitignore_template: gitignore_template.clone(),
-		has_downloads: None,
-		has_issues: has_issues,
-		has_projects: has_projects,
-		has_wiki: has_wiki,
-		homepage: homepage.clone(),
-		is_template: is_template,
-		license_template: license_template.clone(),
-		name: name.clone(),
-		private: private,
-		team_id: team_id.clone(),
+        allow_auto_merge: allow_auto_merge,
+        allow_merge_commit: allow_merge_commit,
+        allow_rebase_merge: allow_rebase_merge,
+        allow_squash_merge: allow_squash_merge,
+        auto_init: auto_init,
+        delete_branch_on_merge: delete_branch_on_merge,
+        description: description.clone(),
+        gitignore_template: gitignore_template.clone(),
+        has_downloads: None,
+        has_issues: has_issues,
+        has_projects: has_projects,
+        has_wiki: has_wiki,
+        homepage: homepage.clone(),
+        is_template: is_template,
+        license_template: license_template.clone(),
+        name: name.clone(),
+        private: private,
+        team_id: 1,
     };
 
-    let new_repo = github_client.repos().create_for_authenticated_user(&request).await;
+    let new_repo = github_client
+        .repos()
+        .create_for_authenticated_user(&request)
+        .await;
 
-	return match new_repo {
-		Ok(_) => "Success".to_string(),
-		Err(message) => {
-			eprintln!("Error: {message}");
-			process::exit(1);
-		}
-	};
+    return match new_repo {
+        Ok(_) => "Success".to_string(),
+        Err(message) => {
+            eprintln!("Error: {message}");
+            process::exit(1);
+        }
+    };
 }

@@ -150,7 +150,5 @@ pub enum RepoCommand {
         name: String,
         #[clap(long, default_value = None)]
         private: Option<bool>,
-        #[clap(long, default_value = "1")]
-        team_id: i64,
     },
 }

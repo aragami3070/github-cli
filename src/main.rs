@@ -12,13 +12,12 @@ use crate::cli_parse::read_cli::IssueCommand;
 use crate::cli_parse::read_cli::RepoCommand;
 use crate::cli_parse::set_vars::set_issues_list_state;
 use crate::cli_parse::set_vars::set_option_string;
-use crate::cli_parse::set_vars::set_state;
 use crate::cli_parse::set_vars::set_repo;
+use crate::cli_parse::set_vars::set_state;
 use crate::git_utils::common::create_comment;
 use crate::git_utils::issues;
 use crate::git_utils::issues::update_issue;
 use crate::git_utils::repos::create_repo_for_authenticated_user;
-
 
 #[tokio::main]
 async fn main() {
@@ -183,7 +182,6 @@ async fn main() {
                 license_template,
                 name,
                 private,
-                team_id,
             } => {
                 let result = create_repo_for_authenticated_user(
                     &github_client,
@@ -203,10 +201,10 @@ async fn main() {
                     &license_template,
                     &name,
                     private,
-                    &team_id,
-                ).await;
+                )
+                .await;
 
-				println!("{result}");
+                println!("{result}");
             }
         },
     }
