@@ -7,7 +7,7 @@ use octorust::{
 
 use crate::git_utils::teams::get_id;
 
-pub async fn create_repo_for_authenticated_user(
+pub async fn create_for_authenticated_user(
     github_client: &Client,
     allow_auto_merge: Option<bool>,
     allow_merge_commit: Option<bool>,

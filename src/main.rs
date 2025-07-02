@@ -17,8 +17,6 @@ use crate::cli_parse::set_vars::set_state;
 use crate::cli_parse::set_vars::set_visibility;
 use crate::git_utils::common::create_comment;
 use crate::git_utils::issues;
-use crate::git_utils::issues::update_issue;
-use crate::git_utils::repos::create_repo_for_authenticated_user;
 use crate::git_utils::repos;
 
 #[tokio::main]
@@ -56,7 +54,7 @@ async fn main() {
                     }
                 };
 
-                let list_issues = issues::get_issues_list(
+                let list_issues = issues::get_list(
                     &github_client,
                     &repo_info,
                     &creator,
@@ -92,7 +90,7 @@ async fn main() {
                 let assignees_list: Vec<String> =
                     assignees.split(",").map(|s| s.to_string()).collect();
 
-                let result = issues::create_issue(
+                let result = issues::create(
                     &github_client,
                     &repo_info,
                     &title,
@@ -108,7 +106,7 @@ async fn main() {
             IssueCommand::Close { number, comment } => {
                 let repo_info: String = set_repo();
                 let result =
-                    issues::close_issue(&github_client, &repo_info, &number, &comment).await;
+                    issues::close(&github_client, &repo_info, &number, &comment).await;
 
                 println!("{result}");
             }
@@ -142,7 +140,7 @@ async fn main() {
                 let new_body: Option<&String> = set_option_string(&body);
                 let new_title: Option<&String> = set_option_string(&title);
 
-                let result = update_issue(
+                let result = issues::update(
                     &github_client,
                     &repo_info,
                     &number,
@@ -185,7 +183,7 @@ async fn main() {
                 name,
                 private,
             } => {
-                let result = create_repo_for_authenticated_user(
+                let result = repos::create_for_authenticated_user(
                     &github_client,
                     allow_auto_merge,
                     allow_merge_commit,
