@@ -165,7 +165,7 @@ async fn main() {
         },
 
         CliCommand::Repo { subcommand } => match subcommand {
-            RepoCommand::CreateRepoForAuthenticatedUser {
+            RepoCommand::CreateForAuthenticatedUser {
                 allow_auto_merge,
                 allow_merge_commit,
                 allow_rebase_merge,
@@ -207,7 +207,7 @@ async fn main() {
                 println!("{result}");
             }
 
-            RepoCommand::CreateRepoInOrg {
+            RepoCommand::CreateInOrg {
                 allow_auto_merge,
                 allow_merge_commit,
                 allow_rebase_merge,

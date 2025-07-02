@@ -117,7 +117,7 @@ pub enum CommentCommand {
 #[derive(Subcommand)]
 pub enum RepoCommand {
     /// Create new repo in your ownership
-    CreateRepoForAuthenticatedUser {
+    CreateForAuthenticatedUser {
         #[clap(long, default_value = None)]
         allow_auto_merge: Option<bool>,
         #[clap(long, default_value = None)]
@@ -152,7 +152,7 @@ pub enum RepoCommand {
         private: Option<bool>,
     },
     /// Create new repo in your ownership
-    CreateRepoInOrg {
+    CreateInOrg {
         #[clap(long, default_value = None)]
         allow_auto_merge: Option<bool>,
         #[clap(long, default_value = None)]
