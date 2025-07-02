@@ -14,10 +14,12 @@ use crate::cli_parse::set_vars::set_issues_list_state;
 use crate::cli_parse::set_vars::set_option_string;
 use crate::cli_parse::set_vars::set_repo;
 use crate::cli_parse::set_vars::set_state;
+use crate::cli_parse::set_vars::set_visibility;
 use crate::git_utils::common::create_comment;
 use crate::git_utils::issues;
 use crate::git_utils::issues::update_issue;
 use crate::git_utils::repos::create_repo_for_authenticated_user;
+use crate::git_utils::repos;
 
 #[tokio::main]
 async fn main() {
@@ -201,6 +203,59 @@ async fn main() {
                     &license_template,
                     &name,
                     private,
+                )
+                .await;
+
+                println!("{result}");
+            }
+
+            RepoCommand::CreateRepoInOrg {
+                allow_auto_merge,
+                allow_merge_commit,
+                allow_rebase_merge,
+                allow_squash_merge,
+                auto_init,
+                delete_branch_on_merge,
+                description,
+                gitignore_template,
+                has_issues,
+                has_projects,
+                has_wiki,
+                homepage,
+                is_template,
+                license_template,
+                name,
+                org,
+                team_name,
+                visibility,
+            } => {
+                let new_visibility = match set_visibility(&visibility) {
+                    Ok(v) => v,
+                    Err(message) => {
+                        eprintln!("Error: {message}");
+                        process::exit(1);
+                    }
+                };
+                let result = repos::create_in_org(
+                    &github_client,
+                    &org,
+                    allow_auto_merge,
+                    allow_merge_commit,
+                    allow_rebase_merge,
+                    allow_squash_merge,
+                    auto_init,
+                    delete_branch_on_merge,
+                    &description,
+                    &gitignore_template,
+                    has_issues,
+                    has_projects,
+                    has_wiki,
+                    &homepage,
+                    is_template,
+                    &license_template,
+                    &name,
+                    &team_name,
+                    Some(new_visibility),
                 )
                 .await;
 
