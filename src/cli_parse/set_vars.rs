@@ -1,7 +1,9 @@
 use std::io;
+use std::io::ErrorKind;
 use std::process;
 
 use crate::git_utils::get_repo_info::get_current_repo;
+use octorust::types::ReposCreateInOrgRequestVisibility;
 use octorust::types::{self, State};
 
 pub fn set_issues_list_state(state: &String) -> Result<types::IssuesListState, io::Error> {
@@ -48,4 +50,23 @@ pub fn set_repo() -> String {
             process::exit(1);
         }
     };
+}
+
+pub fn set_visibility(visibility: &String) -> Result<ReposCreateInOrgRequestVisibility, io::Error> {
+	if visibility == "" {
+		return Ok(ReposCreateInOrgRequestVisibility::Noop);
+	}
+	else if visibility == "private" {
+		return Ok(ReposCreateInOrgRequestVisibility::Private);
+	}
+	else if visibility == "public" {
+		return Ok(ReposCreateInOrgRequestVisibility::Public);
+	}
+	else if visibility == "internal" {
+		return Ok(ReposCreateInOrgRequestVisibility::Internal);
+	}
+	else {
+	    return Err(io::Error::new(ErrorKind::InvalidData, "Bad input. Visibility can be only '', 'public', 'private' or 'internal'"));
+	}
+	
 }
