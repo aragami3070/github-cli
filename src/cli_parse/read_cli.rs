@@ -1,5 +1,6 @@
 use clap::{Parser, Subcommand};
 use crate::cli_parse::issue_command::IssueCommand;
+use crate::cli_parse::comment_command::CommentCommand;
 
 #[derive(Parser)]
 #[command(version, about)]
@@ -30,18 +31,6 @@ pub enum CliCommand {
 }
 
 
-#[derive(Subcommand)]
-pub enum CommentCommand {
-    /// Create new comment for issue/pull request
-    Create {
-        /// Create comment for issue/pull request with number
-        #[clap(long, short)]
-        number: i64,
-        /// Comment body (optional)
-        #[clap(long, short, default_value = "")]
-        body: String,
-    },
-}
 
 #[derive(Subcommand)]
 pub enum RepoCommand {
