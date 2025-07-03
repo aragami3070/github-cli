@@ -151,7 +151,7 @@ pub enum RepoCommand {
         #[clap(long, default_value = None)]
         private: Option<bool>,
     },
-    /// Create new repo in your ownership
+    /// Create new repo in org
     CreateInOrg {
         #[clap(long, default_value = None)]
         allow_auto_merge: Option<bool>,
@@ -190,5 +190,21 @@ pub enum RepoCommand {
 		/// Can be 'public', 'private' and 'internal' for Enterprises
         #[clap(long, default_value = "public")]
         visibility: String,
+    },
+
+    /// Get all repos from org
+    GetAllFromOrg {
+		/// Org name
+        #[clap(long)]
+        org: String,
+		/// Order can be only 'asc' or 'desc' (optional)
+        #[clap(long, short, default_value = "desc")]
+        order: String,
+        /// Sort can be only 'created', 'fullname', 'pushed', or 'updated' (optional)
+        #[clap(long, short, default_value = "updated")]
+        sort_value: String,
+		/// Type can be 'all', 'forks', 'internal', 'member', 'private', 'public' or 'sources' (optional)
+        #[clap(long, short, default_value = "all")]
+        type_value: String,
     },
 }
