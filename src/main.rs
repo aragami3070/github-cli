@@ -7,9 +7,9 @@ mod git_utils;
 
 use crate::cli_parse::read_cli::Args;
 use crate::cli_parse::read_cli::CliCommand;
-use crate::cli_parse::read_cli::CommentCommand;
-use crate::cli_parse::read_cli::IssueCommand;
-use crate::cli_parse::read_cli::RepoCommand;
+use crate::cli_parse::comment_command::CommentCommand;
+use crate::cli_parse::issue_command::IssueCommand;
+use crate::cli_parse::repo_command::RepoCommand;
 use crate::cli_parse::set_vars::set_issues_list_state;
 use crate::cli_parse::set_vars::set_option_string;
 use crate::cli_parse::set_vars::set_order;
@@ -21,7 +21,6 @@ use crate::cli_parse::set_vars::set_visibility;
 use crate::git_utils::comments;
 use crate::git_utils::issues;
 use crate::git_utils::repos;
-use crate::git_utils::repos::get_all_from_org;
 
 #[tokio::main]
 async fn main() {
@@ -77,7 +76,7 @@ async fn main() {
                 );
                 println!();
                 for issue in list_issues {
-                    println!("Issue{}: {};", issue.number, issue.title);
+                    println!("Issue {}: {};", issue.number, issue.title);
                     println!("Body: {}", issue.body);
                     println!();
                 }
@@ -291,18 +290,41 @@ async fn main() {
                 };
 
                 let all_repos =
-                    get_all_from_org(&github_client, &org, new_order, new_type, new_sort).await;
+                    repos::get_all_from_org(&github_client, &org, new_order, new_type, new_sort)
+                        .await;
 
                 println!("Found {} repos in {} org", all_repos.len(), org);
 
                 for repo in all_repos {
-					println!("╭────────────────────────────────────────────────────────────────────────────────────────────────");
+                    println!("╭────────────────────────────────────────────────────────────────────────────────────────────────");
                     println!("│Repo {}: {}", repo.id, repo.full_name);
                     println!("│Language: {}", repo.language);
                     println!("│Url: {}", repo.url);
                     println!("│Description: {}", repo.description);
-					println!("╰────────────────────────────────────────────────────────────────────────────────────────────────");
+                    println!("╰────────────────────────────────────────────────────────────────────────────────────────────────");
                 }
+            }
+            RepoCommand::CreateUsingTemplate {
+                template_owner,
+                template_name,
+                name,
+                owner,
+                description,
+                private,
+                include_all_branches,
+            } => {
+                let result = repos::create_using_template(
+                    &github_client,
+                    &template_owner,
+                    &template_name,
+                    &name,
+                    &owner,
+                    &description,
+                    include_all_branches,
+                    private,
+                ).await;
+
+				println!("{result}");
             }
         },
     }
