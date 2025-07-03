@@ -151,6 +151,7 @@ pub enum RepoCommand {
         #[clap(long, default_value = None)]
         private: Option<bool>,
     },
+
     /// Create new repo in org
     CreateInOrg {
         #[clap(long, default_value = None)]
@@ -190,6 +191,31 @@ pub enum RepoCommand {
 		/// Can be 'public', 'private' and 'internal' for Enterprises
         #[clap(long, default_value = "public")]
         visibility: String,
+    },
+
+    /// Create new repo usnig template
+    CreateUsingTemplate {
+		/// Template owner name
+        #[clap(long)]
+        template_owner: String,
+		/// Template repo name
+        #[clap(long)]
+        template_name: String,
+		/// New repo owner name
+        #[clap(long, short)]
+        name: String,
+		/// New repo name
+        #[clap(long, short)]
+        owner: String,
+		/// New repo description (optional)
+        #[clap(long, short, default_value = "")]
+        description: String,
+		/// Repo visiblity (optional)
+        #[clap(long, short, default_value = None)]
+        private: Option<bool>,
+		/// Include all branches from template (optional)
+        #[clap(long, short, default_value = None)]
+        include_all_branches: Option<bool>,
     },
 
     /// Get all repos from org
