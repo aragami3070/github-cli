@@ -5,10 +5,10 @@ use std::process;
 mod cli_parse;
 mod git_utils;
 
-use crate::cli_parse::read_cli::Args;
-use crate::cli_parse::read_cli::CliCommand;
 use crate::cli_parse::comment_command::CommentCommand;
 use crate::cli_parse::issue_command::IssueCommand;
+use crate::cli_parse::read_cli::Args;
+use crate::cli_parse::read_cli::CliCommand;
 use crate::cli_parse::repo_command::RepoCommand;
 use crate::cli_parse::set_vars::set_issues_list_state;
 use crate::cli_parse::set_vars::set_option_string;
@@ -322,10 +322,16 @@ async fn main() {
                     &description,
                     include_all_branches,
                     private,
-                ).await;
+                )
+                .await;
 
-				println!("{result}");
+                println!("{result}");
             }
+            RepoCommand::CreateFork { org, name, owner } => {
+				let result = repos::create_fork(&github_client, &org, &owner, &name).await;
+
+                println!("{result}");
+			}
         },
     }
 }
