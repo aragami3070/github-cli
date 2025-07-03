@@ -2,7 +2,8 @@ use std::process;
 
 use octorust::{
     types::{
-        MinimalRepository, Order, ReposCreateInOrgRequest, ReposCreateInOrgRequestVisibility, ReposCreateRequest, ReposListOrgSort, ReposListOrgType
+        MinimalRepository, Order, ReposCreateInOrgRequest, ReposCreateInOrgRequestVisibility,
+        ReposCreateRequest, ReposCreateUsingTemplateRequest, ReposListOrgSort, ReposListOrgType,
     },
     Client,
 };
@@ -132,19 +133,46 @@ pub async fn get_all_from_org(
 ) -> Vec<MinimalRepository> {
     let all_repos = github_client
         .repos()
-        .list_all_for_org(
-            org.trim(),
-            type_value,
-            sort_value,
-            order,
-        )
+        .list_all_for_org(org.trim(), type_value, sort_value, order)
         .await;
 
-	return match all_repos {
-		Ok(r) => r.body,
-		Err(message) => {
-			eprintln!("Error: {message}");
-			process::exit(1);
-		}
-	};
+    return match all_repos {
+        Ok(r) => r.body,
+        Err(message) => {
+            eprintln!("Error: {message}");
+            process::exit(1);
+        }
+    };
+}
+
+pub async fn create_using_template(
+    github_client: &Client,
+    template_owner: &String,
+    template_name: &String,
+    name: &String,
+    owner: &String,
+    description: &String,
+    include_all_branches: Option<bool>,
+    private: Option<bool>,
+) -> String {
+    let request = ReposCreateUsingTemplateRequest {
+        description: description.clone(),
+        include_all_branches: include_all_branches,
+        name: name.clone(),
+        owner: owner.clone(),
+        private: private,
+    };
+
+    let new_repo = github_client
+        .repos()
+        .create_using_template(template_owner.trim(), template_name.trim(), &request)
+        .await;
+
+    return match new_repo {
+        Ok(_) => "Success".to_string(),
+        Err(message) => {
+            eprintln!("Error: {message}");
+            process::exit(1);
+        }
+    };
 }
