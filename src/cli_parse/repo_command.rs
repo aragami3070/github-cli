@@ -87,10 +87,10 @@ pub enum RepoCommand {
 		/// Template repo name
         #[clap(long)]
         template_name: String,
-		/// New repo owner name
+		/// New repo name
         #[clap(long, short)]
         name: String,
-		/// New repo name
+		/// New repo owner name
         #[clap(long, short)]
         owner: String,
 		/// New repo description (optional)
@@ -102,6 +102,19 @@ pub enum RepoCommand {
 		/// Include all branches from template (optional)
         #[clap(long, short, default_value = None)]
         include_all_branches: Option<bool>,
+    },
+
+    /// Create fork
+    CreateFork {
+		/// Template name
+        #[clap(long, short)]
+        name: String,
+		/// Template owner name
+        #[clap(long, short)]
+        owner: String,
+		/// Org name if forking into an org. Else forking in account token owner (optional)
+        #[clap(long, default_value = "")]
+        org: String,
     },
 
     /// Get all repos from org

@@ -2,8 +2,7 @@ use std::process;
 
 use octorust::{
     types::{
-        MinimalRepository, Order, ReposCreateInOrgRequest, ReposCreateInOrgRequestVisibility,
-        ReposCreateRequest, ReposCreateUsingTemplateRequest, ReposListOrgSort, ReposListOrgType,
+        MinimalRepository, Order, ReposCreateForkRequest, ReposCreateInOrgRequest, ReposCreateInOrgRequestVisibility, ReposCreateRequest, ReposCreateUsingTemplateRequest, ReposListOrgSort, ReposListOrgType
     },
     Client,
 };
@@ -169,6 +168,27 @@ pub async fn create_using_template(
         .await;
 
     return match new_repo {
+        Ok(_) => "Success".to_string(),
+        Err(message) => {
+            eprintln!("Error: {message}");
+            process::exit(1);
+        }
+    };
+}
+
+pub async fn create_fork(
+    github_client: &Client,
+	org: &String,
+    owner: &String,
+    name: &String,
+) -> String {
+	let request = ReposCreateForkRequest {
+		organization: org.clone()
+	};
+    
+	let new_fork = github_client.repos().create_fork(owner.trim(), name.trim(), &request).await;
+
+    return match new_fork {
         Ok(_) => "Success".to_string(),
         Err(message) => {
             eprintln!("Error: {message}");
