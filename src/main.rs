@@ -21,7 +21,6 @@ use crate::cli_parse::set_vars::set_visibility;
 use crate::git_utils::comments;
 use crate::git_utils::issues;
 use crate::git_utils::repos;
-use crate::git_utils::repos::get_all_from_org;
 
 #[tokio::main]
 async fn main() {
@@ -291,18 +290,41 @@ async fn main() {
                 };
 
                 let all_repos =
-                    get_all_from_org(&github_client, &org, new_order, new_type, new_sort).await;
+                    repos::get_all_from_org(&github_client, &org, new_order, new_type, new_sort)
+                        .await;
 
                 println!("Found {} repos in {} org", all_repos.len(), org);
 
                 for repo in all_repos {
-					println!("╭────────────────────────────────────────────────────────────────────────────────────────────────");
+                    println!("╭────────────────────────────────────────────────────────────────────────────────────────────────");
                     println!("│Repo {}: {}", repo.id, repo.full_name);
                     println!("│Language: {}", repo.language);
                     println!("│Url: {}", repo.url);
                     println!("│Description: {}", repo.description);
-					println!("╰────────────────────────────────────────────────────────────────────────────────────────────────");
+                    println!("╰────────────────────────────────────────────────────────────────────────────────────────────────");
                 }
+            }
+            RepoCommand::CreateUsingTemplate {
+                template_owner,
+                template_name,
+                name,
+                owner,
+                description,
+                private,
+                include_all_branches,
+            } => {
+                let result = repos::create_using_template(
+                    &github_client,
+                    &template_owner,
+                    &template_name,
+                    &name,
+                    &owner,
+                    &description,
+                    include_all_branches,
+                    private,
+                ).await;
+
+				println!("{result}");
             }
         },
     }
