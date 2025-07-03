@@ -126,17 +126,17 @@ pub async fn create_in_org(
 pub async fn get_all_from_org(
     github_client: &Client,
     org: &String,
-    direction: &Order,
-    type_value: &ReposListOrgType,
-    sort_value: &ReposListOrgSort,
+    order: Order,
+    type_value: ReposListOrgType,
+    sort_value: ReposListOrgSort,
 ) -> Vec<MinimalRepository> {
     let all_repos = github_client
         .repos()
         .list_all_for_org(
             org.trim(),
-            type_value.clone(),
-            sort_value.clone(),
-            direction.clone(),
+            type_value,
+            sort_value,
+            order,
         )
         .await;
 
