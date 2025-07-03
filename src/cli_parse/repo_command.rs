@@ -87,10 +87,10 @@ pub enum RepoCommand {
 		/// Template repo name
         #[clap(long)]
         template_name: String,
-		/// New repo owner name
+		/// New repo name
         #[clap(long, short)]
         name: String,
-		/// New repo name
+		/// New repo owner name
         #[clap(long, short)]
         owner: String,
 		/// New repo description (optional)
