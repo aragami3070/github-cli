@@ -1,7 +1,9 @@
 use std::process;
 
 use octorust::{
-    types::{ReposCreateInOrgRequest, ReposCreateInOrgRequestVisibility, ReposCreateRequest},
+    types::{
+        MinimalRepository, Order, ReposCreateInOrgRequest, ReposCreateInOrgRequestVisibility, ReposCreateRequest, ReposListOrgSort, ReposListOrgType
+    },
     Client,
 };
 
@@ -82,9 +84,9 @@ pub async fn create_in_org(
     team_name: &String,
     visibility: Option<ReposCreateInOrgRequestVisibility>,
 ) -> String {
-	let team = get_id(github_client, org, team_name).await;
+    let team = get_id(github_client, org, team_name).await;
 
-	let team_id = team.id;
+    let team_id = team.id;
 
     let request = ReposCreateInOrgRequest {
         allow_auto_merge: allow_auto_merge,
@@ -119,4 +121,30 @@ pub async fn create_in_org(
             process::exit(1);
         }
     };
+}
+
+pub async fn get_all_from_org(
+    github_client: &Client,
+    org: &String,
+    order: Order,
+    type_value: ReposListOrgType,
+    sort_value: ReposListOrgSort,
+) -> Vec<MinimalRepository> {
+    let all_repos = github_client
+        .repos()
+        .list_all_for_org(
+            org.trim(),
+            type_value,
+            sort_value,
+            order,
+        )
+        .await;
+
+	return match all_repos {
+		Ok(r) => r.body,
+		Err(message) => {
+			eprintln!("Error: {message}");
+			process::exit(1);
+		}
+	};
 }

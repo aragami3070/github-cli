@@ -12,12 +12,16 @@ use crate::cli_parse::read_cli::IssueCommand;
 use crate::cli_parse::read_cli::RepoCommand;
 use crate::cli_parse::set_vars::set_issues_list_state;
 use crate::cli_parse::set_vars::set_option_string;
+use crate::cli_parse::set_vars::set_order;
 use crate::cli_parse::set_vars::set_repo;
+use crate::cli_parse::set_vars::set_repos_list_org_sort;
+use crate::cli_parse::set_vars::set_repos_list_org_type;
 use crate::cli_parse::set_vars::set_state;
 use crate::cli_parse::set_vars::set_visibility;
 use crate::git_utils::comments;
 use crate::git_utils::issues;
 use crate::git_utils::repos;
+use crate::git_utils::repos::get_all_from_org;
 
 #[tokio::main]
 async fn main() {
@@ -105,8 +109,7 @@ async fn main() {
 
             IssueCommand::Close { number, comment } => {
                 let repo_info: String = set_repo();
-                let result =
-                    issues::close(&github_client, &repo_info, &number, &comment).await;
+                let result = issues::close(&github_client, &repo_info, &number, &comment).await;
 
                 println!("{result}");
             }
@@ -258,6 +261,48 @@ async fn main() {
                 .await;
 
                 println!("{result}");
+            }
+            RepoCommand::GetAllFromOrg {
+                org,
+                order,
+                sort_value,
+                type_value,
+            } => {
+                let new_order = match set_order(&order) {
+                    Ok(o) => o,
+                    Err(message) => {
+                        eprintln!("Error: {message}");
+                        process::exit(1);
+                    }
+                };
+                let new_sort = match set_repos_list_org_sort(&sort_value) {
+                    Ok(o) => o,
+                    Err(message) => {
+                        eprintln!("Error: {message}");
+                        process::exit(1);
+                    }
+                };
+                let new_type = match set_repos_list_org_type(&type_value) {
+                    Ok(o) => o,
+                    Err(message) => {
+                        eprintln!("Error: {message}");
+                        process::exit(1);
+                    }
+                };
+
+                let all_repos =
+                    get_all_from_org(&github_client, &org, new_order, new_type, new_sort).await;
+
+                println!("Found {} repos in {} org", all_repos.len(), org);
+
+                for repo in all_repos {
+					println!("╭────────────────────────────────────────────────────────────────────────────────────────────────");
+                    println!("│Repo {}: {}", repo.id, repo.full_name);
+                    println!("│Language: {}", repo.language);
+                    println!("│Url: {}", repo.url);
+                    println!("│Description: {}", repo.description);
+					println!("╰────────────────────────────────────────────────────────────────────────────────────────────────");
+                }
             }
         },
     }
