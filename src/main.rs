@@ -9,7 +9,7 @@ use crate::cli_parse::read_cli::Args;
 use crate::cli_parse::read_cli::CliCommand;
 use crate::cli_parse::comment_command::CommentCommand;
 use crate::cli_parse::issue_command::IssueCommand;
-use crate::cli_parse::read_cli::RepoCommand;
+use crate::cli_parse::repo_command::RepoCommand;
 use crate::cli_parse::set_vars::set_issues_list_state;
 use crate::cli_parse::set_vars::set_option_string;
 use crate::cli_parse::set_vars::set_order;
