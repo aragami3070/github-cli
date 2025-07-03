@@ -104,6 +104,19 @@ pub enum RepoCommand {
         include_all_branches: Option<bool>,
     },
 
+    /// Create fork
+    CreateFork {
+		/// Template name
+        #[clap(long, short)]
+        name: String,
+		/// Template owner name
+        #[clap(long, short)]
+        owner: String,
+		/// Org name if forking into an org. Else forking in account token owner (optional)
+        #[clap(long, default_value = "")]
+        org: String,
+    },
+
     /// Get all repos from org
     GetAllFromOrg {
 		/// Org name
