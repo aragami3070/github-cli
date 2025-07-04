@@ -1,8 +1,6 @@
 use std::io;
 use std::io::ErrorKind;
-use std::process;
 
-use crate::git_utils::get_repo_info::get_current_repo;
 use octorust::types::{self, Order, ReposListOrgSort, State};
 use octorust::types::{ReposCreateInOrgRequestVisibility, ReposListOrgType};
 
@@ -33,16 +31,6 @@ pub fn set_option_string(some_string: &String) -> Option<&String> {
     return match some_string.trim() {
         "None" => None,
         _ => Some(some_string),
-    };
-}
-
-pub fn set_repo() -> String {
-    return match get_current_repo() {
-        Ok(repo_url) => repo_url,
-        Err(e) => {
-            eprintln!("Error: {e}");
-            process::exit(1);
-        }
     };
 }
 

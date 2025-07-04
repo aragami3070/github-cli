@@ -14,15 +14,15 @@ use crate::cli_parse::repo_command::RepoCommand;
 use crate::cli_parse::set_vars::set_issues_list_state;
 use crate::cli_parse::set_vars::set_option_string;
 use crate::cli_parse::set_vars::set_order;
-use crate::cli_parse::set_vars::set_repo;
 use crate::cli_parse::set_vars::set_repos_list_org_sort;
 use crate::cli_parse::set_vars::set_repos_list_org_type;
 use crate::cli_parse::set_vars::set_state;
 use crate::cli_parse::set_vars::set_visibility;
 use crate::git_utils::comments;
 use crate::git_utils::issues;
-use crate::git_utils::repos;
 use crate::git_utils::releases;
+use crate::git_utils::repo_info::RepoInfo;
+use crate::git_utils::repos;
 
 #[tokio::main]
 async fn main() {
@@ -50,7 +50,14 @@ async fn main() {
                 numb_of_page,
                 iss_on_page,
             } => {
-                let repo_info: String = set_repo();
+                let repo_info: RepoInfo = match RepoInfo::new(None, None) {
+                    Ok(rep) => rep,
+                    Err(message) => {
+                        eprintln!("Error: {message}");
+                        process::exit(1);
+                    }
+                };
+
                 let inp_state = match set_issues_list_state(&state) {
                     Ok(res) => res,
                     Err(message) => {
@@ -61,7 +68,7 @@ async fn main() {
 
                 let list_issues = issues::get_list(
                     &github_client,
-                    &repo_info,
+                    repo_info,
                     &creator,
                     &assignee,
                     &inp_state,
@@ -91,14 +98,20 @@ async fn main() {
                 assignees,
                 labels,
             } => {
-                let repo_info: String = set_repo();
+                let repo_info: RepoInfo = match RepoInfo::new(None, None) {
+                    Ok(rep) => rep,
+                    Err(message) => {
+                        eprintln!("Error: {message}");
+                        process::exit(1);
+                    }
+                };
                 let labels_list: Vec<String> = labels.split(",").map(|s| s.to_string()).collect();
                 let assignees_list: Vec<String> =
                     assignees.split(",").map(|s| s.to_string()).collect();
 
                 let result = issues::create(
                     &github_client,
-                    &repo_info,
+                    repo_info,
                     &title,
                     &body,
                     &assignees_list,
@@ -110,8 +123,14 @@ async fn main() {
             }
 
             IssueCommand::Close { number, comment } => {
-                let repo_info: String = set_repo();
-                let result = issues::close(&github_client, &repo_info, &number, &comment).await;
+                let repo_info: RepoInfo = match RepoInfo::new(None, None) {
+                    Ok(rep) => rep,
+                    Err(message) => {
+                        eprintln!("Error: {message}");
+                        process::exit(1);
+                    }
+                };
+                let result = issues::close(&github_client, repo_info, &number, &comment).await;
 
                 println!("{result}");
             }
@@ -124,7 +143,13 @@ async fn main() {
                 state,
                 labels,
             } => {
-                let repo_info: String = set_repo();
+                let repo_info: RepoInfo = match RepoInfo::new(None, None) {
+                    Ok(rep) => rep,
+                    Err(message) => {
+                        eprintln!("Error: {message}");
+                        process::exit(1);
+                    }
+                };
                 let new_state = match set_state(&state) {
                     Ok(s) => s,
                     Err(message) => {
@@ -147,7 +172,7 @@ async fn main() {
 
                 let result = issues::update(
                     &github_client,
-                    &repo_info,
+                    repo_info,
                     &number,
                     new_title,
                     new_body,
@@ -160,9 +185,16 @@ async fn main() {
                 println!("{result}");
             }
         },
+
         CliCommand::Comment { subcommand } => match subcommand {
             CommentCommand::Create { number, body } => {
-                let repo_info: String = set_repo();
+                let repo_info: RepoInfo = match RepoInfo::new(None, None) {
+                    Ok(rep) => rep,
+                    Err(message) => {
+                        eprintln!("Error: {message}");
+                        process::exit(1);
+                    }
+                };
                 let result = comments::create(&github_client, &repo_info, &number, &body).await;
 
                 println!("{result}");
@@ -348,10 +380,22 @@ async fn main() {
                 tag_name,
                 target_commitish,
             } => {
-				let result = releases::create(&github_client, &owner, &repo, body, discussion_category_name, draft, &name, prerelease, &tag_name, target_commitish).await;
+                let result = releases::create(
+                    &github_client,
+                    &owner,
+                    &repo,
+                    body,
+                    discussion_category_name,
+                    draft,
+                    &name,
+                    prerelease,
+                    &tag_name,
+                    target_commitish,
+                )
+                .await;
 
-				println!("{result}");
-			}
+                println!("{result}");
+            }
         },
     }
 }
