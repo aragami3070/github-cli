@@ -9,6 +9,7 @@ use crate::cli_parse::comment_command::CommentCommand;
 use crate::cli_parse::issue_command::IssueCommand;
 use crate::cli_parse::read_cli::Args;
 use crate::cli_parse::read_cli::CliCommand;
+use crate::cli_parse::release_command::ReleaseCommand;
 use crate::cli_parse::repo_command::RepoCommand;
 use crate::cli_parse::set_vars::set_issues_list_state;
 use crate::cli_parse::set_vars::set_option_string;
@@ -21,6 +22,7 @@ use crate::cli_parse::set_vars::set_visibility;
 use crate::git_utils::comments;
 use crate::git_utils::issues;
 use crate::git_utils::repos;
+use crate::git_utils::releases;
 
 #[tokio::main]
 async fn main() {
@@ -329,9 +331,26 @@ async fn main() {
                 println!("{result}");
             }
             RepoCommand::CreateFork { org, name, owner } => {
-				let result = repos::create_fork(&github_client, &org, &owner, &name).await;
+                let result = repos::create_fork(&github_client, &org, &owner, &name).await;
 
                 println!("{result}");
+            }
+        },
+        CliCommand::Release { subcommand } => match subcommand {
+            ReleaseCommand::Create {
+                owner,
+                repo,
+                body,
+                name,
+                discussion_category_name,
+                draft,
+                prerelease,
+                tag_name,
+                target_commitish,
+            } => {
+				let result = releases::create(&github_client, &owner, &repo, body, discussion_category_name, draft, &name, prerelease, &tag_name, target_commitish).await;
+
+				println!("{result}");
 			}
         },
     }
