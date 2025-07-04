@@ -76,9 +76,10 @@ async fn main() {
                 );
                 println!();
                 for issue in list_issues {
-                    println!("Issue {}: {};", issue.number, issue.title);
-                    println!("Body: {}", issue.body);
-                    println!();
+                    println!("╭────────────────────────────────────────────────────────────────────────────────────────────────");
+                    println!("│Issue {}: {};", issue.number, issue.title);
+                    println!("│Body: {}", issue.body);
+                    println!("╰────────────────────────────────────────────────────────────────────────────────────────────────");
                 }
             }
 
