@@ -60,3 +60,21 @@ pub async fn get_latest(github_client: &Client, repo_info: RepoInfo) -> Release 
         }
     };
 }
+
+pub async fn get_by_tag(github_client: &Client, repo_info: RepoInfo, tag: String) -> Release {
+    let result = github_client
+        .repos()
+        .get_release_by_tag(
+            &repo_info.get_owner().trim(),
+            &repo_info.get_name().trim(),
+            &tag,
+        )
+        .await;
+	return match result{
+		Ok(r) => r.body,
+		Err(message) => {
+			eprintln!("{message}");
+			process::exit(1);
+		}
+	};
+}

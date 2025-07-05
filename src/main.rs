@@ -307,6 +307,7 @@ async fn main() {
                 println!("│{result}");
                 println!("╰────────────────────────────────────────────────────────────────────────────────────────────────");
             }
+
             RepoCommand::GetAllFromOrg {
                 org,
                 order,
@@ -350,6 +351,7 @@ async fn main() {
                     println!("╰────────────────────────────────────────────────────────────────────────────────────────────────");
                 }
             }
+
             RepoCommand::CreateUsingTemplate {
                 template_owner,
                 template_name,
@@ -443,26 +445,50 @@ async fn main() {
                 println!("│{result}");
                 println!("╰────────────────────────────────────────────────────────────────────────────────────────────────");
             }
+
             ReleaseCommand::GetLatest { owner, repo } => {
-				let repo_info: RepoInfo = match RepoInfo::new(Some(owner), Some(repo)) {
+                let repo_info: RepoInfo = match RepoInfo::new(Some(owner), Some(repo)) {
                     Ok(rep) => rep,
                     Err(message) => {
                         eprintln!("Error: {message}");
                         process::exit(1);
                     }
-				};
+                };
 
-				let result = releases::get_latest(&github_client, repo_info).await;
+                let result = releases::get_latest(&github_client, repo_info).await;
 
                 println!("╭────────────────────────────────────────────────────────────────────────────────────────────────");
                 println!("│Release tag: {}", result.tag_name);
+                println!("│Release id: {}", result.id);
                 println!("│Release title: {}", result.name);
                 println!("│Release body: {}", result.body);
                 println!("│Release tag_commit: {}", result.target_commitish);
                 println!("│Release url: {}", result.url);
                 println!("│Release upload_url: {}", result.upload_url);
                 println!("╰────────────────────────────────────────────────────────────────────────────────────────────────");
-			}
+            }
+
+            ReleaseCommand::GetByTag { owner, repo, tag } => {
+                let repo_info: RepoInfo = match RepoInfo::new(Some(owner), Some(repo)) {
+                    Ok(rep) => rep,
+                    Err(message) => {
+                        eprintln!("Error: {message}");
+                        process::exit(1);
+                    }
+                };
+
+                let result = releases::get_by_tag(&github_client, repo_info, tag).await;
+
+                println!("╭────────────────────────────────────────────────────────────────────────────────────────────────");
+                println!("│Release tag: {}", result.tag_name);
+                println!("│Release id: {}", result.id);
+                println!("│Release title: {}", result.name);
+                println!("│Release body: {}", result.body);
+                println!("│Release tag_commit: {}", result.target_commitish);
+                println!("│Release url: {}", result.url);
+                println!("│Release upload_url: {}", result.upload_url);
+                println!("╰────────────────────────────────────────────────────────────────────────────────────────────────");
+            }
         },
     }
 }
