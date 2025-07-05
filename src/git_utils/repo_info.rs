@@ -148,7 +148,7 @@ impl RepoInfo {
         return self.ssh.clone().0;
     }
 
-    pub fn new(owner: Option<String>, name: Option<String>) -> Result<RepoInfo, io::Error> {
+    pub fn new(owner: Option<RepoOwner>, name: Option<RepoName>) -> Result<RepoInfo, io::Error> {
         if owner.is_none() && name.is_none() {
             let new_repo = RepoInfo {
                 owner: RepoOwner(String::new()),
@@ -169,8 +169,8 @@ impl RepoInfo {
             ));
         } else {
             let mut new_repo = RepoInfo {
-                owner: RepoOwner(owner.unwrap().trim_start().trim_end().to_string()),
-                name: RepoName(name.unwrap().trim_start().trim_end().to_string()),
+                owner: RepoOwner(owner.unwrap().0.trim_start().trim_end().to_string()),
+                name: RepoName(name.unwrap().0.trim_start().trim_end().to_string()),
                 url: RepoUrl(String::new()),
                 ssh: RepoSsh(String::new()),
             };

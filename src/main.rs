@@ -366,11 +366,19 @@ async fn main() {
                         process::exit(1);
                     }
                 };
+                let template_info: RepoInfo =
+                    match RepoInfo::new(Some(template_owner), Some(template_name)) {
+                        Ok(rep) => rep,
+                        Err(message) => {
+                            eprintln!("Error: {message}");
+                            process::exit(1);
+                        }
+                    };
+
                 let (result, repo) = repos::create_using_template(
                     &github_client,
-                    &template_owner,
-                    &template_name,
-					repo_info,
+                    template_info,
+                    repo_info,
                     &description,
                     include_all_branches,
                     private,
@@ -384,7 +392,14 @@ async fn main() {
             }
 
             RepoCommand::CreateFork { org, name, owner } => {
-                let result = repos::create_fork(&github_client, &org, &owner, &name).await;
+                let fork_info: RepoInfo = match RepoInfo::new(Some(owner), Some(name)) {
+                    Ok(rep) => rep,
+                    Err(message) => {
+                        eprintln!("Error: {message}");
+                        process::exit(1);
+                    }
+                };
+                let result = repos::create_fork(&github_client, &org, fork_info).await;
 
                 println!("{result}");
             }
@@ -412,11 +427,11 @@ async fn main() {
 
                 let (result, release) = releases::create(
                     &github_client,
-					repo_info,
+                    repo_info,
                     body,
                     discussion_category_name,
                     draft,
-					&name,
+                    &name,
                     prerelease,
                     &tag_name,
                     target_commitish,

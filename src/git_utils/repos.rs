@@ -147,8 +147,7 @@ pub async fn get_all_from_org(
 
 pub async fn create_using_template(
     github_client: &Client,
-    template_owner: &String,
-    template_name: &String,
+	template_info: RepoInfo,
     repo_info: RepoInfo,
     description: &String,
     include_all_branches: Option<bool>,
@@ -164,7 +163,7 @@ pub async fn create_using_template(
 
     let new_repo = github_client
         .repos()
-        .create_using_template(template_owner.trim(), template_name.trim(), &request)
+        .create_using_template(&template_info.get_owner().trim(), &template_info.get_name().trim(), &request)
         .await;
 
     return match new_repo {
@@ -179,8 +178,7 @@ pub async fn create_using_template(
 pub async fn create_fork(
     github_client: &Client,
     org: &String,
-    owner: &String,
-    name: &String,
+	fork_info: RepoInfo
 ) -> String {
     let request = ReposCreateForkRequest {
         organization: org.clone(),
@@ -188,7 +186,7 @@ pub async fn create_fork(
 
     let new_fork = github_client
         .repos()
-        .create_fork(owner.trim(), name.trim(), &request)
+        .create_fork(&fork_info.get_owner().trim(), &fork_info.get_name().trim(), &request)
         .await;
 
     return match new_fork {
