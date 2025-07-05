@@ -307,6 +307,7 @@ async fn main() {
                 println!("│{result}");
                 println!("╰────────────────────────────────────────────────────────────────────────────────────────────────");
             }
+
             RepoCommand::GetAllFromOrg {
                 org,
                 order,
@@ -350,6 +351,7 @@ async fn main() {
                     println!("╰────────────────────────────────────────────────────────────────────────────────────────────────");
                 }
             }
+
             RepoCommand::CreateUsingTemplate {
                 template_owner,
                 template_name,
