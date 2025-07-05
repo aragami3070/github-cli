@@ -33,6 +33,33 @@ impl RepoSsh {
 	}
 }
 
+impl FromStr for RepoOwner {
+    type Err = String;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        if s.is_empty() {
+            Err("Repo owner cannot be empty".to_string())
+        } else if s.contains('/') {
+            Err("Repo owner cannot contain '/'".to_string())
+        } else {
+            Ok(RepoOwner(s.to_string()))
+        }
+    }
+}
+
+impl FromStr for RepoName {
+    type Err = String;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        if s.is_empty() {
+            Err("Repo name cannot be empty".to_string())
+        } else if s.contains('/') {
+            Err("Repo name cannot contain '/'".to_string())
+        } else {
+            Ok(RepoName(s.to_string()))
+        }
+    }
+}
 
 pub struct RepoInfo {
     owner: RepoOwner,
