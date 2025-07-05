@@ -25,6 +25,7 @@ pub enum ReleaseCommand {
         #[clap(long)]
         target_commitish: String,
     },
+
     /// Get latest release
     GetLatest {
 		/// Repo owner
@@ -33,5 +34,17 @@ pub enum ReleaseCommand {
 		/// Repo name
         #[clap(long, short)]
         repo: RepoName,
+    },
+    /// Get release by tag
+    GetByTag{
+		/// Repo owner
+        #[clap(long, short)]
+        owner: RepoOwner,
+		/// Repo name
+        #[clap(long, short)]
+        repo: RepoName,
+		/// Release tag
+        #[clap(long, short)]
+        tag: String,
     },
 }
