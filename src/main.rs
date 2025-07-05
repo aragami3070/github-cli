@@ -382,12 +382,14 @@ async fn main() {
                 println!("│{result}");
                 println!("╰────────────────────────────────────────────────────────────────────────────────────────────────");
             }
+
             RepoCommand::CreateFork { org, name, owner } => {
                 let result = repos::create_fork(&github_client, &org, &owner, &name).await;
 
                 println!("{result}");
             }
         },
+
         CliCommand::Release { subcommand } => match subcommand {
             ReleaseCommand::Create {
                 owner,
@@ -400,21 +402,31 @@ async fn main() {
                 tag_name,
                 target_commitish,
             } => {
-                let result = releases::create(
+                let repo_info: RepoInfo = match RepoInfo::new(Some(owner), Some(repo)) {
+                    Ok(rep) => rep,
+                    Err(message) => {
+                        eprintln!("Error: {message}");
+                        process::exit(1);
+                    }
+                };
+
+                let (result, release) = releases::create(
                     &github_client,
-                    &owner,
-                    &repo,
+					repo_info,
                     body,
                     discussion_category_name,
                     draft,
-                    &name,
+					&name,
                     prerelease,
                     &tag_name,
                     target_commitish,
                 )
                 .await;
 
-                println!("{result}");
+                println!("╭────────────────────────────────────────────────────────────────────────────────────────────────");
+                println!("│New release: {release}");
+                println!("│{result}");
+                println!("╰────────────────────────────────────────────────────────────────────────────────────────────────");
             }
         },
     }

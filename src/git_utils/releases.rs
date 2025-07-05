@@ -2,10 +2,11 @@ use std::process;
 
 use octorust::{types::ReposCreateReleaseRequest, Client};
 
+use crate::git_utils::repo_info::RepoInfo;
+
 pub async fn create(
     github_client: &Client,
-    owner: &String,
-    repo: &String,
+    repo_info: RepoInfo,
     body: String,
     discussion_category_name: String,
     draft: Option<bool>,
@@ -13,8 +14,7 @@ pub async fn create(
     prerelease: Option<bool>,
     tag_name: &String,
     target_commitish: String,
-) -> String {
-
+) -> (String, String) {
     let request = ReposCreateReleaseRequest {
         body: body,
         discussion_category_name: discussion_category_name,
@@ -27,11 +27,15 @@ pub async fn create(
 
     let result = github_client
         .repos()
-        .create_release(owner.trim(), repo.trim(), &request)
+        .create_release(
+            repo_info.get_owner().trim(),
+            repo_info.get_name().trim(),
+            &request,
+        )
         .await;
 
     return match result {
-        Ok(_) => "Success".to_string(),
+        Ok(_) => ("Success".to_string(), repo_info.get_release_url(tag_name)),
         Err(message) => {
             eprintln!("{message}");
             process::exit(1);
