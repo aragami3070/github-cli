@@ -69,15 +69,18 @@ impl RepoInfo {
     }
 
     pub fn get_owner(&self) -> String {
-        return self.owner.replace("-", " ").clone();
+        return self.owner.clone();
     }
 
     pub fn get_name(&self) -> String {
-        return self.name.replace("-", " ").clone();
+        return self.name.clone();
     }
 
-    pub fn get_url(&self) -> String {
-        return self.url.clone();
+    pub fn get_release_url(&self, tag: &String) -> String {
+        let mut release_url = self.url.clone();
+        release_url.push_str("releases/tag/");
+        release_url.push_str(tag.trim());
+        return release_url;
     }
 
     pub fn get_ssh(&self) -> String {
@@ -105,8 +108,8 @@ impl RepoInfo {
             ));
         } else {
             let mut new_repo = RepoInfo {
-                owner: owner.unwrap().trim_start().trim_end().replace(" ", "-"),
-                name: name.unwrap().trim_start().trim_end().replace(" ", "-"),
+                owner: owner.unwrap().trim_start().trim_end().to_string(),
+                name: name.unwrap().trim_start().trim_end().to_string(),
                 url: String::new(),
                 ssh: String::new(),
             };
