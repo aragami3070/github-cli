@@ -282,7 +282,7 @@ async fn main() {
 
                 let (result, repo) = repos::create_in_org(
                     &github_client,
-                    &repo_info,
+                    repo_info,
                     allow_auto_merge,
                     allow_merge_commit,
                     allow_rebase_merge,
@@ -359,19 +359,28 @@ async fn main() {
                 private,
                 include_all_branches,
             } => {
-                let result = repos::create_using_template(
+                let repo_info: RepoInfo = match RepoInfo::new(Some(owner), Some(name)) {
+                    Ok(rep) => rep,
+                    Err(message) => {
+                        eprintln!("Error: {message}");
+                        process::exit(1);
+                    }
+                };
+                let (result, repo) = repos::create_using_template(
                     &github_client,
                     &template_owner,
                     &template_name,
-                    &name,
-                    &owner,
+					repo_info,
                     &description,
                     include_all_branches,
                     private,
                 )
                 .await;
 
-                println!("{result}");
+                println!("╭────────────────────────────────────────────────────────────────────────────────────────────────");
+                println!("│New repo: {repo}");
+                println!("│{result}");
+                println!("╰────────────────────────────────────────────────────────────────────────────────────────────────");
             }
             RepoCommand::CreateFork { org, name, owner } => {
                 let result = repos::create_fork(&github_client, &org, &owner, &name).await;

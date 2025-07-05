@@ -67,7 +67,7 @@ pub async fn create_for_authenticated_user(
 
 pub async fn create_in_org(
     github_client: &Client,
-    repo_info: &RepoInfo,
+    repo_info: RepoInfo,
     allow_auto_merge: Option<bool>,
     allow_merge_commit: Option<bool>,
     allow_rebase_merge: Option<bool>,
@@ -149,17 +149,16 @@ pub async fn create_using_template(
     github_client: &Client,
     template_owner: &String,
     template_name: &String,
-    name: &String,
-    owner: &String,
+    repo_info: RepoInfo,
     description: &String,
     include_all_branches: Option<bool>,
     private: Option<bool>,
-) -> String {
+) -> (String, String) {
     let request = ReposCreateUsingTemplateRequest {
         description: description.clone(),
         include_all_branches: include_all_branches,
-        name: name.clone(),
-        owner: owner.clone(),
+        name: repo_info.get_name(),
+        owner: repo_info.get_owner(),
         private: private,
     };
 
@@ -169,7 +168,7 @@ pub async fn create_using_template(
         .await;
 
     return match new_repo {
-        Ok(_) => "Success".to_string(),
+        Ok(_) => ("Success".to_string(), repo_info.get_ssh()),
         Err(message) => {
             eprintln!("Error: {message}");
             process::exit(1);
