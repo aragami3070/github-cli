@@ -6,12 +6,12 @@ use octorust::types::{
 };
 use octorust::Client;
 
-use crate::git_utils::common::url_to_vars;
 use crate::git_utils::comments;
+use crate::git_utils::repo_info::RepoInfo;
 
 pub async fn get_list(
     github_client: &Client,
-    repo_info: &String,
+    repo_info: &RepoInfo,
     creator: &String,
     assignee: &String,
     state: &types::IssuesListState,
@@ -21,19 +21,11 @@ pub async fn get_list(
 ) -> Vec<types::IssueSimple> {
     let sort = types::IssuesListSort::Created;
 
-    let (owner, repo) = match url_to_vars(repo_info) {
-        Ok(info) => info,
-        Err(message) => {
-            eprintln!("Error: {message}");
-            process::exit(1);
-        }
-    };
-
     let issues = github_client
         .issues()
         .list_for_repo(
-            owner.trim(),
-            repo.trim(),
+            &repo_info.get_owner().trim(),
+            &repo_info.get_name().trim(),
             "",
             state.clone(),
             assignee,
@@ -86,25 +78,21 @@ fn get_create_request(
 
 pub async fn create(
     github_client: &Client,
-    repo_info: &String,
+    repo_info: RepoInfo,
     title: &String,
     body: &String,
     assignees: &Vec<String>,
     labels: &Vec<String>,
 ) -> String {
-    let (owner, repo) = match url_to_vars(repo_info) {
-        Ok(info) => info,
-        Err(message) => {
-            eprintln!("Error: {message}");
-            process::exit(1);
-        }
-    };
-
     let request = get_create_request(title, body, assignees, labels);
 
     let new_issue = github_client
         .issues()
-        .create(owner.trim(), repo.trim(), &request)
+        .create(
+            &repo_info.get_owner().trim(),
+            &repo_info.get_name().trim(),
+            &request,
+        )
         .await;
 
     return match new_issue {
@@ -146,20 +134,12 @@ fn get_update_request(
 
 pub async fn close(
     github_client: &Client,
-    repo_info: &String,
+    repo_info: RepoInfo,
     issue_number: &i64,
     comment: &String,
 ) -> String {
-    let (owner, repo) = match url_to_vars(repo_info) {
-        Ok(info) => info,
-        Err(message) => {
-            eprintln!("Error: {message}");
-            process::exit(1);
-        }
-    };
-
     if comment != "" {
-        let new_comment = comments::create(github_client, repo_info, issue_number, comment).await;
+        let new_comment = comments::create(github_client, &repo_info, issue_number, comment).await;
         println!("{new_comment}");
     }
 
@@ -167,7 +147,12 @@ pub async fn close(
 
     let close = github_client
         .issues()
-        .update(owner.trim(), repo.trim(), issue_number.clone(), &request)
+        .update(
+            &repo_info.get_owner().trim(),
+            &repo_info.get_name().trim(),
+            issue_number.clone(),
+            &request,
+        )
         .await;
 
     return match close {
@@ -181,7 +166,7 @@ pub async fn close(
 
 pub async fn update(
     github_client: &Client,
-    repo_info: &String,
+    repo_info: RepoInfo,
     issue_number: &i64,
     title: Option<&String>,
     body: Option<&String>,
@@ -189,19 +174,16 @@ pub async fn update(
     labels: &Vec<String>,
     state: &State,
 ) -> String {
-    let (owner, repo) = match url_to_vars(repo_info) {
-        Ok(info) => info,
-        Err(message) => {
-            eprintln!("Error: {message}");
-            process::exit(1);
-        }
-    };
-
     let request = get_update_request(title, body, Some(assignees), Some(labels), state);
 
     let update_iss = github_client
         .issues()
-        .update(owner.trim(), repo.trim(), issue_number.clone(), &request)
+        .update(
+            &repo_info.get_owner().trim(),
+            &repo_info.get_name().trim(),
+            issue_number.clone(),
+            &request,
+        )
         .await;
 
     return match update_iss {

@@ -2,12 +2,14 @@ use std::process;
 
 use octorust::{
     types::{
-        MinimalRepository, Order, ReposCreateForkRequest, ReposCreateInOrgRequest, ReposCreateInOrgRequestVisibility, ReposCreateRequest, ReposCreateUsingTemplateRequest, ReposListOrgSort, ReposListOrgType
+        MinimalRepository, Order, ReposCreateForkRequest, ReposCreateInOrgRequest,
+        ReposCreateInOrgRequestVisibility, ReposCreateRequest, ReposCreateUsingTemplateRequest,
+        ReposListOrgSort, ReposListOrgType,
     },
     Client,
 };
 
-use crate::git_utils::teams::get_id;
+use crate::git_utils::{repo_info::RepoInfo, teams::get_id};
 
 pub async fn create_for_authenticated_user(
     github_client: &Client,
@@ -65,7 +67,7 @@ pub async fn create_for_authenticated_user(
 
 pub async fn create_in_org(
     github_client: &Client,
-    org: &String,
+    repo_info: RepoInfo,
     allow_auto_merge: Option<bool>,
     allow_merge_commit: Option<bool>,
     allow_rebase_merge: Option<bool>,
@@ -80,11 +82,10 @@ pub async fn create_in_org(
     homepage: &String,
     is_template: Option<bool>,
     license_template: &String,
-    name: &String,
     team_name: &String,
     visibility: Option<ReposCreateInOrgRequestVisibility>,
-) -> String {
-    let team = get_id(github_client, org, team_name).await;
+) -> (String, String) {
+    let team = get_id(github_client, &repo_info.get_owner(), team_name).await;
 
     let team_id = team.id;
 
@@ -103,7 +104,7 @@ pub async fn create_in_org(
         homepage: homepage.clone(),
         is_template: is_template,
         license_template: license_template.clone(),
-        name: name.clone(),
+        name: repo_info.get_name(),
         private: None,
         team_id: team_id,
         visibility: visibility,
@@ -111,11 +112,11 @@ pub async fn create_in_org(
 
     let new_repo = github_client
         .repos()
-        .create_in_org(org.trim(), &request)
+        .create_in_org(repo_info.get_owner().trim(), &request)
         .await;
 
     return match new_repo {
-        Ok(_) => "Success".to_string(),
+        Ok(_) => ("Success".to_string(), repo_info.get_ssh()),
         Err(message) => {
             eprintln!("Error: {message}");
             process::exit(1);
@@ -148,17 +149,16 @@ pub async fn create_using_template(
     github_client: &Client,
     template_owner: &String,
     template_name: &String,
-    name: &String,
-    owner: &String,
+    repo_info: RepoInfo,
     description: &String,
     include_all_branches: Option<bool>,
     private: Option<bool>,
-) -> String {
+) -> (String, String) {
     let request = ReposCreateUsingTemplateRequest {
         description: description.clone(),
         include_all_branches: include_all_branches,
-        name: name.clone(),
-        owner: owner.clone(),
+        name: repo_info.get_name(),
+        owner: repo_info.get_owner(),
         private: private,
     };
 
@@ -168,7 +168,7 @@ pub async fn create_using_template(
         .await;
 
     return match new_repo {
-        Ok(_) => "Success".to_string(),
+        Ok(_) => ("Success".to_string(), repo_info.get_ssh()),
         Err(message) => {
             eprintln!("Error: {message}");
             process::exit(1);
@@ -178,15 +178,18 @@ pub async fn create_using_template(
 
 pub async fn create_fork(
     github_client: &Client,
-	org: &String,
+    org: &String,
     owner: &String,
     name: &String,
 ) -> String {
-	let request = ReposCreateForkRequest {
-		organization: org.clone()
-	};
-    
-	let new_fork = github_client.repos().create_fork(owner.trim(), name.trim(), &request).await;
+    let request = ReposCreateForkRequest {
+        organization: org.clone(),
+    };
+
+    let new_fork = github_client
+        .repos()
+        .create_fork(owner.trim(), name.trim(), &request)
+        .await;
 
     return match new_fork {
         Ok(_) => "Success".to_string(),

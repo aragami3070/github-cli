@@ -9,17 +9,19 @@ use crate::cli_parse::comment_command::CommentCommand;
 use crate::cli_parse::issue_command::IssueCommand;
 use crate::cli_parse::read_cli::Args;
 use crate::cli_parse::read_cli::CliCommand;
+use crate::cli_parse::release_command::ReleaseCommand;
 use crate::cli_parse::repo_command::RepoCommand;
 use crate::cli_parse::set_vars::set_issues_list_state;
 use crate::cli_parse::set_vars::set_option_string;
 use crate::cli_parse::set_vars::set_order;
-use crate::cli_parse::set_vars::set_repo;
 use crate::cli_parse::set_vars::set_repos_list_org_sort;
 use crate::cli_parse::set_vars::set_repos_list_org_type;
 use crate::cli_parse::set_vars::set_state;
 use crate::cli_parse::set_vars::set_visibility;
 use crate::git_utils::comments;
 use crate::git_utils::issues;
+use crate::git_utils::releases;
+use crate::git_utils::repo_info::RepoInfo;
 use crate::git_utils::repos;
 
 #[tokio::main]
@@ -48,7 +50,14 @@ async fn main() {
                 numb_of_page,
                 iss_on_page,
             } => {
-                let repo_info: String = set_repo();
+                let repo_info: RepoInfo = match RepoInfo::new(None, None) {
+                    Ok(rep) => rep,
+                    Err(message) => {
+                        eprintln!("Error: {message}");
+                        process::exit(1);
+                    }
+                };
+
                 let inp_state = match set_issues_list_state(&state) {
                     Ok(res) => res,
                     Err(message) => {
@@ -76,9 +85,10 @@ async fn main() {
                 );
                 println!();
                 for issue in list_issues {
-                    println!("Issue {}: {};", issue.number, issue.title);
-                    println!("Body: {}", issue.body);
-                    println!();
+                    println!("╭────────────────────────────────────────────────────────────────────────────────────────────────");
+                    println!("│Issue {}: {};", issue.number, issue.title);
+                    println!("│Body: {}", issue.body);
+                    println!("╰────────────────────────────────────────────────────────────────────────────────────────────────");
                 }
             }
 
@@ -88,14 +98,20 @@ async fn main() {
                 assignees,
                 labels,
             } => {
-                let repo_info: String = set_repo();
+                let repo_info: RepoInfo = match RepoInfo::new(None, None) {
+                    Ok(rep) => rep,
+                    Err(message) => {
+                        eprintln!("Error: {message}");
+                        process::exit(1);
+                    }
+                };
                 let labels_list: Vec<String> = labels.split(",").map(|s| s.to_string()).collect();
                 let assignees_list: Vec<String> =
                     assignees.split(",").map(|s| s.to_string()).collect();
 
                 let result = issues::create(
                     &github_client,
-                    &repo_info,
+                    repo_info,
                     &title,
                     &body,
                     &assignees_list,
@@ -107,8 +123,14 @@ async fn main() {
             }
 
             IssueCommand::Close { number, comment } => {
-                let repo_info: String = set_repo();
-                let result = issues::close(&github_client, &repo_info, &number, &comment).await;
+                let repo_info: RepoInfo = match RepoInfo::new(None, None) {
+                    Ok(rep) => rep,
+                    Err(message) => {
+                        eprintln!("Error: {message}");
+                        process::exit(1);
+                    }
+                };
+                let result = issues::close(&github_client, repo_info, &number, &comment).await;
 
                 println!("{result}");
             }
@@ -121,7 +143,13 @@ async fn main() {
                 state,
                 labels,
             } => {
-                let repo_info: String = set_repo();
+                let repo_info: RepoInfo = match RepoInfo::new(None, None) {
+                    Ok(rep) => rep,
+                    Err(message) => {
+                        eprintln!("Error: {message}");
+                        process::exit(1);
+                    }
+                };
                 let new_state = match set_state(&state) {
                     Ok(s) => s,
                     Err(message) => {
@@ -144,7 +172,7 @@ async fn main() {
 
                 let result = issues::update(
                     &github_client,
-                    &repo_info,
+                    repo_info,
                     &number,
                     new_title,
                     new_body,
@@ -157,9 +185,16 @@ async fn main() {
                 println!("{result}");
             }
         },
+
         CliCommand::Comment { subcommand } => match subcommand {
             CommentCommand::Create { number, body } => {
-                let repo_info: String = set_repo();
+                let repo_info: RepoInfo = match RepoInfo::new(None, None) {
+                    Ok(rep) => rep,
+                    Err(message) => {
+                        eprintln!("Error: {message}");
+                        process::exit(1);
+                    }
+                };
                 let result = comments::create(&github_client, &repo_info, &number, &body).await;
 
                 println!("{result}");
@@ -236,9 +271,18 @@ async fn main() {
                         process::exit(1);
                     }
                 };
-                let result = repos::create_in_org(
+
+                let repo_info: RepoInfo = match RepoInfo::new(Some(org), Some(name)) {
+                    Ok(rep) => rep,
+                    Err(message) => {
+                        eprintln!("Error: {message}");
+                        process::exit(1);
+                    }
+                };
+
+                let (result, repo) = repos::create_in_org(
                     &github_client,
-                    &org,
+                    repo_info,
                     allow_auto_merge,
                     allow_merge_commit,
                     allow_rebase_merge,
@@ -253,13 +297,15 @@ async fn main() {
                     &homepage,
                     is_template,
                     &license_template,
-                    &name,
                     &team_name,
                     Some(new_visibility),
                 )
                 .await;
 
-                println!("{result}");
+                println!("╭────────────────────────────────────────────────────────────────────────────────────────────────");
+                println!("│New repo: {repo}");
+                println!("│{result}");
+                println!("╰────────────────────────────────────────────────────────────────────────────────────────────────");
             }
             RepoCommand::GetAllFromOrg {
                 org,
@@ -313,25 +359,75 @@ async fn main() {
                 private,
                 include_all_branches,
             } => {
-                let result = repos::create_using_template(
+                let repo_info: RepoInfo = match RepoInfo::new(Some(owner), Some(name)) {
+                    Ok(rep) => rep,
+                    Err(message) => {
+                        eprintln!("Error: {message}");
+                        process::exit(1);
+                    }
+                };
+                let (result, repo) = repos::create_using_template(
                     &github_client,
                     &template_owner,
                     &template_name,
-                    &name,
-                    &owner,
+					repo_info,
                     &description,
                     include_all_branches,
                     private,
                 )
                 .await;
 
-                println!("{result}");
+                println!("╭────────────────────────────────────────────────────────────────────────────────────────────────");
+                println!("│New repo: {repo}");
+                println!("│{result}");
+                println!("╰────────────────────────────────────────────────────────────────────────────────────────────────");
             }
+
             RepoCommand::CreateFork { org, name, owner } => {
-				let result = repos::create_fork(&github_client, &org, &owner, &name).await;
+                let result = repos::create_fork(&github_client, &org, &owner, &name).await;
 
                 println!("{result}");
-			}
+            }
+        },
+
+        CliCommand::Release { subcommand } => match subcommand {
+            ReleaseCommand::Create {
+                owner,
+                repo,
+                body,
+                name,
+                discussion_category_name,
+                draft,
+                prerelease,
+                tag_name,
+                target_commitish,
+            } => {
+                let repo_info: RepoInfo = match RepoInfo::new(Some(owner), Some(repo)) {
+                    Ok(rep) => rep,
+                    Err(message) => {
+                        eprintln!("Error: {message}");
+                        process::exit(1);
+                    }
+                };
+
+                let (result, release) = releases::create(
+                    &github_client,
+					repo_info,
+                    body,
+                    discussion_category_name,
+                    draft,
+					&name,
+                    prerelease,
+                    &tag_name,
+                    target_commitish,
+                )
+                .await;
+
+                println!("╭────────────────────────────────────────────────────────────────────────────────────────────────");
+                println!("│New release: {release}");
+                println!("│{result}");
+                println!("╰────────────────────────────────────────────────────────────────────────────────────────────────");
+            }
         },
     }
 }
