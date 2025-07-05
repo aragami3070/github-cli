@@ -1,5 +1,7 @@
 use clap::{Subcommand};
 
+use crate::git_utils::repo_info::{RepoName, RepoOwner};
+
 #[derive(Subcommand)]
 pub enum RepoCommand {
     /// Create new repo in your ownership
@@ -69,9 +71,9 @@ pub enum RepoCommand {
         #[clap(long, default_value = "")]
         license_template: String,
         #[clap(long)]
-        name: String,
+        name: RepoName,
         #[clap(long)]
-        org: String,
+        org: RepoOwner,
         #[clap(long)]
         team_name: String,
 		/// Can be 'public', 'private' and 'internal' for Enterprises
@@ -83,16 +85,16 @@ pub enum RepoCommand {
     CreateUsingTemplate {
 		/// Template owner name
         #[clap(long)]
-        template_owner: String,
+        template_owner: RepoOwner,
 		/// Template repo name
         #[clap(long)]
-        template_name: String,
+        template_name: RepoName,
 		/// New repo name
         #[clap(long, short)]
-        name: String,
+        name: RepoName,
 		/// New repo owner name
         #[clap(long, short)]
-        owner: String,
+        owner: RepoOwner,
 		/// New repo description (optional)
         #[clap(long, short, default_value = "")]
         description: String,
@@ -108,10 +110,10 @@ pub enum RepoCommand {
     CreateFork {
 		/// Template name
         #[clap(long, short)]
-        name: String,
+        name: RepoName,
 		/// Template owner name
         #[clap(long, short)]
-        owner: String,
+        owner: RepoOwner,
 		/// Org name if forking into an org. Else forking in account token owner (optional)
         #[clap(long, default_value = "")]
         org: String,

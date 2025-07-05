@@ -1,6 +1,9 @@
 use std::process;
 
-use octorust::{types::ReposCreateReleaseRequest, Client};
+use octorust::{
+    types::{Release, ReposCreateReleaseRequest},
+    Client,
+};
 
 use crate::git_utils::repo_info::RepoInfo;
 
@@ -36,6 +39,21 @@ pub async fn create(
 
     return match result {
         Ok(_) => ("Success".to_string(), repo_info.get_release_url(tag_name)),
+        Err(message) => {
+            eprintln!("{message}");
+            process::exit(1);
+        }
+    };
+}
+
+pub async fn get_latest(github_client: &Client, repo_info: RepoInfo) -> Release {
+    let result = github_client
+        .repos()
+        .get_latest_release(&repo_info.get_owner().trim(), &repo_info.get_name().trim())
+        .await;
+
+    return match result {
+        Ok(r) => r.body,
         Err(message) => {
             eprintln!("{message}");
             process::exit(1);

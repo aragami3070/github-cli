@@ -1,13 +1,15 @@
 use clap::{Subcommand};
 
+use crate::git_utils::repo_info::{RepoName, RepoOwner};
+
 #[derive(Subcommand)]
 pub enum ReleaseCommand {
     /// Create new release
     Create {
         #[clap(long, short)]
-        owner: String,
+        owner: RepoOwner,
         #[clap(long, short)]
-        repo: String,
+        repo: RepoName,
         #[clap(long, short, default_value = "")]
         body: String,
         #[clap(long, short)]
@@ -22,5 +24,14 @@ pub enum ReleaseCommand {
         tag_name: String,
         #[clap(long)]
         target_commitish: String,
+    },
+    /// Get latest release
+    GetLatest {
+		/// Repo owner
+        #[clap(long, short)]
+        owner: RepoOwner,
+		/// Repo name
+        #[clap(long, short)]
+        repo: RepoName,
     },
 }
