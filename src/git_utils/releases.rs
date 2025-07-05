@@ -70,11 +70,29 @@ pub async fn get_by_tag(github_client: &Client, repo_info: RepoInfo, tag: String
             &tag,
         )
         .await;
-	return match result{
-		Ok(r) => r.body,
-		Err(message) => {
-			eprintln!("{message}");
-			process::exit(1);
-		}
-	};
+    return match result {
+        Ok(r) => r.body,
+        Err(message) => {
+            eprintln!("{message}");
+            process::exit(1);
+        }
+    };
+}
+
+pub async fn get_by_id(github_client: &Client, repo_info: RepoInfo, id: i64) -> Release {
+    let result = github_client
+        .repos()
+        .get_release(
+            &repo_info.get_owner().trim(),
+            &repo_info.get_name().trim(),
+            id,
+        )
+        .await;
+    return match result {
+        Ok(r) => r.body,
+        Err(message) => {
+            eprintln!("{message}");
+            process::exit(1);
+        }
+    };
 }
