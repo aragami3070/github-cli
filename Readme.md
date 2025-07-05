@@ -38,7 +38,7 @@ github-cli comment --help
 ```bash
 github-cli repo --help
 ```
-**Repo man page**
+**Release man page**
 ```bash
 github-cli release --help
 ```
@@ -82,7 +82,7 @@ github-cli release --help
 - [ ] Сделать получение списка репозиториев пользователя
 - [ ] Сделать получение релиза по tag
 - [ ] Сделать получение релиза по id
-- [ ] Сделать получение последнего релиза
+- [x] Сделать получение последнего релиза
 
 ### test
 - [ ] Сделать тесты (maybe in feature)
