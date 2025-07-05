@@ -11,7 +11,7 @@ use crate::git_utils::repo_info::RepoInfo;
 
 pub async fn get_list(
     github_client: &Client,
-    repo_info: RepoInfo,
+    repo_info: &RepoInfo,
     creator: &String,
     assignee: &String,
     state: &types::IssuesListState,

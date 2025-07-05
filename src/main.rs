@@ -68,7 +68,7 @@ async fn main() {
 
                 let list_issues = issues::get_list(
                     &github_client,
-                    repo_info,
+                    &repo_info,
                     &creator,
                     &assignee,
                     &inp_state,
@@ -271,9 +271,18 @@ async fn main() {
                         process::exit(1);
                     }
                 };
-                let result = repos::create_in_org(
+
+                let repo_info: RepoInfo = match RepoInfo::new(Some(org), Some(name)) {
+                    Ok(rep) => rep,
+                    Err(message) => {
+                        eprintln!("Error: {message}");
+                        process::exit(1);
+                    }
+                };
+
+                let (result, repo) = repos::create_in_org(
                     &github_client,
-                    &org,
+                    &repo_info,
                     allow_auto_merge,
                     allow_merge_commit,
                     allow_rebase_merge,
@@ -288,13 +297,15 @@ async fn main() {
                     &homepage,
                     is_template,
                     &license_template,
-                    &name,
                     &team_name,
                     Some(new_visibility),
                 )
                 .await;
 
-                println!("{result}");
+                println!("╭────────────────────────────────────────────────────────────────────────────────────────────────");
+                println!("│New repo: {repo}");
+                println!("│{result}");
+                println!("╰────────────────────────────────────────────────────────────────────────────────────────────────");
             }
             RepoCommand::GetAllFromOrg {
                 org,
