@@ -69,11 +69,11 @@ impl RepoInfo {
     }
 
     pub fn get_owner(&self) -> String {
-        return self.owner.clone();
+        return self.owner.replace("-", " ").clone();
     }
 
     pub fn get_name(&self) -> String {
-        return self.name.clone();
+        return self.name.replace("-", " ").clone();
     }
 
     pub fn get_url(&self) -> String {
@@ -105,8 +105,8 @@ impl RepoInfo {
             ));
         } else {
             let mut new_repo = RepoInfo {
-                owner: owner.unwrap(),
-                name: name.unwrap(),
+                owner: owner.unwrap().trim_start().trim_end().replace(" ", "-"),
+                name: name.unwrap().trim_start().trim_end().replace(" ", "-"),
                 url: String::new(),
                 ssh: String::new(),
             };
