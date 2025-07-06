@@ -1,4 +1,4 @@
-use octorust::types::{IssueSimple, Release};
+use octorust::types::{IssueSimple, MinimalRepository, Release};
 
 pub fn print_release(result: Release) {
     println!("╭────────────────────────────────────────────────────────────────────────────────────────────────");
@@ -14,7 +14,7 @@ pub fn print_release(result: Release) {
 
 pub fn print_issues(list_issues: Vec<IssueSimple>, state: String, numb_of_page: i64) {
     println!(
-        "{} {} Issues from {} page:",
+        " {} {} Issues from {} page:",
         list_issues.len(),
         state,
         numb_of_page
@@ -32,4 +32,17 @@ pub fn print_url(result: String, description: &str) {
     println!("╭────────────────────────────────────────────────────────────────────────────────────────────────");
     println!("│{} : {}", description, result.replace(" ", "-"));
     println!("╰────────────────────────────────────────────────────────────────────────────────────────────────");
+}
+
+pub fn print_repos(repos: Vec<MinimalRepository>, owner: String, owner_type: &str) {
+    println!(" Found {} repos in {} {}", repos.len(), owner, owner_type);
+
+    for repo in repos {
+        println!("╭────────────────────────────────────────────────────────────────────────────────────────────────");
+        println!("│Repo {}: {}", repo.id, repo.full_name);
+        println!("│Language: {}", repo.language);
+        println!("│Url: {}", repo.url);
+        println!("│Description: {}", repo.description);
+        println!("╰────────────────────────────────────────────────────────────────────────────────────────────────");
+    }
 }
