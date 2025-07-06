@@ -1,4 +1,4 @@
-use octorust::types::Release;
+use octorust::types::{IssueSimple, Release};
 
 pub fn print_release(result: Release) {
     println!("╭────────────────────────────────────────────────────────────────────────────────────────────────");
@@ -10,4 +10,20 @@ pub fn print_release(result: Release) {
     println!("│Release url: {}", result.url);
     println!("│Release upload_url: {}", result.upload_url);
     println!("╰────────────────────────────────────────────────────────────────────────────────────────────────");
+}
+
+pub fn print_issues(list_issues: Vec<IssueSimple>, state: String, numb_of_page: i64) {
+    println!(
+        "{} {} Issues from {} page:",
+        list_issues.len(),
+        state,
+        numb_of_page
+    );
+    println!();
+    for issue in list_issues {
+        println!("╭────────────────────────────────────────────────────────────────────────────────────────────────");
+        println!("│Issue {}: {};", issue.number, issue.title);
+        println!("│Body: {}", issue.body);
+        println!("╰────────────────────────────────────────────────────────────────────────────────────────────────");
+    }
 }
