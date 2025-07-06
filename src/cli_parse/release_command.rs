@@ -1,4 +1,4 @@
-use clap::{Subcommand};
+use clap::Subcommand;
 
 use crate::git_utils::repo_info::{RepoName, RepoOwner};
 
@@ -28,23 +28,37 @@ pub enum ReleaseCommand {
 
     /// Get latest release
     GetLatest {
-		/// Repo owner
+        /// Repo owner
         #[clap(long, short)]
         owner: RepoOwner,
-		/// Repo name
+        /// Repo name
         #[clap(long, short)]
         repo: RepoName,
     },
+
     /// Get release by tag
-    GetByTag{
-		/// Repo owner
+    GetByTag {
+        /// Repo owner
         #[clap(long, short)]
         owner: RepoOwner,
-		/// Repo name
+        /// Repo name
         #[clap(long, short)]
         repo: RepoName,
-		/// Release tag
+        /// Release tag
         #[clap(long, short)]
         tag: String,
+    },
+
+    /// Get release by id
+    GetById {
+        /// Repo owner
+        #[clap(long, short)]
+        owner: RepoOwner,
+        /// Repo name
+        #[clap(long, short)]
+        repo: RepoName,
+        /// Release id
+        #[clap(long, short)]
+        id: i64,
     },
 }

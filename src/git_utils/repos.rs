@@ -84,7 +84,7 @@ pub async fn create_in_org(
     license_template: &String,
     team_name: &String,
     visibility: Option<ReposCreateInOrgRequestVisibility>,
-) -> (String, String) {
+) -> String {
     let team = get_id(github_client, &repo_info.get_owner(), team_name).await;
 
     let team_id = team.id;
@@ -116,7 +116,7 @@ pub async fn create_in_org(
         .await;
 
     return match new_repo {
-        Ok(_) => ("Success".to_string(), repo_info.get_ssh()),
+        Ok(_) => repo_info.get_ssh(),
         Err(message) => {
             eprintln!("Error: {message}");
             process::exit(1);
@@ -152,7 +152,7 @@ pub async fn create_using_template(
     description: &String,
     include_all_branches: Option<bool>,
     private: Option<bool>,
-) -> (String, String) {
+) -> String {
     let request = ReposCreateUsingTemplateRequest {
         description: description.clone(),
         include_all_branches: include_all_branches,
@@ -167,7 +167,7 @@ pub async fn create_using_template(
         .await;
 
     return match new_repo {
-        Ok(_) => ("Success".to_string(), repo_info.get_ssh()),
+        Ok(_) => repo_info.get_ssh(),
         Err(message) => {
             eprintln!("Error: {message}");
             process::exit(1);

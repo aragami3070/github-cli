@@ -2,9 +2,14 @@ use clap::Parser;
 use octorust::{self, auth::Credentials, Client};
 use std::process;
 
+mod cli_out;
 mod cli_parse;
 mod git_utils;
 
+use crate::cli_out::print_in_cli::print_issues;
+use crate::cli_out::print_in_cli::print_release;
+use crate::cli_out::print_in_cli::print_repos;
+use crate::cli_out::print_in_cli::print_url;
 use crate::cli_parse::comment_command::CommentCommand;
 use crate::cli_parse::issue_command::IssueCommand;
 use crate::cli_parse::read_cli::Args;
@@ -77,19 +82,8 @@ async fn main() {
                     &iss_on_page,
                 )
                 .await;
-                println!(
-                    "{} {} Issues from {} page:",
-                    list_issues.len(),
-                    state,
-                    numb_of_page
-                );
-                println!();
-                for issue in list_issues {
-                    println!("╭────────────────────────────────────────────────────────────────────────────────────────────────");
-                    println!("│Issue {}: {};", issue.number, issue.title);
-                    println!("│Body: {}", issue.body);
-                    println!("╰────────────────────────────────────────────────────────────────────────────────────────────────");
-                }
+
+                print_issues(list_issues, state, numb_of_page);
             }
 
             IssueCommand::Create {
@@ -280,7 +274,7 @@ async fn main() {
                     }
                 };
 
-                let (result, repo) = repos::create_in_org(
+                let result = repos::create_in_org(
                     &github_client,
                     repo_info,
                     allow_auto_merge,
@@ -302,10 +296,7 @@ async fn main() {
                 )
                 .await;
 
-                println!("╭────────────────────────────────────────────────────────────────────────────────────────────────");
-                println!("│New repo: {}", repo.replace(" ", "-"));
-                println!("│{result}");
-                println!("╰────────────────────────────────────────────────────────────────────────────────────────────────");
+                print_url(result, "New repo");
             }
 
             RepoCommand::GetAllFromOrg {
@@ -340,16 +331,7 @@ async fn main() {
                     repos::get_all_from_org(&github_client, &org, new_order, new_type, new_sort)
                         .await;
 
-                println!("Found {} repos in {} org", all_repos.len(), org);
-
-                for repo in all_repos {
-                    println!("╭────────────────────────────────────────────────────────────────────────────────────────────────");
-                    println!("│Repo {}: {}", repo.id, repo.full_name);
-                    println!("│Language: {}", repo.language);
-                    println!("│Url: {}", repo.url);
-                    println!("│Description: {}", repo.description);
-                    println!("╰────────────────────────────────────────────────────────────────────────────────────────────────");
-                }
+                print_repos(all_repos, org, "org");
             }
 
             RepoCommand::CreateUsingTemplate {
@@ -377,7 +359,7 @@ async fn main() {
                         }
                     };
 
-                let (result, repo) = repos::create_using_template(
+                let result = repos::create_using_template(
                     &github_client,
                     template_info,
                     repo_info,
@@ -387,10 +369,7 @@ async fn main() {
                 )
                 .await;
 
-                println!("╭────────────────────────────────────────────────────────────────────────────────────────────────");
-                println!("│New repo: {}", repo.replace(" ", "-"));
-                println!("│{result}");
-                println!("╰────────────────────────────────────────────────────────────────────────────────────────────────");
+                print_url(result, "New repo");
             }
 
             RepoCommand::CreateFork { org, name, owner } => {
@@ -427,7 +406,7 @@ async fn main() {
                     }
                 };
 
-                let (result, release) = releases::create(
+                let result = releases::create(
                     &github_client,
                     repo_info,
                     body,
@@ -440,10 +419,7 @@ async fn main() {
                 )
                 .await;
 
-                println!("╭────────────────────────────────────────────────────────────────────────────────────────────────");
-                println!("│New release: {}", release.replace(" ", "-"));
-                println!("│{result}");
-                println!("╰────────────────────────────────────────────────────────────────────────────────────────────────");
+                print_url(result, "New release");
             }
 
             ReleaseCommand::GetLatest { owner, repo } => {
@@ -457,15 +433,7 @@ async fn main() {
 
                 let result = releases::get_latest(&github_client, repo_info).await;
 
-                println!("╭────────────────────────────────────────────────────────────────────────────────────────────────");
-                println!("│Release tag: {}", result.tag_name);
-                println!("│Release id: {}", result.id);
-                println!("│Release title: {}", result.name);
-                println!("│Release body: {}", result.body);
-                println!("│Release tag_commit: {}", result.target_commitish);
-                println!("│Release url: {}", result.url);
-                println!("│Release upload_url: {}", result.upload_url);
-                println!("╰────────────────────────────────────────────────────────────────────────────────────────────────");
+                print_release(result);
             }
 
             ReleaseCommand::GetByTag { owner, repo, tag } => {
@@ -479,15 +447,21 @@ async fn main() {
 
                 let result = releases::get_by_tag(&github_client, repo_info, tag).await;
 
-                println!("╭────────────────────────────────────────────────────────────────────────────────────────────────");
-                println!("│Release tag: {}", result.tag_name);
-                println!("│Release id: {}", result.id);
-                println!("│Release title: {}", result.name);
-                println!("│Release body: {}", result.body);
-                println!("│Release tag_commit: {}", result.target_commitish);
-                println!("│Release url: {}", result.url);
-                println!("│Release upload_url: {}", result.upload_url);
-                println!("╰────────────────────────────────────────────────────────────────────────────────────────────────");
+                print_release(result);
+            }
+
+            ReleaseCommand::GetById { owner, repo, id } => {
+                let repo_info: RepoInfo = match RepoInfo::new(Some(owner), Some(repo)) {
+                    Ok(rep) => rep,
+                    Err(message) => {
+                        eprintln!("Error: {message}");
+                        process::exit(1);
+                    }
+                };
+
+                let result = releases::get_by_id(&github_client, repo_info, id).await;
+
+                print_release(result);
             }
         },
     }
