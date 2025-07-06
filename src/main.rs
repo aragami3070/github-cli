@@ -2,10 +2,11 @@ use clap::Parser;
 use octorust::{self, auth::Credentials, Client};
 use std::process;
 
+mod cli_out;
 mod cli_parse;
 mod git_utils;
-mod cli_out;
 
+use crate::cli_out::print_in_cli::print_issues;
 use crate::cli_out::print_in_cli::print_release;
 use crate::cli_parse::comment_command::CommentCommand;
 use crate::cli_parse::issue_command::IssueCommand;
@@ -79,19 +80,8 @@ async fn main() {
                     &iss_on_page,
                 )
                 .await;
-                println!(
-                    "{} {} Issues from {} page:",
-                    list_issues.len(),
-                    state,
-                    numb_of_page
-                );
-                println!();
-                for issue in list_issues {
-                    println!("╭────────────────────────────────────────────────────────────────────────────────────────────────");
-                    println!("│Issue {}: {};", issue.number, issue.title);
-                    println!("│Body: {}", issue.body);
-                    println!("╰────────────────────────────────────────────────────────────────────────────────────────────────");
-                }
+
+                print_issues(list_issues, state, numb_of_page);
             }
 
             IssueCommand::Create {
@@ -476,7 +466,7 @@ async fn main() {
                 print_release(result);
             }
 
-            ReleaseCommand::GetById{ owner, repo, id} => {
+            ReleaseCommand::GetById { owner, repo, id } => {
                 let repo_info: RepoInfo = match RepoInfo::new(Some(owner), Some(repo)) {
                     Ok(rep) => rep,
                     Err(message) => {
@@ -490,6 +480,5 @@ async fn main() {
                 print_release(result);
             }
         },
-
     }
 }
