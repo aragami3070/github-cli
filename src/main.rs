@@ -8,6 +8,7 @@ mod git_utils;
 
 use crate::cli_out::print_in_cli::print_issues;
 use crate::cli_out::print_in_cli::print_release;
+use crate::cli_out::print_in_cli::print_url;
 use crate::cli_parse::comment_command::CommentCommand;
 use crate::cli_parse::issue_command::IssueCommand;
 use crate::cli_parse::read_cli::Args;
@@ -272,7 +273,7 @@ async fn main() {
                     }
                 };
 
-                let (result, repo) = repos::create_in_org(
+                let result = repos::create_in_org(
                     &github_client,
                     repo_info,
                     allow_auto_merge,
@@ -294,10 +295,7 @@ async fn main() {
                 )
                 .await;
 
-                println!("╭────────────────────────────────────────────────────────────────────────────────────────────────");
-                println!("│New repo: {}", repo.replace(" ", "-"));
-                println!("│{result}");
-                println!("╰────────────────────────────────────────────────────────────────────────────────────────────────");
+                print_url(result, "New repo");
             }
 
             RepoCommand::GetAllFromOrg {
@@ -369,7 +367,7 @@ async fn main() {
                         }
                     };
 
-                let (result, repo) = repos::create_using_template(
+                let result = repos::create_using_template(
                     &github_client,
                     template_info,
                     repo_info,
@@ -379,10 +377,7 @@ async fn main() {
                 )
                 .await;
 
-                println!("╭────────────────────────────────────────────────────────────────────────────────────────────────");
-                println!("│New repo: {}", repo.replace(" ", "-"));
-                println!("│{result}");
-                println!("╰────────────────────────────────────────────────────────────────────────────────────────────────");
+                print_url(result, "New repo");
             }
 
             RepoCommand::CreateFork { org, name, owner } => {
@@ -419,7 +414,7 @@ async fn main() {
                     }
                 };
 
-                let (result, release) = releases::create(
+                let result = releases::create(
                     &github_client,
                     repo_info,
                     body,
@@ -432,10 +427,7 @@ async fn main() {
                 )
                 .await;
 
-                println!("╭────────────────────────────────────────────────────────────────────────────────────────────────");
-                println!("│New release: {}", release.replace(" ", "-"));
-                println!("│{result}");
-                println!("╰────────────────────────────────────────────────────────────────────────────────────────────────");
+                print_url(result, "New release");
             }
 
             ReleaseCommand::GetLatest { owner, repo } => {

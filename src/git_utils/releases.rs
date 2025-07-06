@@ -17,7 +17,7 @@ pub async fn create(
     prerelease: Option<bool>,
     tag_name: &String,
     target_commitish: String,
-) -> (String, String) {
+) -> String {
     let request = ReposCreateReleaseRequest {
         body: body,
         discussion_category_name: discussion_category_name,
@@ -38,7 +38,7 @@ pub async fn create(
         .await;
 
     return match result {
-        Ok(_) => ("Success".to_string(), repo_info.get_release_url(tag_name)),
+        Ok(_) => repo_info.get_release_url(tag_name),
         Err(message) => {
             eprintln!("{message}");
             process::exit(1);
