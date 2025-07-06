@@ -4,7 +4,9 @@ use std::process;
 
 mod cli_parse;
 mod git_utils;
+mod cli_out;
 
+use crate::cli_out::print_in_cli::print_release;
 use crate::cli_parse::comment_command::CommentCommand;
 use crate::cli_parse::issue_command::IssueCommand;
 use crate::cli_parse::read_cli::Args;
@@ -457,15 +459,7 @@ async fn main() {
 
                 let result = releases::get_latest(&github_client, repo_info).await;
 
-                println!("╭────────────────────────────────────────────────────────────────────────────────────────────────");
-                println!("│Release tag: {}", result.tag_name);
-                println!("│Release id: {}", result.id);
-                println!("│Release title: {}", result.name);
-                println!("│Release body: {}", result.body);
-                println!("│Release tag_commit: {}", result.target_commitish);
-                println!("│Release url: {}", result.url);
-                println!("│Release upload_url: {}", result.upload_url);
-                println!("╰────────────────────────────────────────────────────────────────────────────────────────────────");
+                print_release(result);
             }
 
             ReleaseCommand::GetByTag { owner, repo, tag } => {
@@ -479,15 +473,7 @@ async fn main() {
 
                 let result = releases::get_by_tag(&github_client, repo_info, tag).await;
 
-                println!("╭────────────────────────────────────────────────────────────────────────────────────────────────");
-                println!("│Release tag: {}", result.tag_name);
-                println!("│Release id: {}", result.id);
-                println!("│Release title: {}", result.name);
-                println!("│Release body: {}", result.body);
-                println!("│Release tag_commit: {}", result.target_commitish);
-                println!("│Release url: {}", result.url);
-                println!("│Release upload_url: {}", result.upload_url);
-                println!("╰────────────────────────────────────────────────────────────────────────────────────────────────");
+                print_release(result);
             }
 
             ReleaseCommand::GetById{ owner, repo, id} => {
@@ -501,15 +487,7 @@ async fn main() {
 
                 let result = releases::get_by_id(&github_client, repo_info, id).await;
 
-                println!("╭────────────────────────────────────────────────────────────────────────────────────────────────");
-                println!("│Release tag: {}", result.tag_name);
-                println!("│Release id: {}", result.id);
-                println!("│Release title: {}", result.name);
-                println!("│Release body: {}", result.body);
-                println!("│Release tag_commit: {}", result.target_commitish);
-                println!("│Release url: {}", result.url);
-                println!("│Release upload_url: {}", result.upload_url);
-                println!("╰────────────────────────────────────────────────────────────────────────────────────────────────");
+                print_release(result);
             }
         },
 
