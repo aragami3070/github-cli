@@ -1,10 +1,12 @@
 use std::process;
 
+use chrono::Utc;
 use octorust::{
     types::{
         MinimalRepository, Order, ReposCreateForkRequest, ReposCreateInOrgRequest,
         ReposCreateInOrgRequestVisibility, ReposCreateRequest, ReposCreateUsingTemplateRequest,
-        ReposListOrgSort, ReposListOrgType, ReposListUserType, ReposListVisibility,
+        ReposListOrgSort, ReposListOrgType, ReposListType, ReposListUserType, ReposListVisibility,
+        Repository,
     },
     Client,
 };
@@ -210,11 +212,40 @@ pub async fn get_all_from_user(
     order: Order,
 ) -> Vec<MinimalRepository> {
     let all_repos = github_client
-                .repos()
-                .list_all_for_user(owner.trim(), type_value, sort_value, order)
-                .await;
+        .repos()
+        .list_all_for_user(owner.trim(), type_value, sort_value, order)
+        .await;
 
-    return match all_repos{
+    return match all_repos {
+        Ok(reps) => reps.body,
+        Err(message) => {
+            eprintln!("Error: {message}");
+            process::exit(1);
+        }
+    };
+}
+
+pub async fn get_all_from_authenticated_user(
+    github_client: &Client,
+    type_value: ReposListType,
+    sort_value: ReposListOrgSort,
+    order: Order,
+    affiliation: &str,
+) -> Vec<Repository> {
+    let all_repos = github_client
+        .repos()
+        .list_all_for_authenticated_user(
+            ReposListVisibility::All,
+            affiliation,
+            type_value,
+            sort_value,
+            order,
+            None,
+            None,
+        )
+        .await;
+
+    return match all_repos {
         Ok(reps) => reps.body,
         Err(message) => {
             eprintln!("Error: {message}");
