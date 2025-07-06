@@ -4,7 +4,7 @@ use octorust::{
     types::{
         MinimalRepository, Order, ReposCreateForkRequest, ReposCreateInOrgRequest,
         ReposCreateInOrgRequestVisibility, ReposCreateRequest, ReposCreateUsingTemplateRequest,
-        ReposListOrgSort, ReposListOrgType,
+        ReposListOrgSort, ReposListOrgType, ReposListUserType, ReposListVisibility,
     },
     Client,
 };
@@ -147,7 +147,7 @@ pub async fn get_all_from_org(
 
 pub async fn create_using_template(
     github_client: &Client,
-	template_info: RepoInfo,
+    template_info: RepoInfo,
     repo_info: RepoInfo,
     description: &String,
     include_all_branches: Option<bool>,
@@ -163,7 +163,11 @@ pub async fn create_using_template(
 
     let new_repo = github_client
         .repos()
-        .create_using_template(&template_info.get_owner().trim(), &template_info.get_name().trim(), &request)
+        .create_using_template(
+            &template_info.get_owner().trim(),
+            &template_info.get_name().trim(),
+            &request,
+        )
         .await;
 
     return match new_repo {
@@ -175,22 +179,43 @@ pub async fn create_using_template(
     };
 }
 
-pub async fn create_fork(
-    github_client: &Client,
-    org: &String,
-	fork_info: RepoInfo
-) -> String {
+pub async fn create_fork(github_client: &Client, org: &String, fork_info: RepoInfo) -> String {
     let request = ReposCreateForkRequest {
         organization: org.clone(),
     };
 
     let new_fork = github_client
         .repos()
-        .create_fork(&fork_info.get_owner().trim(), &fork_info.get_name().trim(), &request)
+        .create_fork(
+            &fork_info.get_owner().trim(),
+            &fork_info.get_name().trim(),
+            &request,
+        )
         .await;
 
     return match new_fork {
         Ok(_) => "Success".to_string(),
+        Err(message) => {
+            eprintln!("Error: {message}");
+            process::exit(1);
+        }
+    };
+}
+
+pub async fn get_all_from_user(
+    github_client: &Client,
+    owner: String,
+    type_value: ReposListUserType,
+    sort_value: ReposListOrgSort,
+    order: Order,
+) -> Vec<MinimalRepository> {
+    let all_repos = github_client
+                .repos()
+                .list_all_for_user(owner.trim(), type_value, sort_value, order)
+                .await;
+
+    return match all_repos{
+        Ok(reps) => reps.body,
         Err(message) => {
             eprintln!("Error: {message}");
             process::exit(1);
