@@ -8,6 +8,7 @@ mod git_utils;
 
 use crate::cli_out::print_in_cli::print_issues;
 use crate::cli_out::print_in_cli::print_release;
+use crate::cli_out::print_in_cli::print_repos;
 use crate::cli_out::print_in_cli::print_url;
 use crate::cli_parse::comment_command::CommentCommand;
 use crate::cli_parse::issue_command::IssueCommand;
@@ -330,16 +331,7 @@ async fn main() {
                     repos::get_all_from_org(&github_client, &org, new_order, new_type, new_sort)
                         .await;
 
-                println!("Found {} repos in {} org", all_repos.len(), org);
-
-                for repo in all_repos {
-                    println!("╭────────────────────────────────────────────────────────────────────────────────────────────────");
-                    println!("│Repo {}: {}", repo.id, repo.full_name);
-                    println!("│Language: {}", repo.language);
-                    println!("│Url: {}", repo.url);
-                    println!("│Description: {}", repo.description);
-                    println!("╰────────────────────────────────────────────────────────────────────────────────────────────────");
-                }
+                print_repos(all_repos, org, "org");
             }
 
             RepoCommand::CreateUsingTemplate {
