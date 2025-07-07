@@ -1,6 +1,6 @@
 use clap::Subcommand;
 
-use crate::{cli_parse::set_vars::Orders, git_utils::repo_info::{RepoName, RepoOwner}};
+use crate::{cli_parse::set_vars::{Orders, ReposListOrgSorts}, git_utils::repo_info::{RepoName, RepoOwner}};
 
 #[derive(Subcommand)]
 pub enum RepoCommand {
@@ -129,7 +129,7 @@ pub enum RepoCommand {
         order: Orders,
         /// Sort can be only 'created', 'fullname', 'pushed', or 'updated' (optional)
         #[clap(long, short, default_value = "updated")]
-        sort_value: String,
+        sort_value: ReposListOrgSorts,
         /// Type can be 'all', 'forks', 'internal', 'member', 'private', 'public' or 'sources' (optional)
         #[clap(long, short, default_value = "all")]
         type_value: String,
@@ -145,7 +145,7 @@ pub enum RepoCommand {
         order: Orders,
         /// Sort can be only 'created', 'fullname', 'pushed', or 'updated' (optional)
         #[clap(long, short, default_value = "updated")]
-        sort_value: String,
+        sort_value: ReposListOrgSorts,
         /// Type can be 'all', 'member', or 'owner' always and can be 'private', 'public' if owner
         /// not 'me' (optional)
         #[clap(long, short, default_value = "all")]

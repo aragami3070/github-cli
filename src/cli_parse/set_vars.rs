@@ -20,6 +20,24 @@ impl FromStr for Orders {
         }
     }
 }
+
+#[derive(Debug, Clone)]
+pub struct ReposListOrgSorts(pub ReposListOrgSort);
+
+impl FromStr for ReposListOrgSorts {
+    type Err = String;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+        "created" => Ok(ReposListOrgSorts(ReposListOrgSort::Created)),
+        "fullname" => Ok(ReposListOrgSorts(ReposListOrgSort::FullName)),
+        "pushed" => Ok(ReposListOrgSorts(ReposListOrgSort::Pushed)),
+        "updated" => Ok(ReposListOrgSorts(ReposListOrgSort::Updated)),
+            _ => Err("Bad input. Sort can be only 'created', 'fullname', 'pushed' or 'updated'".to_string()),
+        }
+    }
+}
+
 pub fn set_issues_list_state(state: &String) -> Result<types::IssuesListState, io::Error> {
     return match state.trim() {
         "open" => Ok(types::IssuesListState::Open),
@@ -91,15 +109,3 @@ pub fn set_repos_list_user_type(type_value: &String) -> Result<ReposListUserType
     };
 }
 
-pub fn set_repos_list_org_sort(sort_value: &String) -> Result<ReposListOrgSort, io::Error> {
-    return match sort_value.trim() {
-        "created" => Ok(ReposListOrgSort::Created),
-        "fullname" => Ok(ReposListOrgSort::FullName),
-        "pushed" => Ok(ReposListOrgSort::Pushed),
-        "updated" => Ok(ReposListOrgSort::Updated),
-        _ => Err(io::Error::new(
-            ErrorKind::InvalidData,
-            "Bad input. Sort can be only 'created', 'fullname', 'pushed' or 'updated'",
-        )),
-    };
-}

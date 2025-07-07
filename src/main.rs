@@ -18,7 +18,6 @@ use crate::cli_parse::release_command::ReleaseCommand;
 use crate::cli_parse::repo_command::RepoCommand;
 use crate::cli_parse::set_vars::set_issues_list_state;
 use crate::cli_parse::set_vars::set_option_string;
-use crate::cli_parse::set_vars::set_repos_list_org_sort;
 use crate::cli_parse::set_vars::set_repos_list_org_type;
 use crate::cli_parse::set_vars::set_repos_list_user_type;
 use crate::cli_parse::set_vars::set_state;
@@ -305,13 +304,6 @@ async fn main() {
                 sort_value,
                 type_value,
             } => {
-                let new_sort = match set_repos_list_org_sort(&sort_value) {
-                    Ok(o) => o,
-                    Err(message) => {
-                        eprintln!("Error: {message}");
-                        process::exit(1);
-                    }
-                };
                 let new_type = match set_repos_list_org_type(&type_value) {
                     Ok(o) => o,
                     Err(message) => {
@@ -321,7 +313,7 @@ async fn main() {
                 };
 
                 let all_repos =
-                    repos::get_all_from_org(&github_client, &org, order.0, new_type, new_sort)
+                    repos::get_all_from_org(&github_client, &org, order.0, new_type, sort_value.0)
                         .await;
 
                 print_repos(all_repos, org, "org");
@@ -384,13 +376,6 @@ async fn main() {
                 sort_value,
                 type_value,
             } => {
-                let new_sort = match set_repos_list_org_sort(&sort_value) {
-                    Ok(o) => o,
-                    Err(message) => {
-                        eprintln!("Error: {message}");
-                        process::exit(1);
-                    }
-                };
                 let new_type = match set_repos_list_user_type(&type_value) {
                     Ok(o) => o,
                     Err(message) => {
@@ -402,7 +387,7 @@ async fn main() {
                     &github_client,
                     owner.clone(),
                     new_type,
-                    new_sort,
+                    sort_value.0,
                     order.0,
                 )
                 .await;
