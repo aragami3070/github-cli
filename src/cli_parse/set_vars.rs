@@ -92,6 +92,21 @@ impl FromStr for Visibilities {
     }
 }
 
+#[derive(Debug, Clone)]
+pub struct States(pub State);
+
+impl FromStr for States {
+    type Err = String;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+        "open" => Ok(Self(State::Open)),
+        "closed" => Ok(Self(State::Closed)),
+            _ => Err("Bad input. State can be only 'open' or 'closed'".to_string()),
+        }
+    }
+}
+
 pub fn set_issues_list_state(state: &String) -> Result<types::IssuesListState, io::Error> {
     return match state.trim() {
         "open" => Ok(types::IssuesListState::Open),
@@ -104,16 +119,6 @@ pub fn set_issues_list_state(state: &String) -> Result<types::IssuesListState, i
     };
 }
 
-pub fn set_state(state: &String) -> Result<State, io::Error> {
-    return match state.trim() {
-        "open" => Ok(State::Open),
-        "closed" => Ok(State::Closed),
-        _ => Err(io::Error::new(
-            io::ErrorKind::InvalidData,
-            "Bad input. State can be only 'open' or 'closed'",
-        )),
-    };
-}
 
 pub fn set_option_string(some_string: &String) -> Option<&String> {
     return match some_string.trim() {

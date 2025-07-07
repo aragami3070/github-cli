@@ -18,7 +18,6 @@ use crate::cli_parse::release_command::ReleaseCommand;
 use crate::cli_parse::repo_command::RepoCommand;
 use crate::cli_parse::set_vars::set_issues_list_state;
 use crate::cli_parse::set_vars::set_option_string;
-use crate::cli_parse::set_vars::set_state;
 use crate::git_utils::comments;
 use crate::git_utils::issues;
 use crate::git_utils::releases;
@@ -140,13 +139,6 @@ async fn main() {
                         process::exit(1);
                     }
                 };
-                let new_state = match set_state(&state) {
-                    Ok(s) => s,
-                    Err(message) => {
-                        eprintln!("Error: {message}");
-                        process::exit(1);
-                    }
-                };
 
                 let labels_list: Vec<String> = match labels {
                     Some(l) => l.split(",").map(|s| s.to_string()).collect(),
@@ -168,7 +160,7 @@ async fn main() {
                     new_body,
                     &assignees_list,
                     &labels_list,
-                    &new_state,
+                    &state.0,
                 )
                 .await;
 
