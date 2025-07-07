@@ -1,6 +1,5 @@
 use std::process;
 
-use chrono::Utc;
 use octorust::{
     types::{
         MinimalRepository, Order, ReposCreateForkRequest, ReposCreateInOrgRequest,
@@ -225,6 +224,8 @@ pub async fn get_all_from_user(
     };
 }
 
+// NOT WORKING NOW BECAUSE OCTORUST BREAK THIS
+// 422 always
 pub async fn get_all_from_authenticated_user(
     github_client: &Client,
     type_value: ReposListType,
