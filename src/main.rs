@@ -16,13 +16,6 @@ use crate::cli_parse::read_cli::Args;
 use crate::cli_parse::read_cli::CliCommand;
 use crate::cli_parse::release_command::ReleaseCommand;
 use crate::cli_parse::repo_command::RepoCommand;
-use crate::cli_parse::set_vars::set_issues_list_state;
-use crate::cli_parse::set_vars::set_option_string;
-use crate::cli_parse::set_vars::set_order;
-use crate::cli_parse::set_vars::set_repos_list_org_sort;
-use crate::cli_parse::set_vars::set_repos_list_org_type;
-use crate::cli_parse::set_vars::set_state;
-use crate::cli_parse::set_vars::set_visibility;
 use crate::git_utils::comments;
 use crate::git_utils::issues;
 use crate::git_utils::releases;
@@ -63,20 +56,12 @@ async fn main() {
                     }
                 };
 
-                let inp_state = match set_issues_list_state(&state) {
-                    Ok(res) => res,
-                    Err(message) => {
-                        eprintln!("Error: {message}");
-                        process::exit(1);
-                    }
-                };
-
                 let list_issues = issues::get_list(
                     &github_client,
                     &repo_info,
                     &creator,
                     &assignee,
-                    &inp_state,
+                    &state.0,
                     &labels,
                     &numb_of_page,
                     &iss_on_page,
@@ -144,13 +129,6 @@ async fn main() {
                         process::exit(1);
                     }
                 };
-                let new_state = match set_state(&state) {
-                    Ok(s) => s,
-                    Err(message) => {
-                        eprintln!("Error: {message}");
-                        process::exit(1);
-                    }
-                };
 
                 let labels_list: Vec<String> = match labels {
                     Some(l) => l.split(",").map(|s| s.to_string()).collect(),
@@ -161,18 +139,16 @@ async fn main() {
                     None => Vec::new(),
                 };
 
-                let new_body: Option<&String> = set_option_string(&body);
-                let new_title: Option<&String> = set_option_string(&title);
 
                 let result = issues::update(
                     &github_client,
                     repo_info,
                     &number,
-                    new_title,
-                    new_body,
+                    Some(title),
+                    Some(body),
                     &assignees_list,
                     &labels_list,
-                    &new_state,
+                    &state.0,
                 )
                 .await;
 
@@ -258,13 +234,6 @@ async fn main() {
                 team_name,
                 visibility,
             } => {
-                let new_visibility = match set_visibility(&visibility) {
-                    Ok(v) => v,
-                    Err(message) => {
-                        eprintln!("Error: {message}");
-                        process::exit(1);
-                    }
-                };
 
                 let repo_info: RepoInfo = match RepoInfo::new(Some(org), Some(name)) {
                     Ok(rep) => rep,
@@ -292,7 +261,7 @@ async fn main() {
                     is_template,
                     &license_template,
                     &team_name,
-                    Some(new_visibility),
+                    Some(visibility.0),
                 )
                 .await;
 
@@ -305,30 +274,9 @@ async fn main() {
                 sort_value,
                 type_value,
             } => {
-                let new_order = match set_order(&order) {
-                    Ok(o) => o,
-                    Err(message) => {
-                        eprintln!("Error: {message}");
-                        process::exit(1);
-                    }
-                };
-                let new_sort = match set_repos_list_org_sort(&sort_value) {
-                    Ok(o) => o,
-                    Err(message) => {
-                        eprintln!("Error: {message}");
-                        process::exit(1);
-                    }
-                };
-                let new_type = match set_repos_list_org_type(&type_value) {
-                    Ok(o) => o,
-                    Err(message) => {
-                        eprintln!("Error: {message}");
-                        process::exit(1);
-                    }
-                };
 
                 let all_repos =
-                    repos::get_all_from_org(&github_client, &org, new_order, new_type, new_sort)
+                    repos::get_all_from_org(&github_client, &org, order.0, type_value.0, sort_value.0)
                         .await;
 
                 print_repos(all_repos, org, "org");
@@ -383,6 +331,24 @@ async fn main() {
                 let result = repos::create_fork(&github_client, &org, fork_info).await;
 
                 println!("{result}");
+            }
+
+            RepoCommand::GetAllFromUser {
+                owner,
+                order,
+                sort_value,
+                type_value,
+            } => {
+                let result = repos::get_all_from_user(
+                    &github_client,
+                    owner.clone(),
+                    type_value.0,
+                    sort_value.0,
+                    order.0,
+                )
+                .await;
+
+                print_repos(result, owner, "user");
             }
         },
 

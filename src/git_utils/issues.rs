@@ -105,8 +105,8 @@ pub async fn create(
 }
 
 fn get_update_request(
-    title: Option<&String>,
-    body: Option<&String>,
+    title: Option<String>,
+    body: Option<String>,
     assignees: Option<&Vec<String>>,
     labels: Option<&Vec<String>>,
     state: &State,
@@ -168,8 +168,8 @@ pub async fn update(
     github_client: &Client,
     repo_info: RepoInfo,
     issue_number: &i64,
-    title: Option<&String>,
-    body: Option<&String>,
+    title: Option<String>,
+    body: Option<String>,
     assignees: &Vec<String>,
     labels: &Vec<String>,
     state: &State,

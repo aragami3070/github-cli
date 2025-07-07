@@ -1,5 +1,7 @@
 use clap::{Subcommand};
 
+use crate::cli_parse::set_vars::{IssuesListStates, States};
+
 #[derive(Subcommand)]
 pub enum IssueCommand {
     /// Get list of issues
@@ -12,7 +14,7 @@ pub enum IssueCommand {
         assignee: String,
         /// Indicates the state of the issues to return. Can be either `open`, `closed`, or `all` (optional)
         #[clap(long, short, default_value = "open")]
-        state: String,
+        state: IssuesListStates,
         /// A list of comma separated label names. Example: `bug,ui,@high` (optional)
         #[clap(long, short, default_value = "")]
         labels: String,
@@ -56,7 +58,7 @@ pub enum IssueCommand {
         assignees: Option<String>,
         /// Indicates the state of the issues to return. Can be either `open` or `closed`(optional)
         #[clap(long, short, default_value = "open")]
-        state: String,
+        state: States,
         /// A list of comma separated label names. Example: `bug,ui,@high` (optional)
         #[clap(long, short, default_value = None)]
         labels: Option<String>,
