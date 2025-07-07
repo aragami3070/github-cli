@@ -37,6 +37,21 @@ impl FromStr for ReposListOrgSorts {
         }
     }
 }
+#[derive(Debug, Clone)]
+pub struct ReposListUserTypes(pub ReposListUserType);
+
+impl FromStr for ReposListUserTypes {
+    type Err = String;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+        "all" => Ok(Self(ReposListUserType::All)),
+        "member" => Ok(Self(ReposListUserType::Member)),
+        "owner" => Ok(Self(ReposListUserType::Owner)),
+            _ => Err("Bad input. Type can be only 'all', 'member' or 'owner'".to_string()),
+        }
+    }
+}
 
 pub fn set_issues_list_state(state: &String) -> Result<types::IssuesListState, io::Error> {
     return match state.trim() {
@@ -97,15 +112,4 @@ pub fn set_repos_list_org_type(type_value: &String) -> Result<ReposListOrgType, 
 	};
 }
 
-pub fn set_repos_list_user_type(type_value: &String) -> Result<ReposListUserType, io::Error> {
-    return match type_value.trim() {
-        "all" => Ok(ReposListUserType::All),
-        "member" => Ok(ReposListUserType::Member),
-        "owner" => Ok(ReposListUserType::Owner),
-        _ => Err(io::Error::new(
-            ErrorKind::InvalidData,
-            "Bad input. Type can be only 'all', 'member' or 'owner'",
-        )),
-    };
-}
 

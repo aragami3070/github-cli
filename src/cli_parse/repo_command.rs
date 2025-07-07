@@ -1,6 +1,6 @@
 use clap::Subcommand;
 
-use crate::{cli_parse::set_vars::{Orders, ReposListOrgSorts}, git_utils::repo_info::{RepoName, RepoOwner}};
+use crate::{cli_parse::set_vars::{Orders, ReposListOrgSorts, ReposListUserTypes}, git_utils::repo_info::{RepoName, RepoOwner}};
 
 #[derive(Subcommand)]
 pub enum RepoCommand {
@@ -149,7 +149,7 @@ pub enum RepoCommand {
         /// Type can be 'all', 'member', or 'owner' always and can be 'private', 'public' if owner
         /// not 'me' (optional)
         #[clap(long, short, default_value = "all")]
-        type_value: String,
+        type_value: ReposListUserTypes,
         ///// NOT WORKING NOW BECAUSE OCTORUST BREAK THIS
 		///// Can include:
         ///// - owner: Repositories that are owned by the authenticated user.
