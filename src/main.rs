@@ -16,7 +16,6 @@ use crate::cli_parse::read_cli::Args;
 use crate::cli_parse::read_cli::CliCommand;
 use crate::cli_parse::release_command::ReleaseCommand;
 use crate::cli_parse::repo_command::RepoCommand;
-use crate::cli_parse::set_vars::set_option_string;
 use crate::git_utils::comments;
 use crate::git_utils::issues;
 use crate::git_utils::releases;
@@ -140,15 +139,13 @@ async fn main() {
                     None => Vec::new(),
                 };
 
-                let new_body: Option<&String> = set_option_string(&body);
-                let new_title: Option<&String> = set_option_string(&title);
 
                 let result = issues::update(
                     &github_client,
                     repo_info,
                     &number,
-                    new_title,
-                    new_body,
+                    Some(title),
+                    Some(body),
                     &assignees_list,
                     &labels_list,
                     &state.0,

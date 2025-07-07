@@ -135,10 +135,3 @@ impl ToString for IssuesListStates {
         }
     }
 }
-
-pub fn set_option_string(some_string: &String) -> Option<&String> {
-    return match some_string.trim() {
-        "None" => None,
-        _ => Some(some_string),
-    };
-}
