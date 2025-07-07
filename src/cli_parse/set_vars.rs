@@ -1,7 +1,6 @@
-use std::io;
 use std::str::FromStr;
 
-use octorust::types::{self, Order, ReposListOrgSort, ReposListUserType, State};
+use octorust::types::{IssuesListState, Order, ReposListOrgSort, ReposListUserType, State};
 use octorust::types::{ReposCreateInOrgRequestVisibility, ReposListOrgType};
 
 #[derive(Debug, Clone)]
@@ -83,11 +82,14 @@ impl FromStr for Visibilities {
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
-        "" => Ok(Self(ReposCreateInOrgRequestVisibility::Noop)),
-        "private" => Ok(Self(ReposCreateInOrgRequestVisibility::Private)),
-        "public" => Ok(Self(ReposCreateInOrgRequestVisibility::Public)),
-        "internal" => Ok(Self(ReposCreateInOrgRequestVisibility::Internal)),
-            _ => Err("Bad input. Visibility can be only '', 'public', 'private' or 'internal'".to_string()),
+            "" => Ok(Self(ReposCreateInOrgRequestVisibility::Noop)),
+            "private" => Ok(Self(ReposCreateInOrgRequestVisibility::Private)),
+            "public" => Ok(Self(ReposCreateInOrgRequestVisibility::Public)),
+            "internal" => Ok(Self(ReposCreateInOrgRequestVisibility::Internal)),
+            _ => Err(
+                "Bad input. Visibility can be only '', 'public', 'private' or 'internal'"
+                    .to_string(),
+            ),
         }
     }
 }
@@ -100,25 +102,39 @@ impl FromStr for States {
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
-        "open" => Ok(Self(State::Open)),
-        "closed" => Ok(Self(State::Closed)),
+            "open" => Ok(Self(State::Open)),
+            "closed" => Ok(Self(State::Closed)),
             _ => Err("Bad input. State can be only 'open' or 'closed'".to_string()),
         }
     }
 }
 
-pub fn set_issues_list_state(state: &String) -> Result<types::IssuesListState, io::Error> {
-    return match state.trim() {
-        "open" => Ok(types::IssuesListState::Open),
-        "closed" => Ok(types::IssuesListState::Closed),
-        "all" => Ok(types::IssuesListState::All),
-        _ => Err(io::Error::new(
-            io::ErrorKind::InvalidData,
-            "Bad input. State can be only 'open', 'all', 'closed'",
-        )),
-    };
+#[derive(Debug, Clone)]
+pub struct IssuesListStates(pub IssuesListState);
+
+impl FromStr for IssuesListStates {
+    type Err = String;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "open" => Ok(Self(IssuesListState::Open)),
+            "closed" => Ok(Self(IssuesListState::Closed)),
+            "all" => Ok(Self(IssuesListState::All)),
+            _ => Err("Bad input. State can be only 'open', 'all', 'closed'".to_string()),
+        }
+    }
 }
 
+impl ToString for IssuesListStates {
+    fn to_string(&self) -> String {
+        match self.0 {
+            IssuesListState::Open => String::from("open"),
+            IssuesListState::Closed => String::from("closed"),
+            IssuesListState::All => String::from("all"),
+            IssuesListState::FallthroughString => String::from("FallthroughString"),
+        }
+    }
+}
 
 pub fn set_option_string(some_string: &String) -> Option<&String> {
     return match some_string.trim() {

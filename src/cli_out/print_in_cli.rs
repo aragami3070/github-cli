@@ -1,5 +1,7 @@
 use octorust::types::{IssueSimple, MinimalRepository, Release};
 
+use crate::cli_parse::set_vars::IssuesListStates;
+
 pub fn print_release(result: Release) {
     println!("╭────────────────────────────────────────────────────────────────────────────────────────────────");
     println!("│Release tag: {}", result.tag_name);
@@ -12,11 +14,11 @@ pub fn print_release(result: Release) {
     println!("╰────────────────────────────────────────────────────────────────────────────────────────────────");
 }
 
-pub fn print_issues(list_issues: Vec<IssueSimple>, state: String, numb_of_page: i64) {
+pub fn print_issues(list_issues: Vec<IssueSimple>, state: IssuesListStates, numb_of_page: i64) {
     println!(
         " {} {} Issues from {} page:",
         list_issues.len(),
-        state,
+        state.0,
         numb_of_page
     );
     println!();

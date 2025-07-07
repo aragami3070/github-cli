@@ -16,7 +16,6 @@ use crate::cli_parse::read_cli::Args;
 use crate::cli_parse::read_cli::CliCommand;
 use crate::cli_parse::release_command::ReleaseCommand;
 use crate::cli_parse::repo_command::RepoCommand;
-use crate::cli_parse::set_vars::set_issues_list_state;
 use crate::cli_parse::set_vars::set_option_string;
 use crate::git_utils::comments;
 use crate::git_utils::issues;
@@ -58,20 +57,12 @@ async fn main() {
                     }
                 };
 
-                let inp_state = match set_issues_list_state(&state) {
-                    Ok(res) => res,
-                    Err(message) => {
-                        eprintln!("Error: {message}");
-                        process::exit(1);
-                    }
-                };
-
                 let list_issues = issues::get_list(
                     &github_client,
                     &repo_info,
                     &creator,
                     &assignee,
-                    &inp_state,
+                    &state.0,
                     &labels,
                     &numb_of_page,
                     &iss_on_page,
