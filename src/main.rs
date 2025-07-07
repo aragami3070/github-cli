@@ -18,7 +18,6 @@ use crate::cli_parse::release_command::ReleaseCommand;
 use crate::cli_parse::repo_command::RepoCommand;
 use crate::cli_parse::set_vars::set_issues_list_state;
 use crate::cli_parse::set_vars::set_option_string;
-use crate::cli_parse::set_vars::set_repos_list_org_type;
 use crate::cli_parse::set_vars::set_state;
 use crate::cli_parse::set_vars::set_visibility;
 use crate::git_utils::comments;
@@ -303,16 +302,9 @@ async fn main() {
                 sort_value,
                 type_value,
             } => {
-                let new_type = match set_repos_list_org_type(&type_value) {
-                    Ok(o) => o,
-                    Err(message) => {
-                        eprintln!("Error: {message}");
-                        process::exit(1);
-                    }
-                };
 
                 let all_repos =
-                    repos::get_all_from_org(&github_client, &org, order.0, new_type, sort_value.0)
+                    repos::get_all_from_org(&github_client, &org, order.0, type_value.0, sort_value.0)
                         .await;
 
                 print_repos(all_repos, org, "org");

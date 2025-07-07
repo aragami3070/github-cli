@@ -14,8 +14,8 @@ impl FromStr for Orders {
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
-            "asc" => Ok(Orders(Order::Asc)),
-            "desc" => Ok(Orders(Order::Desc)),
+            "asc" => Ok(Self(Order::Asc)),
+            "desc" => Ok(Self(Order::Desc)),
             _ => Err("Bad input. Order can be only 'asc' or 'desc'".to_string()),
         }
     }
@@ -29,14 +29,15 @@ impl FromStr for ReposListOrgSorts {
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
-        "created" => Ok(ReposListOrgSorts(ReposListOrgSort::Created)),
-        "fullname" => Ok(ReposListOrgSorts(ReposListOrgSort::FullName)),
-        "pushed" => Ok(ReposListOrgSorts(ReposListOrgSort::Pushed)),
-        "updated" => Ok(ReposListOrgSorts(ReposListOrgSort::Updated)),
+        "created" => Ok(Self(ReposListOrgSort::Created)),
+        "fullname" => Ok(Self(ReposListOrgSort::FullName)),
+        "pushed" => Ok(Self(ReposListOrgSort::Pushed)),
+        "updated" => Ok(Self(ReposListOrgSort::Updated)),
             _ => Err("Bad input. Sort can be only 'created', 'fullname', 'pushed' or 'updated'".to_string()),
         }
     }
 }
+
 #[derive(Debug, Clone)]
 pub struct ReposListUserTypes(pub ReposListUserType);
 
@@ -49,6 +50,26 @@ impl FromStr for ReposListUserTypes {
         "member" => Ok(Self(ReposListUserType::Member)),
         "owner" => Ok(Self(ReposListUserType::Owner)),
             _ => Err("Bad input. Type can be only 'all', 'member' or 'owner'".to_string()),
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ReposListOrgTypes(pub ReposListOrgType);
+
+impl FromStr for ReposListOrgTypes {
+    type Err = String;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+        "all" => Ok(Self(ReposListOrgType::All)),
+		"forks" => Ok(Self(ReposListOrgType::Forks)),
+		"internal" => Ok(Self(ReposListOrgType::Internal)),
+		"member" => Ok(Self(ReposListOrgType::Member)),
+		"private" => Ok(Self(ReposListOrgType::Private)),
+		"public" => Ok(Self(ReposListOrgType::Public)),
+		"sources" => Ok(Self(ReposListOrgType::Sources)),
+            _ => Err("Bad input. Type can be only 'all', 'forks', 'internal', 'member', 'private', 'public' or 'sources'".to_string()),
         }
     }
 }
@@ -94,22 +115,6 @@ pub fn set_visibility(visibility: &String) -> Result<ReposCreateInOrgRequestVisi
             "Bad input. Visibility can be only '', 'public', 'private' or 'internal'",
         )),
     };
-}
-
-pub fn set_repos_list_org_type(type_value: &String) -> Result<ReposListOrgType, io::Error> {
-    return match type_value.trim() {
-		"all" => Ok(ReposListOrgType::All),
-		"forks" => Ok(ReposListOrgType::Forks),
-		"internal" => Ok(ReposListOrgType::Internal),
-		"member" => Ok(ReposListOrgType::Member),
-		"private" => Ok(ReposListOrgType::Private),
-		"public" => Ok(ReposListOrgType::Public),
-		"sources" => Ok(ReposListOrgType::Sources),
-		_ => Err(io::Error::new(
-            ErrorKind::InvalidData,
-            "Bad input. Type can be only 'all', 'forks', 'internal', 'member', 'private', 'public' or 'sources'",
-        )),
-	};
 }
 
 

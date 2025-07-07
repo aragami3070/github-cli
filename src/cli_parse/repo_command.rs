@@ -1,6 +1,6 @@
 use clap::Subcommand;
 
-use crate::{cli_parse::set_vars::{Orders, ReposListOrgSorts, ReposListUserTypes}, git_utils::repo_info::{RepoName, RepoOwner}};
+use crate::{cli_parse::set_vars::{Orders, ReposListOrgSorts, ReposListOrgTypes, ReposListUserTypes}, git_utils::repo_info::{RepoName, RepoOwner}};
 
 #[derive(Subcommand)]
 pub enum RepoCommand {
@@ -132,7 +132,7 @@ pub enum RepoCommand {
         sort_value: ReposListOrgSorts,
         /// Type can be 'all', 'forks', 'internal', 'member', 'private', 'public' or 'sources' (optional)
         #[clap(long, short, default_value = "all")]
-        type_value: String,
+        type_value: ReposListOrgTypes,
     },
 
     /// Get all repos from user
