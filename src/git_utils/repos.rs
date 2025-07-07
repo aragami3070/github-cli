@@ -4,8 +4,7 @@ use octorust::{
     types::{
         MinimalRepository, Order, ReposCreateForkRequest, ReposCreateInOrgRequest,
         ReposCreateInOrgRequestVisibility, ReposCreateRequest, ReposCreateUsingTemplateRequest,
-        ReposListOrgSort, ReposListOrgType, ReposListType, ReposListUserType, ReposListVisibility,
-        Repository,
+        ReposListOrgSort, ReposListOrgType, ReposListUserType,
     },
     Client,
 };

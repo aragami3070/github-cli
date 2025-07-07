@@ -1,6 +1,6 @@
 use clap::Subcommand;
 
-use crate::git_utils::repo_info::{RepoName, RepoOwner};
+use crate::{cli_parse::set_vars::Orders, git_utils::repo_info::{RepoName, RepoOwner}};
 
 #[derive(Subcommand)]
 pub enum RepoCommand {
@@ -126,7 +126,7 @@ pub enum RepoCommand {
         org: String,
         /// Order can be only 'asc' or 'desc' (optional)
         #[clap(long, short, default_value = "desc")]
-        order: String,
+        order: Orders,
         /// Sort can be only 'created', 'fullname', 'pushed', or 'updated' (optional)
         #[clap(long, short, default_value = "updated")]
         sort_value: String,
@@ -142,7 +142,7 @@ pub enum RepoCommand {
         owner: String,
         /// Order can be only 'asc' or 'desc' (optional)
         #[clap(long, short, default_value = "desc")]
-        order: String,
+        order: Orders,
         /// Sort can be only 'created', 'fullname', 'pushed', or 'updated' (optional)
         #[clap(long, short, default_value = "updated")]
         sort_value: String,

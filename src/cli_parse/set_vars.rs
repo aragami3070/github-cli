@@ -2,9 +2,24 @@ use std::io;
 use std::io::ErrorKind;
 use std::str::FromStr;
 
-use octorust::types::{self, Order, ReposListOrgSort, ReposListType, ReposListUserType, State};
+use octorust::types::{self, Order, ReposListOrgSort, ReposListUserType, State};
 use octorust::types::{ReposCreateInOrgRequestVisibility, ReposListOrgType};
 
+
+#[derive(Debug, Clone)]
+pub struct Orders(pub Order);
+
+impl FromStr for Orders {
+    type Err = String;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "asc" => Ok(Orders(Order::Asc)),
+            "desc" => Ok(Orders(Order::Desc)),
+            _ => Err("Bad input. Order can be only 'asc' or 'desc'".to_string()),
+        }
+    }
+}
 pub fn set_issues_list_state(state: &String) -> Result<types::IssuesListState, io::Error> {
     return match state.trim() {
         "open" => Ok(types::IssuesListState::Open),
@@ -64,17 +79,16 @@ pub fn set_repos_list_org_type(type_value: &String) -> Result<ReposListOrgType, 
 	};
 }
 
-
 pub fn set_repos_list_user_type(type_value: &String) -> Result<ReposListUserType, io::Error> {
     return match type_value.trim() {
-    "all" => Ok(ReposListUserType::All),
-    "member" => Ok(ReposListUserType::Member),
-    "owner" => Ok(ReposListUserType::Owner),
-		_ => Err(io::Error::new(
+        "all" => Ok(ReposListUserType::All),
+        "member" => Ok(ReposListUserType::Member),
+        "owner" => Ok(ReposListUserType::Owner),
+        _ => Err(io::Error::new(
             ErrorKind::InvalidData,
             "Bad input. Type can be only 'all', 'member' or 'owner'",
         )),
-	};
+    };
 }
 
 pub fn set_repos_list_org_sort(sort_value: &String) -> Result<ReposListOrgSort, io::Error> {
@@ -86,17 +100,6 @@ pub fn set_repos_list_org_sort(sort_value: &String) -> Result<ReposListOrgSort, 
         _ => Err(io::Error::new(
             ErrorKind::InvalidData,
             "Bad input. Sort can be only 'created', 'fullname', 'pushed' or 'updated'",
-        )),
-    };
-}
-
-pub fn set_order(order: &String) -> Result<Order, io::Error> {
-    return match order.trim() {
-        "asc" => Ok(Order::Asc),
-        "desc" => Ok(Order::Desc),
-        _ => Err(io::Error::new(
-            ErrorKind::InvalidData,
-            "Bad input. Order can be only 'asc' or 'desc'",
         )),
     };
 }
