@@ -19,7 +19,6 @@ use crate::cli_parse::repo_command::RepoCommand;
 use crate::cli_parse::set_vars::set_issues_list_state;
 use crate::cli_parse::set_vars::set_option_string;
 use crate::cli_parse::set_vars::set_state;
-use crate::cli_parse::set_vars::set_visibility;
 use crate::git_utils::comments;
 use crate::git_utils::issues;
 use crate::git_utils::releases;
@@ -255,13 +254,6 @@ async fn main() {
                 team_name,
                 visibility,
             } => {
-                let new_visibility = match set_visibility(&visibility) {
-                    Ok(v) => v,
-                    Err(message) => {
-                        eprintln!("Error: {message}");
-                        process::exit(1);
-                    }
-                };
 
                 let repo_info: RepoInfo = match RepoInfo::new(Some(org), Some(name)) {
                     Ok(rep) => rep,
@@ -289,7 +281,7 @@ async fn main() {
                     is_template,
                     &license_template,
                     &team_name,
-                    Some(new_visibility),
+                    Some(visibility.0),
                 )
                 .await;
 

@@ -1,6 +1,6 @@
 use clap::Subcommand;
 
-use crate::{cli_parse::set_vars::{Orders, ReposListOrgSorts, ReposListOrgTypes, ReposListUserTypes}, git_utils::repo_info::{RepoName, RepoOwner}};
+use crate::{cli_parse::set_vars::{Orders, ReposListOrgSorts, ReposListOrgTypes, ReposListUserTypes, Visibilities}, git_utils::repo_info::{RepoName, RepoOwner}};
 
 #[derive(Subcommand)]
 pub enum RepoCommand {
@@ -78,7 +78,7 @@ pub enum RepoCommand {
         team_name: String,
         /// Can be 'public', 'private' and 'internal' for Enterprises
         #[clap(long, default_value = "public")]
-        visibility: String,
+        visibility: Visibilities,
     },
 
     /// Create new repo usnig template

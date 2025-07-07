@@ -1,10 +1,8 @@
 use std::io;
-use std::io::ErrorKind;
 use std::str::FromStr;
 
 use octorust::types::{self, Order, ReposListOrgSort, ReposListUserType, State};
 use octorust::types::{ReposCreateInOrgRequestVisibility, ReposListOrgType};
-
 
 #[derive(Debug, Clone)]
 pub struct Orders(pub Order);
@@ -29,11 +27,14 @@ impl FromStr for ReposListOrgSorts {
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
-        "created" => Ok(Self(ReposListOrgSort::Created)),
-        "fullname" => Ok(Self(ReposListOrgSort::FullName)),
-        "pushed" => Ok(Self(ReposListOrgSort::Pushed)),
-        "updated" => Ok(Self(ReposListOrgSort::Updated)),
-            _ => Err("Bad input. Sort can be only 'created', 'fullname', 'pushed' or 'updated'".to_string()),
+            "created" => Ok(Self(ReposListOrgSort::Created)),
+            "fullname" => Ok(Self(ReposListOrgSort::FullName)),
+            "pushed" => Ok(Self(ReposListOrgSort::Pushed)),
+            "updated" => Ok(Self(ReposListOrgSort::Updated)),
+            _ => Err(
+                "Bad input. Sort can be only 'created', 'fullname', 'pushed' or 'updated'"
+                    .to_string(),
+            ),
         }
     }
 }
@@ -46,9 +47,9 @@ impl FromStr for ReposListUserTypes {
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
-        "all" => Ok(Self(ReposListUserType::All)),
-        "member" => Ok(Self(ReposListUserType::Member)),
-        "owner" => Ok(Self(ReposListUserType::Owner)),
+            "all" => Ok(Self(ReposListUserType::All)),
+            "member" => Ok(Self(ReposListUserType::Member)),
+            "owner" => Ok(Self(ReposListUserType::Owner)),
             _ => Err("Bad input. Type can be only 'all', 'member' or 'owner'".to_string()),
         }
     }
@@ -70,6 +71,23 @@ impl FromStr for ReposListOrgTypes {
 		"public" => Ok(Self(ReposListOrgType::Public)),
 		"sources" => Ok(Self(ReposListOrgType::Sources)),
             _ => Err("Bad input. Type can be only 'all', 'forks', 'internal', 'member', 'private', 'public' or 'sources'".to_string()),
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct Visibilities(pub ReposCreateInOrgRequestVisibility);
+
+impl FromStr for Visibilities {
+    type Err = String;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+        "" => Ok(Self(ReposCreateInOrgRequestVisibility::Noop)),
+        "private" => Ok(Self(ReposCreateInOrgRequestVisibility::Private)),
+        "public" => Ok(Self(ReposCreateInOrgRequestVisibility::Public)),
+        "internal" => Ok(Self(ReposCreateInOrgRequestVisibility::Internal)),
+            _ => Err("Bad input. Visibility can be only '', 'public', 'private' or 'internal'".to_string()),
         }
     }
 }
@@ -103,18 +121,3 @@ pub fn set_option_string(some_string: &String) -> Option<&String> {
         _ => Some(some_string),
     };
 }
-
-pub fn set_visibility(visibility: &String) -> Result<ReposCreateInOrgRequestVisibility, io::Error> {
-    return match visibility.trim() {
-        "" => Ok(ReposCreateInOrgRequestVisibility::Noop),
-        "private" => Ok(ReposCreateInOrgRequestVisibility::Private),
-        "public" => Ok(ReposCreateInOrgRequestVisibility::Public),
-        "internal" => Ok(ReposCreateInOrgRequestVisibility::Internal),
-        _ => Err(io::Error::new(
-            ErrorKind::InvalidData,
-            "Bad input. Visibility can be only '', 'public', 'private' or 'internal'",
-        )),
-    };
-}
-
-
