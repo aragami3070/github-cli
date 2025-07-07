@@ -1,7 +1,8 @@
 use std::io;
 use std::io::ErrorKind;
+use std::str::FromStr;
 
-use octorust::types::{self, Order, ReposListOrgSort, State};
+use octorust::types::{self, Order, ReposListOrgSort, ReposListType, ReposListUserType, State};
 use octorust::types::{ReposCreateInOrgRequestVisibility, ReposListOrgType};
 
 pub fn set_issues_list_state(state: &String) -> Result<types::IssuesListState, io::Error> {
@@ -59,6 +60,19 @@ pub fn set_repos_list_org_type(type_value: &String) -> Result<ReposListOrgType, 
 		_ => Err(io::Error::new(
             ErrorKind::InvalidData,
             "Bad input. Type can be only 'all', 'forks', 'internal', 'member', 'private', 'public' or 'sources'",
+        )),
+	};
+}
+
+
+pub fn set_repos_list_user_type(type_value: &String) -> Result<ReposListUserType, io::Error> {
+    return match type_value.trim() {
+    "all" => Ok(ReposListUserType::All),
+    "member" => Ok(ReposListUserType::Member),
+    "owner" => Ok(ReposListUserType::Owner),
+		_ => Err(io::Error::new(
+            ErrorKind::InvalidData,
+            "Bad input. Type can be only 'all', 'member' or 'owner'",
         )),
 	};
 }

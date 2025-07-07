@@ -223,34 +223,3 @@ pub async fn get_all_from_user(
         }
     };
 }
-
-// NOT WORKING NOW BECAUSE OCTORUST BREAK THIS
-// 422 always
-pub async fn get_all_from_authenticated_user(
-    github_client: &Client,
-    type_value: ReposListType,
-    sort_value: ReposListOrgSort,
-    order: Order,
-    affiliation: &str,
-) -> Vec<Repository> {
-    let all_repos = github_client
-        .repos()
-        .list_all_for_authenticated_user(
-            ReposListVisibility::All,
-            affiliation,
-            type_value,
-            sort_value,
-            order,
-            None,
-            None,
-        )
-        .await;
-
-    return match all_repos {
-        Ok(reps) => reps.body,
-        Err(message) => {
-            eprintln!("Error: {message}");
-            process::exit(1);
-        }
-    };
-}
