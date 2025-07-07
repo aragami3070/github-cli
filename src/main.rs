@@ -21,6 +21,7 @@ use crate::cli_parse::set_vars::set_option_string;
 use crate::cli_parse::set_vars::set_order;
 use crate::cli_parse::set_vars::set_repos_list_org_sort;
 use crate::cli_parse::set_vars::set_repos_list_org_type;
+use crate::cli_parse::set_vars::set_repos_list_user_type;
 use crate::cli_parse::set_vars::set_state;
 use crate::cli_parse::set_vars::set_visibility;
 use crate::git_utils::comments;
@@ -383,6 +384,45 @@ async fn main() {
                 let result = repos::create_fork(&github_client, &org, fork_info).await;
 
                 println!("{result}");
+            }
+
+            RepoCommand::GetAllFromUser {
+                owner,
+                order,
+                sort_value,
+                type_value,
+            } => {
+                let new_order = match set_order(&order) {
+                    Ok(o) => o,
+                    Err(message) => {
+                        eprintln!("Error: {message}");
+                        process::exit(1);
+                    }
+                };
+                let new_sort = match set_repos_list_org_sort(&sort_value) {
+                    Ok(o) => o,
+                    Err(message) => {
+                        eprintln!("Error: {message}");
+                        process::exit(1);
+                    }
+                };
+                let new_type = match set_repos_list_user_type(&type_value) {
+                    Ok(o) => o,
+                    Err(message) => {
+                        eprintln!("Error: {message}");
+                        process::exit(1);
+                    }
+                };
+                let result = repos::get_all_from_user(
+                    &github_client,
+                    owner.clone(),
+                    new_type,
+                    new_sort,
+                    new_order,
+                )
+                .await;
+
+                print_repos(result, owner, "user");
             }
         },
 
