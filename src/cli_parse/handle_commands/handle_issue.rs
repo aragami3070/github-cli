@@ -2,10 +2,43 @@ use octorust::{self, Client};
 use std::process;
 
 use crate::cli_in::issue_command::IssueCommand;
+use crate::cli_in::set_vars::IssuesListStates;
 use crate::cli_out::print_in_cli::print_issues;
 use crate::git_utils::issues;
 use crate::git_utils::repo_info::Repo;
 use crate::git_utils::repo_info::RepoInfo;
+
+async fn handle_list(
+    github_client: Client,
+    creator: String,
+    assignee: String,
+    state: IssuesListStates,
+    labels: String,
+    numb_of_page: i64,
+    iss_on_page: i64,
+) {
+    let repo_info: RepoInfo = match RepoInfo::new(Repo::Current, None, None) {
+        Ok(rep) => rep,
+        Err(message) => {
+            eprintln!("Error: {message}");
+            process::exit(1);
+        }
+    };
+
+    let list_issues = issues::get_list(
+        &github_client,
+        &repo_info,
+        &creator,
+        &assignee,
+        &state.0,
+        &labels,
+        &numb_of_page,
+        &iss_on_page,
+    )
+    .await;
+
+    print_issues(list_issues, state, numb_of_page);
+}
 
 pub async fn handle_issue_command(github_client: Client, subcommand: IssueCommand) {
     match subcommand {
@@ -17,27 +50,16 @@ pub async fn handle_issue_command(github_client: Client, subcommand: IssueComman
             numb_of_page,
             iss_on_page,
         } => {
-            let repo_info: RepoInfo = match RepoInfo::new(Repo::Current, None, None) {
-                Ok(rep) => rep,
-                Err(message) => {
-                    eprintln!("Error: {message}");
-                    process::exit(1);
-                }
-            };
-
-            let list_issues = issues::get_list(
-                &github_client,
-                &repo_info,
-                &creator,
-                &assignee,
-                &state.0,
-                &labels,
-                &numb_of_page,
-                &iss_on_page,
+            handle_list(
+                github_client,
+                creator,
+                assignee,
+                state,
+                labels,
+                numb_of_page,
+                iss_on_page,
             )
             .await;
-
-            print_issues(list_issues, state, numb_of_page);
         }
 
         IssueCommand::Create {
