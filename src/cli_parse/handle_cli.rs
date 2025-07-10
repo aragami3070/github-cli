@@ -1,5 +1,3 @@
-use std::process;
-use octorust::{self, Client};
 use crate::cli_in::comment_command::CommentCommand;
 use crate::cli_in::issue_command::IssueCommand;
 use crate::cli_in::read_cli::Args;
@@ -13,9 +11,11 @@ use crate::cli_out::print_in_cli::print_url;
 use crate::git_utils::comments;
 use crate::git_utils::issues;
 use crate::git_utils::releases;
+use crate::git_utils::repo_info::Repo;
 use crate::git_utils::repo_info::RepoInfo;
 use crate::git_utils::repos;
-
+use octorust::{self, Client};
+use std::process;
 
 pub async fn handle_cli_command(args: Args, github_client: Client) {
     match args.command {
@@ -28,7 +28,7 @@ pub async fn handle_cli_command(args: Args, github_client: Client) {
                 numb_of_page,
                 iss_on_page,
             } => {
-                let repo_info: RepoInfo = match RepoInfo::new(None, None) {
+                let repo_info: RepoInfo = match RepoInfo::new(Repo::Current, None, None) {
                     Ok(rep) => rep,
                     Err(message) => {
                         eprintln!("Error: {message}");
@@ -57,7 +57,7 @@ pub async fn handle_cli_command(args: Args, github_client: Client) {
                 assignees,
                 labels,
             } => {
-                let repo_info: RepoInfo = match RepoInfo::new(None, None) {
+                let repo_info: RepoInfo = match RepoInfo::new(Repo::Current, None, None) {
                     Ok(rep) => rep,
                     Err(message) => {
                         eprintln!("Error: {message}");
@@ -82,7 +82,7 @@ pub async fn handle_cli_command(args: Args, github_client: Client) {
             }
 
             IssueCommand::Close { number, comment } => {
-                let repo_info: RepoInfo = match RepoInfo::new(None, None) {
+                let repo_info: RepoInfo = match RepoInfo::new(Repo::Current, None, None) {
                     Ok(rep) => rep,
                     Err(message) => {
                         eprintln!("Error: {message}");
@@ -102,7 +102,7 @@ pub async fn handle_cli_command(args: Args, github_client: Client) {
                 state,
                 labels,
             } => {
-                let repo_info: RepoInfo = match RepoInfo::new(None, None) {
+                let repo_info: RepoInfo = match RepoInfo::new(Repo::Current, None, None) {
                     Ok(rep) => rep,
                     Err(message) => {
                         eprintln!("Error: {message}");
@@ -137,7 +137,7 @@ pub async fn handle_cli_command(args: Args, github_client: Client) {
 
         CliCommand::Comment { subcommand } => match subcommand {
             CommentCommand::Create { number, body } => {
-                let repo_info: RepoInfo = match RepoInfo::new(None, None) {
+                let repo_info: RepoInfo = match RepoInfo::new(Repo::Current, None, None) {
                     Ok(rep) => rep,
                     Err(message) => {
                         eprintln!("Error: {message}");
@@ -213,7 +213,7 @@ pub async fn handle_cli_command(args: Args, github_client: Client) {
                 team_name,
                 visibility,
             } => {
-                let repo_info: RepoInfo = match RepoInfo::new(Some(org), Some(name)) {
+                let repo_info: RepoInfo = match RepoInfo::new(Repo::Input, Some(org), Some(name)) {
                     Ok(rep) => rep,
                     Err(message) => {
                         eprintln!("Error: {message}");
@@ -273,7 +273,7 @@ pub async fn handle_cli_command(args: Args, github_client: Client) {
                 private,
                 include_all_branches,
             } => {
-                let repo_info: RepoInfo = match RepoInfo::new(Some(owner), Some(name)) {
+                let repo_info: RepoInfo = match RepoInfo::new(Repo::Input, Some(owner), Some(name)) {
                     Ok(rep) => rep,
                     Err(message) => {
                         eprintln!("Error: {message}");
@@ -281,7 +281,7 @@ pub async fn handle_cli_command(args: Args, github_client: Client) {
                     }
                 };
                 let template_info: RepoInfo =
-                    match RepoInfo::new(Some(template_owner), Some(template_name)) {
+                    match RepoInfo::new(Repo::Input, Some(template_owner), Some(template_name)) {
                         Ok(rep) => rep,
                         Err(message) => {
                             eprintln!("Error: {message}");
@@ -303,7 +303,7 @@ pub async fn handle_cli_command(args: Args, github_client: Client) {
             }
 
             RepoCommand::CreateFork { org, name, owner } => {
-                let fork_info: RepoInfo = match RepoInfo::new(Some(owner), Some(name)) {
+                let fork_info: RepoInfo = match RepoInfo::new(Repo::Input, Some(owner), Some(name)) {
                     Ok(rep) => rep,
                     Err(message) => {
                         eprintln!("Error: {message}");
@@ -346,7 +346,7 @@ pub async fn handle_cli_command(args: Args, github_client: Client) {
                 tag_name,
                 target_commitish,
             } => {
-                let repo_info: RepoInfo = match RepoInfo::new(Some(owner), Some(repo)) {
+                let repo_info: RepoInfo = match RepoInfo::new(Repo::Input, Some(owner), Some(repo)) {
                     Ok(rep) => rep,
                     Err(message) => {
                         eprintln!("Error: {message}");
@@ -371,7 +371,7 @@ pub async fn handle_cli_command(args: Args, github_client: Client) {
             }
 
             ReleaseCommand::GetLatest { owner, repo } => {
-                let repo_info: RepoInfo = match RepoInfo::new(Some(owner), Some(repo)) {
+                let repo_info: RepoInfo = match RepoInfo::new(Repo::Input, Some(owner), Some(repo)) {
                     Ok(rep) => rep,
                     Err(message) => {
                         eprintln!("Error: {message}");
@@ -385,7 +385,7 @@ pub async fn handle_cli_command(args: Args, github_client: Client) {
             }
 
             ReleaseCommand::GetByTag { owner, repo, tag } => {
-                let repo_info: RepoInfo = match RepoInfo::new(Some(owner), Some(repo)) {
+                let repo_info: RepoInfo = match RepoInfo::new(Repo::Input, Some(owner), Some(repo)) {
                     Ok(rep) => rep,
                     Err(message) => {
                         eprintln!("Error: {message}");
@@ -399,7 +399,7 @@ pub async fn handle_cli_command(args: Args, github_client: Client) {
             }
 
             ReleaseCommand::GetById { owner, repo, id } => {
-                let repo_info: RepoInfo = match RepoInfo::new(Some(owner), Some(repo)) {
+                let repo_info: RepoInfo = match RepoInfo::new(Repo::Input, Some(owner), Some(repo)) {
                     Ok(rep) => rep,
                     Err(message) => {
                         eprintln!("Error: {message}");

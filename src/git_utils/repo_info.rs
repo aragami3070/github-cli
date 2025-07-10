@@ -1,5 +1,10 @@
 use std::{io, process::Command, str::FromStr};
 
+pub enum Repo {
+    Current,
+    Input,
+}
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct RepoOwner(String);
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -11,26 +16,26 @@ pub struct RepoSsh(String);
 
 impl RepoOwner {
     pub fn trim(&self) -> &str {
-		return self.0.trim();
-	}
+        return self.0.trim();
+    }
 }
 
 impl RepoName {
     pub fn trim(&self) -> &str {
-		return self.0.trim();
-	}
+        return self.0.trim();
+    }
 }
 
 impl RepoUrl {
     pub fn push_str(&mut self, s: &str) {
-		self.0.push_str(s);
-	}
+        self.0.push_str(s);
+    }
 }
 
 impl RepoSsh {
     pub fn push_str(&mut self, s: &str) {
-		self.0.push_str(s);
-	}
+        self.0.push_str(s);
+    }
 }
 
 impl FromStr for RepoOwner {
@@ -148,16 +153,11 @@ impl RepoInfo {
         return self.ssh.clone().0;
     }
 
-    pub fn new(owner: Option<RepoOwner>, name: Option<RepoName>) -> Result<RepoInfo, io::Error> {
-        if owner.is_none() && name.is_none() {
-            let new_repo = RepoInfo {
-                owner: RepoOwner(String::new()),
-                name: RepoName(String::new()),
-                url: RepoUrl(String::new()),
-                ssh: RepoSsh(String::new()),
-            };
-            return Self::get_current_repo(new_repo);
-        } else if owner.is_none() {
+    fn create_repo_info(
+        owner: Option<RepoOwner>,
+        name: Option<RepoName>,
+    ) -> Result<RepoInfo, io::Error> {
+        if owner.is_none() {
             return Err(io::Error::new(
                 io::ErrorKind::NotFound,
                 "Not found repo owner",
@@ -178,6 +178,29 @@ impl RepoInfo {
             Self::set_ssh(&mut new_repo);
 
             return Ok(new_repo);
+        }
+    }
+
+    pub fn new(
+        type_repo: Repo,
+        owner: Option<RepoOwner>,
+        name: Option<RepoName>,
+    ) -> Result<RepoInfo, io::Error> {
+
+        match type_repo {
+            Repo::Current => {
+
+            let new_repo = RepoInfo {
+                owner: RepoOwner(String::new()),
+                name: RepoName(String::new()),
+                url: RepoUrl(String::new()),
+                ssh: RepoSsh(String::new()),
+            };
+            return Self::get_current_repo(new_repo);
+			}
+            Repo::Input => {
+				return Self::create_repo_info(owner, name);
+			}
         }
     }
 }
