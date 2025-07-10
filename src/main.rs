@@ -3,19 +3,19 @@ use octorust::{self, auth::Credentials, Client};
 use std::process;
 
 mod cli_out;
-mod cli_parse;
+mod cli_in;
 mod git_utils;
 
 use crate::cli_out::print_in_cli::print_issues;
 use crate::cli_out::print_in_cli::print_release;
 use crate::cli_out::print_in_cli::print_repos;
 use crate::cli_out::print_in_cli::print_url;
-use crate::cli_parse::comment_command::CommentCommand;
-use crate::cli_parse::issue_command::IssueCommand;
-use crate::cli_parse::read_cli::Args;
-use crate::cli_parse::read_cli::CliCommand;
-use crate::cli_parse::release_command::ReleaseCommand;
-use crate::cli_parse::repo_command::RepoCommand;
+use crate::cli_in::comment_command::CommentCommand;
+use crate::cli_in::issue_command::IssueCommand;
+use crate::cli_in::read_cli::Args;
+use crate::cli_in::read_cli::CliCommand;
+use crate::cli_in::release_command::ReleaseCommand;
+use crate::cli_in::repo_command::RepoCommand;
 use crate::git_utils::comments;
 use crate::git_utils::issues;
 use crate::git_utils::releases;

@@ -1,6 +1,6 @@
 use octorust::types::{IssueSimple, MinimalRepository, Release};
 
-use crate::cli_parse::set_vars::IssuesListStates;
+use crate::cli_in::set_vars::IssuesListStates;
 
 pub fn print_release(result: Release) {
     println!("╭────────────────────────────────────────────────────────────────────────────────────────────────");
