@@ -40,6 +40,36 @@ async fn handle_list(
     print_issues(list_issues, state, numb_of_page);
 }
 
+async fn handle_create(
+    github_client: Client,
+    title: String,
+    body: String,
+    assignees: String,
+    labels: String,
+) {
+    let repo_info: RepoInfo = match RepoInfo::new(Repo::Current, None, None) {
+        Ok(rep) => rep,
+        Err(message) => {
+            eprintln!("Error: {message}");
+            process::exit(1);
+        }
+    };
+    let labels_list: Vec<String> = labels.split(",").map(|s| s.to_string()).collect();
+    let assignees_list: Vec<String> = assignees.split(",").map(|s| s.to_string()).collect();
+
+    let result = issues::create(
+        &github_client,
+        repo_info,
+        &title,
+        &body,
+        &assignees_list,
+        &labels_list,
+    )
+    .await;
+
+    println!("{result}");
+}
+
 pub async fn handle_issue_command(github_client: Client, subcommand: IssueCommand) {
     match subcommand {
         IssueCommand::List {
@@ -68,27 +98,7 @@ pub async fn handle_issue_command(github_client: Client, subcommand: IssueComman
             assignees,
             labels,
         } => {
-            let repo_info: RepoInfo = match RepoInfo::new(Repo::Current, None, None) {
-                Ok(rep) => rep,
-                Err(message) => {
-                    eprintln!("Error: {message}");
-                    process::exit(1);
-                }
-            };
-            let labels_list: Vec<String> = labels.split(",").map(|s| s.to_string()).collect();
-            let assignees_list: Vec<String> = assignees.split(",").map(|s| s.to_string()).collect();
-
-            let result = issues::create(
-                &github_client,
-                repo_info,
-                &title,
-                &body,
-                &assignees_list,
-                &labels_list,
-            )
-            .await;
-
-            println!("{result}");
+            handle_create(github_client, title, body, assignees, labels).await;
         }
 
         IssueCommand::Close { number, comment } => {
