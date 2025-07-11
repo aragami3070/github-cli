@@ -7,6 +7,44 @@ use crate::cli_out::print_in_cli::print_url;
 use crate::git_utils::releases;
 use crate::git_utils::repo_info::Repo;
 use crate::git_utils::repo_info::RepoInfo;
+use crate::git_utils::repo_info::RepoName;
+use crate::git_utils::repo_info::RepoOwner;
+
+async fn handle_create(
+    github_client: Client,
+    owner: RepoOwner,
+    repo: RepoName,
+    body: String,
+    discussion_category_name: String,
+    name: String,
+    draft: Option<bool>,
+    prerelease: Option<bool>,
+    tag_name: String,
+    target_commitish: String,
+) {
+    let repo_info: RepoInfo = match RepoInfo::new(Repo::Input, Some(owner), Some(repo)) {
+        Ok(rep) => rep,
+        Err(message) => {
+            eprintln!("Error: {message}");
+            process::exit(1);
+        }
+    };
+
+    let result = releases::create(
+        &github_client,
+        repo_info,
+        body,
+        discussion_category_name,
+        draft,
+        &name,
+        prerelease,
+        &tag_name,
+        target_commitish,
+    )
+    .await;
+
+    print_url(result, "New release");
+}
 
 pub async fn handle_release_command(github_client: Client, subcommand: ReleaseCommand) {
     match subcommand {
@@ -21,28 +59,19 @@ pub async fn handle_release_command(github_client: Client, subcommand: ReleaseCo
             tag_name,
             target_commitish,
         } => {
-            let repo_info: RepoInfo = match RepoInfo::new(Repo::Input, Some(owner), Some(repo)) {
-                Ok(rep) => rep,
-                Err(message) => {
-                    eprintln!("Error: {message}");
-                    process::exit(1);
-                }
-            };
-
-            let result = releases::create(
-                &github_client,
-                repo_info,
+            handle_create(
+                github_client,
+                owner,
+                repo,
                 body,
                 discussion_category_name,
+                name,
                 draft,
-                &name,
                 prerelease,
-                &tag_name,
+                tag_name,
                 target_commitish,
             )
             .await;
-
-            print_url(result, "New release");
         }
 
         ReleaseCommand::GetLatest { owner, repo } => {
