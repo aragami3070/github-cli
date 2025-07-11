@@ -2,10 +2,12 @@ use octorust::{self, Client};
 use std::process;
 
 use crate::cli_in::repo_command::RepoCommand;
+use crate::cli_in::set_vars::Visibilities;
 use crate::cli_out::print_in_cli::print_repos;
 use crate::cli_out::print_in_cli::print_url;
 use crate::git_utils::repo_info::Repo;
 use crate::git_utils::repo_info::RepoInfo;
+use crate::git_utils::repo_info::{RepoName, RepoOwner};
 use crate::git_utils::repos;
 
 async fn handle_create_for_auth_user(
@@ -49,6 +51,60 @@ async fn handle_create_for_auth_user(
     .await;
 
     println!("{result}");
+}
+
+async fn handle_create_in_org(
+    github_client: Client,
+    allow_auto_merge: Option<bool>,
+    allow_merge_commit: Option<bool>,
+    allow_rebase_merge: Option<bool>,
+    allow_squash_merge: Option<bool>,
+    auto_init: Option<bool>,
+    delete_branch_on_merge: Option<bool>,
+    description: String,
+    gitignore_template: String,
+    has_issues: Option<bool>,
+    has_projects: Option<bool>,
+    has_wiki: Option<bool>,
+    homepage: String,
+    is_template: Option<bool>,
+    license_template: String,
+    name: RepoName,
+    org: RepoOwner,
+    team_name: String,
+    visibility: Visibilities,
+) {
+    let repo_info: RepoInfo = match RepoInfo::new(Repo::Input, Some(org), Some(name)) {
+        Ok(rep) => rep,
+        Err(message) => {
+            eprintln!("Error: {message}");
+            process::exit(1);
+        }
+    };
+
+    let result = repos::create_in_org(
+        &github_client,
+        repo_info,
+        allow_auto_merge,
+        allow_merge_commit,
+        allow_rebase_merge,
+        allow_squash_merge,
+        auto_init,
+        delete_branch_on_merge,
+        &description,
+        &gitignore_template,
+        has_issues,
+        has_projects,
+        has_wiki,
+        &homepage,
+        is_template,
+        &license_template,
+        &team_name,
+        Some(visibility.0),
+    )
+    .await;
+
+    print_url(result, "New repo");
 }
 
 pub async fn handle_repo_command(github_client: Client, subcommand: RepoCommand) {
@@ -113,37 +169,28 @@ pub async fn handle_repo_command(github_client: Client, subcommand: RepoCommand)
             team_name,
             visibility,
         } => {
-            let repo_info: RepoInfo = match RepoInfo::new(Repo::Input, Some(org), Some(name)) {
-                Ok(rep) => rep,
-                Err(message) => {
-                    eprintln!("Error: {message}");
-                    process::exit(1);
-                }
-            };
-
-            let result = repos::create_in_org(
-                &github_client,
-                repo_info,
+            handle_create_in_org(
+                github_client,
                 allow_auto_merge,
                 allow_merge_commit,
                 allow_rebase_merge,
                 allow_squash_merge,
                 auto_init,
                 delete_branch_on_merge,
-                &description,
-                &gitignore_template,
+                description,
+                gitignore_template,
                 has_issues,
                 has_projects,
                 has_wiki,
-                &homepage,
+                homepage,
                 is_template,
-                &license_template,
-                &team_name,
-                Some(visibility.0),
+                license_template,
+                name,
+                org,
+                team_name,
+                visibility,
             )
             .await;
-
-            print_url(result, "New repo");
         }
 
         RepoCommand::GetAllFromOrg {
