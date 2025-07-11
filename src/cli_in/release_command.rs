@@ -6,24 +6,33 @@ use crate::git_utils::repo_info::{RepoName, RepoOwner};
 pub enum ReleaseCommand {
     /// Create new release
     Create {
+        /// Repo owner
         #[clap(long, short)]
         owner: RepoOwner,
+        /// Repo name
         #[clap(long, short)]
         repo: RepoName,
-        #[clap(long, short, default_value = "")]
-        body: String,
-        #[clap(long, short)]
-        name: String,
-        #[clap(long, default_value = "")]
-        discussion_category_name: String,
-        #[clap(long, default_value = None)]
-        draft: Option<bool>,
-        #[clap(long, default_value = None)]
-        prerelease: Option<bool>,
+		/// Tag name
         #[clap(long)]
         tag_name: String,
+		/// Target commit hash (only long variant of commit hash)
         #[clap(long)]
         target_commitish: String,
+        /// Release name
+        #[clap(long, short)]
+        name: String,
+        /// Release body (optional)
+        #[clap(long, short, default_value = "")]
+        body: String,
+        /// Name of discussion category (optional)
+        #[clap(long, default_value = "")]
+        discussion_category_name: String,
+		/// It's draft? (optional)
+        #[clap(long, default_value = None)]
+        draft: Option<bool>,
+		// It's prerelease? (optional)
+        #[clap(long, default_value = None)]
+        prerelease: Option<bool>,
     },
 
     /// Get latest release
