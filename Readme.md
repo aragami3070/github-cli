@@ -86,6 +86,7 @@ github-cli release --help
 
 ### test
 - [ ] Сделать тесты (maybe in feature)
+- [ ] Добавить тесты в github workflow
 
 ### tui
 - [ ] Добавить TUI через ratatui на issues
