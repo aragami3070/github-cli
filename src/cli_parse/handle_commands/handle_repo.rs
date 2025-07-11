@@ -8,6 +8,49 @@ use crate::git_utils::repo_info::Repo;
 use crate::git_utils::repo_info::RepoInfo;
 use crate::git_utils::repos;
 
+async fn handle_create_for_auth_user(
+    github_client: Client,
+    allow_auto_merge: Option<bool>,
+    allow_merge_commit: Option<bool>,
+    allow_rebase_merge: Option<bool>,
+    allow_squash_merge: Option<bool>,
+    auto_init: Option<bool>,
+    delete_branch_on_merge: Option<bool>,
+    description: String,
+    gitignore_template: String,
+    has_issues: Option<bool>,
+    has_projects: Option<bool>,
+    has_wiki: Option<bool>,
+    homepage: String,
+    is_template: Option<bool>,
+    license_template: String,
+    name: String,
+    private: Option<bool>,
+) {
+    let result = repos::create_for_authenticated_user(
+        &github_client,
+        allow_auto_merge,
+        allow_merge_commit,
+        allow_rebase_merge,
+        allow_squash_merge,
+        auto_init,
+        delete_branch_on_merge,
+        &description,
+        &gitignore_template,
+        has_issues,
+        has_projects,
+        has_wiki,
+        &homepage,
+        is_template,
+        &license_template,
+        &name,
+        private,
+    )
+    .await;
+
+    println!("{result}");
+}
+
 pub async fn handle_repo_command(github_client: Client, subcommand: RepoCommand) {
     match subcommand {
         RepoCommand::CreateForAuthenticatedUser {
@@ -28,28 +71,26 @@ pub async fn handle_repo_command(github_client: Client, subcommand: RepoCommand)
             name,
             private,
         } => {
-            let result = repos::create_for_authenticated_user(
-                &github_client,
+            handle_create_for_auth_user(
+                github_client,
                 allow_auto_merge,
                 allow_merge_commit,
                 allow_rebase_merge,
                 allow_squash_merge,
                 auto_init,
                 delete_branch_on_merge,
-                &description,
-                &gitignore_template,
+                description,
+                gitignore_template,
                 has_issues,
                 has_projects,
                 has_wiki,
-                &homepage,
+                homepage,
                 is_template,
-                &license_template,
-                &name,
+                license_template,
+                name,
                 private,
             )
             .await;
-
-            println!("{result}");
         }
 
         RepoCommand::CreateInOrg {
