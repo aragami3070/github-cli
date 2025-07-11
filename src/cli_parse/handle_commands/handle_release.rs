@@ -10,6 +10,49 @@ use crate::git_utils::repo_info::RepoInfo;
 use crate::git_utils::repo_info::RepoName;
 use crate::git_utils::repo_info::RepoOwner;
 
+
+pub async fn handle_release_command(github_client: Client, subcommand: ReleaseCommand) {
+    match subcommand {
+        ReleaseCommand::Create {
+            owner,
+            repo,
+            body,
+            name,
+            discussion_category_name,
+            draft,
+            prerelease,
+            tag_name,
+            target_commitish,
+        } => {
+            handle_create(
+                github_client,
+                owner,
+                repo,
+                body,
+                discussion_category_name,
+                name,
+                draft,
+                prerelease,
+                tag_name,
+                target_commitish,
+            )
+            .await;
+        }
+
+        ReleaseCommand::GetLatest { owner, repo } => {
+            handle_get_latest(github_client, owner, repo).await;
+        }
+
+        ReleaseCommand::GetByTag { owner, repo, tag } => {
+            handle_get_by_tag(github_client, owner, repo, tag).await;
+        }
+
+        ReleaseCommand::GetById { owner, repo, id } => {
+            handle_get_by_id(github_client, owner, repo, id).await;
+        }
+    };
+}
+
 async fn handle_create(
     github_client: Client,
     owner: RepoOwner,
@@ -74,54 +117,16 @@ async fn handle_get_by_tag(github_client: Client, owner: RepoOwner, repo: RepoNa
     print_release(result);
 }
 
-pub async fn handle_release_command(github_client: Client, subcommand: ReleaseCommand) {
-    match subcommand {
-        ReleaseCommand::Create {
-            owner,
-            repo,
-            body,
-            name,
-            discussion_category_name,
-            draft,
-            prerelease,
-            tag_name,
-            target_commitish,
-        } => {
-            handle_create(
-                github_client,
-                owner,
-                repo,
-                body,
-                discussion_category_name,
-                name,
-                draft,
-                prerelease,
-                tag_name,
-                target_commitish,
-            )
-            .await;
-        }
-
-        ReleaseCommand::GetLatest { owner, repo } => {
-            handle_get_latest(github_client, owner, repo).await;
-        }
-
-        ReleaseCommand::GetByTag { owner, repo, tag } => {
-			handle_get_by_tag(github_client, owner, repo, tag).await;
-		},
-
-        ReleaseCommand::GetById { owner, repo, id } => {
-            let repo_info: RepoInfo = match RepoInfo::new(Repo::Input, Some(owner), Some(repo)) {
-                Ok(rep) => rep,
-                Err(message) => {
-                    eprintln!("Error: {message}");
-                    process::exit(1);
-                }
-            };
-
-            let result = releases::get_by_id(&github_client, repo_info, id).await;
-
-            print_release(result);
+async fn handle_get_by_id(github_client: Client, owner: RepoOwner, repo: RepoName, id: i64) {
+    let repo_info: RepoInfo = match RepoInfo::new(Repo::Input, Some(owner), Some(repo)) {
+        Ok(rep) => rep,
+        Err(message) => {
+            eprintln!("Error: {message}");
+            process::exit(1);
         }
     };
+
+    let result = releases::get_by_id(&github_client, repo_info, id).await;
+
+    print_release(result);
 }
