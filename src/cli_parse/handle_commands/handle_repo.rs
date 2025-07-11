@@ -162,6 +162,19 @@ async fn handle_create_using_template(
     print_url(result, "New repo");
 }
 
+async fn handle_create_fork(github_client: Client, owner: RepoOwner, name: RepoName, org: String) {
+    let fork_info: RepoInfo = match RepoInfo::new(Repo::Input, Some(owner), Some(name)) {
+        Ok(rep) => rep,
+        Err(message) => {
+            eprintln!("Error: {message}");
+            process::exit(1);
+        }
+    };
+    let result = repos::create_fork(&github_client, &org, fork_info).await;
+
+    println!("{result}");
+}
+
 pub async fn handle_repo_command(github_client: Client, subcommand: RepoCommand) {
     match subcommand {
         RepoCommand::CreateForAuthenticatedUser {
@@ -280,16 +293,7 @@ pub async fn handle_repo_command(github_client: Client, subcommand: RepoCommand)
         }
 
         RepoCommand::CreateFork { org, name, owner } => {
-            let fork_info: RepoInfo = match RepoInfo::new(Repo::Input, Some(owner), Some(name)) {
-                Ok(rep) => rep,
-                Err(message) => {
-                    eprintln!("Error: {message}");
-                    process::exit(1);
-                }
-            };
-            let result = repos::create_fork(&github_client, &org, fork_info).await;
-
-            println!("{result}");
+            handle_create_fork(github_client, owner, name, org).await;
         }
 
         RepoCommand::GetAllFromUser {
