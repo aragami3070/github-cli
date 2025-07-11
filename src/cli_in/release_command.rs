@@ -30,7 +30,7 @@ pub enum ReleaseCommand {
 		/// It's draft? (optional)
         #[clap(long, default_value = None)]
         draft: Option<bool>,
-		// It's prerelease? (optional)
+		/// It's prerelease? (optional)
         #[clap(long, default_value = None)]
         prerelease: Option<bool>,
     },
