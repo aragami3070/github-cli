@@ -1,6 +1,6 @@
 use clap::Subcommand;
 
-use crate::{cli_parse::set_vars::{Orders, ReposListOrgSorts, ReposListOrgTypes, ReposListUserTypes, Visibilities}, git_utils::repo_info::{RepoName, RepoOwner}};
+use crate::{cli_in::set_vars::{Orders, ReposListOrgSorts, ReposListOrgTypes, ReposListUserTypes, Visibilities}, git_utils::repo_info::{RepoName, RepoOwner}};
 
 #[derive(Subcommand)]
 pub enum RepoCommand {

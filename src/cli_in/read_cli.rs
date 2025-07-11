@@ -1,7 +1,7 @@
-use crate::cli_parse::comment_command::CommentCommand;
-use crate::cli_parse::issue_command::IssueCommand;
-use crate::cli_parse::release_command::ReleaseCommand;
-use crate::cli_parse::repo_command::RepoCommand;
+use crate::cli_in::comment_command::CommentCommand;
+use crate::cli_in::issue_command::IssueCommand;
+use crate::cli_in::release_command::ReleaseCommand;
+use crate::cli_in::repo_command::RepoCommand;
 use clap::{Parser, Subcommand};
 
 #[derive(Parser)]

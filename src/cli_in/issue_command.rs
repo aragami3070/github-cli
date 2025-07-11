@@ -1,6 +1,6 @@
 use clap::{Subcommand};
 
-use crate::cli_parse::set_vars::{IssuesListStates, States};
+use crate::cli_in::set_vars::{IssuesListStates, States};
 
 #[derive(Subcommand)]
 pub enum IssueCommand {
