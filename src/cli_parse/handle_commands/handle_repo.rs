@@ -123,6 +123,45 @@ async fn handle_get_all_from_org(
     print_repos(all_repos, org, "org");
 }
 
+async fn handle_create_using_template(
+    github_client: Client,
+    owner: RepoOwner,
+    name: RepoName,
+    template_owner: RepoOwner,
+    template_name: RepoName,
+    description: String,
+    include_all_branches: Option<bool>,
+    private: Option<bool>,
+) {
+    let repo_info: RepoInfo = match RepoInfo::new(Repo::Input, Some(owner), Some(name)) {
+        Ok(rep) => rep,
+        Err(message) => {
+            eprintln!("Error: {message}");
+            process::exit(1);
+        }
+    };
+    let template_info: RepoInfo =
+        match RepoInfo::new(Repo::Input, Some(template_owner), Some(template_name)) {
+            Ok(rep) => rep,
+            Err(message) => {
+                eprintln!("Error: {message}");
+                process::exit(1);
+            }
+        };
+
+    let result = repos::create_using_template(
+        &github_client,
+        template_info,
+        repo_info,
+        &description,
+        include_all_branches,
+        private,
+    )
+    .await;
+
+    print_url(result, "New repo");
+}
+
 pub async fn handle_repo_command(github_client: Client, subcommand: RepoCommand) {
     match subcommand {
         RepoCommand::CreateForAuthenticatedUser {
@@ -227,33 +266,17 @@ pub async fn handle_repo_command(github_client: Client, subcommand: RepoCommand)
             private,
             include_all_branches,
         } => {
-            let repo_info: RepoInfo = match RepoInfo::new(Repo::Input, Some(owner), Some(name)) {
-                Ok(rep) => rep,
-                Err(message) => {
-                    eprintln!("Error: {message}");
-                    process::exit(1);
-                }
-            };
-            let template_info: RepoInfo =
-                match RepoInfo::new(Repo::Input, Some(template_owner), Some(template_name)) {
-                    Ok(rep) => rep,
-                    Err(message) => {
-                        eprintln!("Error: {message}");
-                        process::exit(1);
-                    }
-                };
-
-            let result = repos::create_using_template(
-                &github_client,
-                template_info,
-                repo_info,
-                &description,
+            handle_create_using_template(
+                github_client,
+                owner,
+                name,
+                template_owner,
+                template_name,
+                description,
                 include_all_branches,
                 private,
             )
             .await;
-
-            print_url(result, "New repo");
         }
 
         RepoCommand::CreateFork { org, name, owner } => {
