@@ -46,6 +46,20 @@ async fn handle_create(
     print_url(result, "New release");
 }
 
+async fn handle_get_latest(github_client: Client, owner: RepoOwner, repo: RepoName) {
+    let repo_info: RepoInfo = match RepoInfo::new(Repo::Input, Some(owner), Some(repo)) {
+        Ok(rep) => rep,
+        Err(message) => {
+            eprintln!("Error: {message}");
+            process::exit(1);
+        }
+    };
+
+    let result = releases::get_latest(&github_client, repo_info).await;
+
+    print_release(result);
+}
+
 pub async fn handle_release_command(github_client: Client, subcommand: ReleaseCommand) {
     match subcommand {
         ReleaseCommand::Create {
@@ -75,17 +89,7 @@ pub async fn handle_release_command(github_client: Client, subcommand: ReleaseCo
         }
 
         ReleaseCommand::GetLatest { owner, repo } => {
-            let repo_info: RepoInfo = match RepoInfo::new(Repo::Input, Some(owner), Some(repo)) {
-                Ok(rep) => rep,
-                Err(message) => {
-                    eprintln!("Error: {message}");
-                    process::exit(1);
-                }
-            };
-
-            let result = releases::get_latest(&github_client, repo_info).await;
-
-            print_release(result);
+            handle_get_latest(github_client, owner, repo).await;
         }
 
         ReleaseCommand::GetByTag { owner, repo, tag } => {
