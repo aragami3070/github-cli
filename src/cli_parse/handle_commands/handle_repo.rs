@@ -146,7 +146,6 @@ pub async fn handle_repo_command(github_client: Client, subcommand: RepoCommand)
     }
 }
 
-
 async fn handle_create_for_auth_user(
     github_client: Client,
     allow_auto_merge: Option<bool>,
