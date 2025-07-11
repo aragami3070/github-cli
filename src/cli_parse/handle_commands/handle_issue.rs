@@ -70,6 +70,19 @@ async fn handle_create(
     println!("{result}");
 }
 
+async fn handle_close(github_client: Client, number: i64, comment: String) {
+    let repo_info: RepoInfo = match RepoInfo::new(Repo::Current, None, None) {
+        Ok(rep) => rep,
+        Err(message) => {
+            eprintln!("Error: {message}");
+            process::exit(1);
+        }
+    };
+    let result = issues::close(&github_client, repo_info, &number, &comment).await;
+
+    println!("{result}");
+}
+
 pub async fn handle_issue_command(github_client: Client, subcommand: IssueCommand) {
     match subcommand {
         IssueCommand::List {
@@ -102,16 +115,7 @@ pub async fn handle_issue_command(github_client: Client, subcommand: IssueComman
         }
 
         IssueCommand::Close { number, comment } => {
-            let repo_info: RepoInfo = match RepoInfo::new(Repo::Current, None, None) {
-                Ok(rep) => rep,
-                Err(message) => {
-                    eprintln!("Error: {message}");
-                    process::exit(1);
-                }
-            };
-            let result = issues::close(&github_client, repo_info, &number, &comment).await;
-
-            println!("{result}");
+            handle_close(github_client, number, comment).await;
         }
 
         IssueCommand::Update {
