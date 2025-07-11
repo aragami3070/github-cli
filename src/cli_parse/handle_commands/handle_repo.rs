@@ -2,6 +2,9 @@ use octorust::{self, Client};
 use std::process;
 
 use crate::cli_in::repo_command::RepoCommand;
+use crate::cli_in::set_vars::Orders;
+use crate::cli_in::set_vars::ReposListOrgSorts;
+use crate::cli_in::set_vars::ReposListOrgTypes;
 use crate::cli_in::set_vars::Visibilities;
 use crate::cli_out::print_in_cli::print_repos;
 use crate::cli_out::print_in_cli::print_url;
@@ -107,6 +110,19 @@ async fn handle_create_in_org(
     print_url(result, "New repo");
 }
 
+async fn handle_get_all_from_org(
+    github_client: Client,
+    org: String,
+    order: Orders,
+    type_value: ReposListOrgTypes,
+    sort_value: ReposListOrgSorts,
+) {
+    let all_repos =
+        repos::get_all_from_org(&github_client, &org, order.0, type_value.0, sort_value.0).await;
+
+    print_repos(all_repos, org, "org");
+}
+
 pub async fn handle_repo_command(github_client: Client, subcommand: RepoCommand) {
     match subcommand {
         RepoCommand::CreateForAuthenticatedUser {
@@ -199,11 +215,7 @@ pub async fn handle_repo_command(github_client: Client, subcommand: RepoCommand)
             sort_value,
             type_value,
         } => {
-            let all_repos =
-                repos::get_all_from_org(&github_client, &org, order.0, type_value.0, sort_value.0)
-                    .await;
-
-            print_repos(all_repos, org, "org");
+            handle_get_all_from_org(github_client, org, order, type_value, sort_value).await;
         }
 
         RepoCommand::CreateUsingTemplate {
