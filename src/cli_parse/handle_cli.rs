@@ -1,4 +1,3 @@
-use crate::cli_in::comment_command::CommentCommand;
 use crate::cli_in::read_cli::Args;
 use crate::cli_in::read_cli::CliCommand;
 use crate::cli_in::release_command::ReleaseCommand;
@@ -6,8 +5,8 @@ use crate::cli_in::repo_command::RepoCommand;
 use crate::cli_out::print_in_cli::print_release;
 use crate::cli_out::print_in_cli::print_repos;
 use crate::cli_out::print_in_cli::print_url;
+use crate::cli_parse::handle_commands::handle_comment::handle_comment_command;
 use crate::cli_parse::handle_commands::handle_issue::handle_issue_command;
-use crate::git_utils::comments;
 use crate::git_utils::releases;
 use crate::git_utils::repo_info::Repo;
 use crate::git_utils::repo_info::RepoInfo;
@@ -20,21 +19,9 @@ pub async fn handle_cli_command(args: Args, github_client: Client) {
         CliCommand::Issue { subcommand } => {
             handle_issue_command(github_client, subcommand).await;
         }
-        CliCommand::Comment { subcommand } => match subcommand {
-            CommentCommand::Create { number, body } => {
-                let repo_info: RepoInfo = match RepoInfo::new(Repo::Current, None, None) {
-                    Ok(rep) => rep,
-                    Err(message) => {
-                        eprintln!("Error: {message}");
-                        process::exit(1);
-                    }
-                };
-                let result = comments::create(&github_client, &repo_info, &number, &body).await;
-
-                println!("{result}");
-            }
-        },
-
+        CliCommand::Comment { subcommand } => {
+			handle_comment_command(github_client, subcommand).await;
+		}
         CliCommand::Repo { subcommand } => match subcommand {
             RepoCommand::CreateForAuthenticatedUser {
                 allow_auto_merge,
