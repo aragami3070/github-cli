@@ -1,4 +1,6 @@
-use octorust::types::{IssueSimple, MinimalRepository, Release};
+use std::process;
+
+use octorust::types::{IssueComment, IssueSimple, MinimalRepository, Release};
 
 use crate::cli_in::set_vars::IssuesListStates;
 
@@ -45,6 +47,24 @@ pub fn print_repos(repos: Vec<MinimalRepository>, owner: String, owner_type: &st
         println!("│Language: {}", repo.language);
         println!("│Url: {}", repo.url);
         println!("│Description: {}", repo.description);
+        println!("╰────────────────────────────────────────────────────────────────────────────────────────────────");
+    }
+}
+
+pub fn print_comments(list_comments: Vec<IssueComment>) {
+    for comment in list_comments {
+        println!("╭────────────────────────────────────────────────────────────────────────────────────────────────");
+        println!(
+            "│Who create: {}",
+            match comment.user {
+                Some(u) => u.login,
+                None => {
+                    eprintln!("Bad response from github");
+                    process::exit(1);
+                }
+            }
+        );
+        println!("│Body: {}", comment.body);
         println!("╰────────────────────────────────────────────────────────────────────────────────────────────────");
     }
 }
