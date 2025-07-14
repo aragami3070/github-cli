@@ -36,14 +36,14 @@ pub async fn create(
 pub async fn get_all(
     github_client: &Client,
     repo_info: &RepoInfo,
-    issue_number: &i64,
+    number: &i64,
 ) -> Vec<IssueComment> {
     let list_comments = github_client
         .issues()
         .list_all_comments(
             &repo_info.get_owner(),
             &repo_info.get_name(),
-            issue_number.clone(),
+            number.clone(),
             None,
         )
         .await;

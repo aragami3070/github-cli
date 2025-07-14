@@ -11,4 +11,11 @@ pub enum CommentCommand {
         #[clap(long, short, default_value = "")]
         body: String,
     },
+	
+    /// Get all comments from issue/pull request
+    GetAll{
+        /// Get all comments from issue/pull request with number
+        #[clap(long, short)]
+        number: i64,
+    },
 }
