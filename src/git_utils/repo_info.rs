@@ -206,52 +206,41 @@ impl RepoInfo {
 #[cfg(test)]
 mod repo_info_tests {
     use super::*;
+    use paste::paste;
     use rstest::rstest;
 
+    // Macros for Repo owner and name tests
+    macro_rules! repo_main_field_valid_tests {
+        ($type: ident, $type_name: literal) => {
+            paste! {
+                // Tests valid cases
+                #[rstest]
+                #[case("aragami3070", "aragami3070")]
+                #[case("SE-legacy", "SE-legacy")]
+                #[case("The Drot Team", "The Drot Team")]
+                fn [<valid_ $type:snake>](#[case] input: &str, #[case] expected: &str) {
+                    assert_eq!(
+                        $type::from_str(input).unwrap(),
+                        $type(expected.to_string())
+                    );
+                }
+
+                // Tests invalid cases
+                #[rstest]
+                #[case("", concat!($type_name, " cannot be empty"))]
+                #[case("owner/repo", concat!($type_name, " cannot contain '/'"))]
+                #[case("/owner", concat!($type_name, " cannot contain '/'"))]
+                #[case("/owner/repo/", concat!($type_name, " cannot contain '/'"))]
+                fn [<invalid_ $type:snake>](#[case] input: &str, #[case] error: &str) {
+                    assert_eq!($type::from_str(input).unwrap_err(), error);
+                }
+            }
+        };
+    }
+
     // RepoOwner tests
-    // Tests valid cases
-    #[rstest]
-    #[case("aragami3070", "aragami3070")]
-    #[case("SE-legacy", "SE-legacy")]
-    #[case("The Drot Team", "The Drot Team")]
-    fn valid_repo_owner(#[case] input: &str, #[case] expected: &str) {
-        assert_eq!(
-            RepoOwner::from_str(input).unwrap(),
-            RepoOwner(expected.to_string())
-        );
-    }
-
-    // Tests invalid cases
-    #[rstest]
-    #[case("", "Repo owner cannot be empty")]
-    #[case("owner/repo", "Repo owner cannot contain '/'")]
-    #[case("/owner", "Repo owner cannot contain '/'")]
-    #[case("/owner/repo/", "Repo owner cannot contain '/'")]
-    fn invalid_repo_owner(#[case] input: &str, #[case] error: &str) {
-        assert_eq!(RepoOwner::from_str(input).unwrap_err(), error);
-    }
-
-
+    repo_main_field_valid_tests!(RepoOwner, "Repo owner");
     // RepoName tests
-    // Tests valid cases
-    #[rstest]
-    #[case("github-cli", "github-cli")]
-    #[case("repo", "repo")]
-    #[case("kg-exam-4sem", "kg-exam-4sem")]
-    fn valid_repo_name(#[case] input: &str, #[case] expected: &str) {
-        assert_eq!(
-            RepoName::from_str(input).unwrap(),
-            RepoName(expected.to_string())
-        );
-    }
+    repo_main_field_valid_tests!(RepoName, "Repo name");
 
-    // Tests invalid cases
-    #[rstest]
-    #[case("", "Repo name cannot be empty")]
-    #[case("owner/repo", "Repo name cannot contain '/'")]
-    #[case("/owner", "Repo name cannot contain '/'")]
-    #[case("/owner/repo/", "Repo name cannot contain '/'")]
-    fn invalid_repo_name(#[case] input: &str, #[case] error: &str) {
-        assert_eq!(RepoName::from_str(input).unwrap_err(), error);
-    }
 }
