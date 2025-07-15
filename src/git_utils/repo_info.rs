@@ -169,8 +169,8 @@ impl RepoInfo {
             ));
         } else {
             let mut new_repo = RepoInfo {
-                owner: RepoOwner(owner.unwrap().0.trim_start().trim_end().to_string()),
-                name: RepoName(name.unwrap().0.trim_start().trim_end().to_string()),
+                owner: RepoOwner(owner.unwrap().0.trim().to_string()),
+                name: RepoName(name.unwrap().0.trim().to_string()),
                 url: RepoUrl(String::new()),
                 ssh: RepoSsh(String::new()),
             };
@@ -242,4 +242,42 @@ mod repo_info_tests {
     repo_main_field_valid_tests!(RepoOwner, "Repo owner");
     // RepoName tests
     repo_main_field_valid_tests!(RepoName, "Repo name");
+
+    macro_rules! repo_links_field_valid_test {
+        ($type: ident, $field_name: ident, $start_link: literal, $end_link: literal) => {
+            paste! {
+                // Tests valid cases
+                #[rstest]
+                #[case(
+                    "aragami3070",
+                    "github-cli",
+                    concat!($start_link, "aragami3070/github-cli", $end_link)
+                )]
+                #[case(
+                    " SE-legacy     ",
+                    "kg-exam-4sem",
+                    concat!($start_link, "SE-legacy/kg-exam-4sem", $end_link)
+                )]
+                #[case(
+                    "The Drot Team",
+                    "      Trash-Hack-Back-end",
+                    concat!($start_link, "The-Drot-Team/Trash-Hack-Back-end", $end_link)
+                )]
+                fn [<valid_ $type:snake>](#[case] owner: &str, #[case] name: &str, #[case] expected: &str) {
+                    let repo = RepoInfo::new(
+                        Repo::Input,
+                        Some(RepoOwner(owner.to_string())),
+                        Some(RepoName(name.to_string())),
+                    );
+                    assert_eq!(repo.unwrap().$field_name.0.replace(" ", "-"), expected);
+                }
+            }
+        };
+    }
+
+    // RepoUrl valid test
+    repo_links_field_valid_test!(RepoUrl, url, "https://github.com/", "/");
+
+    // RepoSsh valid test
+    repo_links_field_valid_test!(RepoSsh, ssh, "git@github.com:", ".git");
 }
