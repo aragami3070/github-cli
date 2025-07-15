@@ -230,4 +230,28 @@ mod repo_info_tests {
     fn invalid_repo_owner(#[case] input: &str, #[case] error: &str) {
         assert_eq!(RepoOwner::from_str(input).unwrap_err(), error);
     }
+
+
+    // RepoName tests
+    // Tests valid cases
+    #[rstest]
+    #[case("github-cli", "github-cli")]
+    #[case("repo", "repo")]
+    #[case("kg-exam-4sem", "kg-exam-4sem")]
+    fn valid_repo_name(#[case] input: &str, #[case] expected: &str) {
+        assert_eq!(
+            RepoName::from_str(input).unwrap(),
+            RepoName(expected.to_string())
+        );
+    }
+
+    // Tests invalid cases
+    #[rstest]
+    #[case("", "Repo name cannot be empty")]
+    #[case("owner/repo", "Repo name cannot contain '/'")]
+    #[case("/owner", "Repo name cannot contain '/'")]
+    #[case("/owner/repo/", "Repo name cannot contain '/'")]
+    fn invalid_repo_name(#[case] input: &str, #[case] error: &str) {
+        assert_eq!(RepoName::from_str(input).unwrap_err(), error);
+    }
 }
