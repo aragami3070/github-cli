@@ -186,21 +186,39 @@ impl RepoInfo {
         owner: Option<RepoOwner>,
         name: Option<RepoName>,
     ) -> Result<RepoInfo, io::Error> {
-
         match type_repo {
             Repo::Current => {
-
-            let new_repo = RepoInfo {
-                owner: RepoOwner(String::new()),
-                name: RepoName(String::new()),
-                url: RepoUrl(String::new()),
-                ssh: RepoSsh(String::new()),
-            };
-            return Self::get_current_repo(new_repo);
-			}
+                let new_repo = RepoInfo {
+                    owner: RepoOwner(String::new()),
+                    name: RepoName(String::new()),
+                    url: RepoUrl(String::new()),
+                    ssh: RepoSsh(String::new()),
+                };
+                return Self::get_current_repo(new_repo);
+            }
             Repo::Input => {
-				return Self::create_repo_info(owner, name);
-			}
+                return Self::create_repo_info(owner, name);
+            }
         }
     }
+}
+
+#[cfg(test)]
+mod repo_info_tests {
+    use super::*;
+	use rstest::rstest;
+
+    // RepoOwner tests
+    // Tests valid cases
+    #[rstest]
+	#[case("aragami3070", "aragami3070")]
+	#[case("SE-legacy", "SE-legacy")]
+	#[case("The Drot Team", "The Drot Team")]
+    fn valid_repo_owner(#[case] input: &str, #[case] expected: &str) {
+        assert_eq!(
+            RepoOwner::from_str(input).unwrap(),
+            RepoOwner(expected.to_string())
+        );
+    }
+
 }
