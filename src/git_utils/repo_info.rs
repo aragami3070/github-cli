@@ -66,6 +66,7 @@ impl FromStr for RepoName {
     }
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct RepoInfo {
     owner: RepoOwner,
     name: RepoName,
@@ -169,8 +170,8 @@ impl RepoInfo {
             ));
         } else {
             let mut new_repo = RepoInfo {
-                owner: RepoOwner(owner.unwrap().0.trim_start().trim_end().to_string()),
-                name: RepoName(name.unwrap().0.trim_start().trim_end().to_string()),
+                owner: RepoOwner(owner.unwrap().0.trim().to_string()),
+                name: RepoName(name.unwrap().0.trim().to_string()),
                 url: RepoUrl(String::new()),
                 ssh: RepoSsh(String::new()),
             };
@@ -186,21 +187,123 @@ impl RepoInfo {
         owner: Option<RepoOwner>,
         name: Option<RepoName>,
     ) -> Result<RepoInfo, io::Error> {
-
         match type_repo {
             Repo::Current => {
-
-            let new_repo = RepoInfo {
-                owner: RepoOwner(String::new()),
-                name: RepoName(String::new()),
-                url: RepoUrl(String::new()),
-                ssh: RepoSsh(String::new()),
-            };
-            return Self::get_current_repo(new_repo);
-			}
+                let new_repo = RepoInfo {
+                    owner: RepoOwner(String::new()),
+                    name: RepoName(String::new()),
+                    url: RepoUrl(String::new()),
+                    ssh: RepoSsh(String::new()),
+                };
+                return Self::get_current_repo(new_repo);
+            }
             Repo::Input => {
-				return Self::create_repo_info(owner, name);
-			}
+                return Self::create_repo_info(owner, name);
+            }
         }
+    }
+}
+
+#[cfg(test)]
+mod repo_info_tests {
+    use super::*;
+    use paste::paste;
+    use rstest::rstest;
+
+    // Macros for Repo owner and name tests
+    macro_rules! repo_main_field_valid_tests {
+        ($type: ident, $type_name: literal) => {
+            paste! {
+                // Tests valid cases
+                #[rstest]
+                #[case("aragami3070", "aragami3070")]
+                #[case("SE-legacy", "SE-legacy")]
+                #[case("The Drot Team", "The Drot Team")]
+                fn [<valid_ $type:snake>](#[case] input: &str, #[case] expected: &str) {
+                    assert_eq!(
+                        $type::from_str(input).unwrap(),
+                        $type(expected.to_string())
+                    );
+                }
+
+                // Tests invalid cases
+                #[rstest]
+                #[case("", concat!($type_name, " cannot be empty"))]
+                #[case("owner/repo", concat!($type_name, " cannot contain '/'"))]
+                #[case("/owner", concat!($type_name, " cannot contain '/'"))]
+                #[case("/owner/repo/", concat!($type_name, " cannot contain '/'"))]
+                fn [<invalid_ $type:snake>](#[case] input: &str, #[case] error: &str) {
+                    assert_eq!($type::from_str(input).unwrap_err(), error);
+                }
+            }
+        };
+    }
+
+    // RepoOwner tests
+    repo_main_field_valid_tests!(RepoOwner, "Repo owner");
+    // RepoName tests
+    repo_main_field_valid_tests!(RepoName, "Repo name");
+
+    macro_rules! repo_links_field_valid_test {
+        ($type: ident, $field_name: ident, $start_link: literal, $end_link: literal) => {
+            paste! {
+                // Tests valid cases
+                #[rstest]
+                #[case(
+                    "aragami3070",
+                    "github-cli",
+                    concat!($start_link, "aragami3070/github-cli", $end_link)
+                )]
+                #[case(
+                    " SE-legacy     ",
+                    "kg-exam-4sem",
+                    concat!($start_link, "SE-legacy/kg-exam-4sem", $end_link)
+                )]
+                #[case(
+                    "The Drot Team",
+                    "      Trash-Hack-Back-end",
+                    concat!($start_link, "The-Drot-Team/Trash-Hack-Back-end", $end_link)
+                )]
+                fn [<valid_ $type:snake>](#[case] owner: &str, #[case] name: &str, #[case] expected: &str) {
+                    let repo = RepoInfo::new(
+                        Repo::Input,
+                        Some(RepoOwner(owner.to_string())),
+                        Some(RepoName(name.to_string())),
+                    );
+                    assert_eq!(repo.unwrap().$field_name.0.replace(" ", "-"), expected);
+                }
+            }
+        };
+    }
+
+    // RepoUrl valid test
+    repo_links_field_valid_test!(RepoUrl, url, "https://github.com/", "/");
+
+    // RepoSsh valid test
+    repo_links_field_valid_test!(RepoSsh, ssh, "git@github.com:", ".git");
+
+    // Tests valid case
+    #[test]
+    fn valid_new_repo_info() {
+        let repo_input = RepoInfo::new(
+            Repo::Input,
+            Some(RepoOwner("aragami3070".to_string())),
+            Some(RepoName("github-cli".to_string())),
+        );
+        let repo_current = RepoInfo::new(Repo::Current, None, None);
+        assert_eq!(repo_input.unwrap(), repo_current.unwrap());
+    }
+
+    // Tests invalid case
+    #[rstest]
+    #[case(None, None)]
+    #[case(Some(RepoOwner("aragami3070".to_string())), None)]
+    #[case(None, Some(RepoName("github-cli".to_string())))]
+    fn invalid_new_input_repo_info(
+        #[case] owner: Option<RepoOwner>,
+        #[case] name: Option<RepoName>,
+    ) {
+        let repo_current = RepoInfo::new(Repo::Input, owner, name);
+        assert_eq!(repo_current.unwrap_err().kind(), io::ErrorKind::NotFound);
     }
 }

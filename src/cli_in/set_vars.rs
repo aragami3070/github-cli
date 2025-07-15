@@ -135,3 +135,21 @@ impl ToString for IssuesListStates {
         }
     }
 }
+
+#[derive(Debug, Clone)]
+pub enum CommentTarget {
+    Issue,
+	PullRequest,
+}
+
+impl FromStr for CommentTarget {
+	type Err = String;
+    
+	fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "issue" => Ok(CommentTarget::Issue),
+            "pull-request" => Ok(CommentTarget::PullRequest),
+            _ => Err("Bad input. Comment target can be only 'issue' or 'pull-request'".to_string()),
+        }
+	}
+}

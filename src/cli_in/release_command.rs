@@ -12,10 +12,10 @@ pub enum ReleaseCommand {
         /// Repo name
         #[clap(long, short)]
         repo: RepoName,
-		/// Tag name
+        /// Tag name
         #[clap(long)]
         tag_name: String,
-		/// Target commit hash (only long variant of commit hash)
+        /// Target commit hash (only long variant of commit hash)
         #[clap(long)]
         target_commitish: String,
         /// Release name
@@ -27,10 +27,10 @@ pub enum ReleaseCommand {
         /// Name of discussion category (optional)
         #[clap(long, default_value = "")]
         discussion_category_name: String,
-		/// It's draft? (optional)
+        /// It's draft? (optional)
         #[clap(long, default_value = None)]
         draft: Option<bool>,
-		/// It's prerelease? (optional)
+        /// It's prerelease? (optional)
         #[clap(long, default_value = None)]
         prerelease: Option<bool>,
     },

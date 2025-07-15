@@ -22,7 +22,7 @@ pub async fn handle_cli_command(args: Args, github_client: Client) {
         }
 
         CliCommand::Release { subcommand } => {
-			handle_release_command(github_client, subcommand).await;
-		}
+            handle_release_command(github_client, subcommand).await;
+        }
     }
 }

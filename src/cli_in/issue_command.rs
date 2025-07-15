@@ -1,4 +1,4 @@
-use clap::{Subcommand};
+use clap::Subcommand;
 
 use crate::cli_in::set_vars::{IssuesListStates, States};
 

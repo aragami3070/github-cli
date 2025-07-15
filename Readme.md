@@ -52,7 +52,7 @@ github-cli release --help
 
 ### comment
 - [x] Сделать создание комментария в issue/pull request
-- [ ] Сделать получение комментариев для issue/pull request
+- [x] Сделать получение комментариев для issue/pull request
 - [ ] Сделать редактирование комментария для issue/pull request
 - [ ] Сделать удаление комментария для issue/pull request
 

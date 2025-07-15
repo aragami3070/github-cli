@@ -1,6 +1,11 @@
 use clap::Subcommand;
 
-use crate::{cli_in::set_vars::{Orders, ReposListOrgSorts, ReposListOrgTypes, ReposListUserTypes, Visibilities}, git_utils::repo_info::{RepoName, RepoOwner}};
+use crate::{
+    cli_in::set_vars::{
+        Orders, ReposListOrgSorts, ReposListOrgTypes, ReposListUserTypes, Visibilities,
+    },
+    git_utils::repo_info::{RepoName, RepoOwner},
+};
 
 #[derive(Subcommand)]
 pub enum RepoCommand {
@@ -137,7 +142,7 @@ pub enum RepoCommand {
 
     /// Get all repos from user
     GetAllFromUser {
-        /// Owner name 
+        /// Owner name
         #[clap(long)]
         owner: String,
         /// Order can be only 'asc' or 'desc' (optional)
@@ -151,7 +156,7 @@ pub enum RepoCommand {
         #[clap(long, short, default_value = "all")]
         type_value: ReposListUserTypes,
         ///// NOT WORKING NOW BECAUSE OCTORUST BREAK THIS
-		///// Can include:
+        ///// Can include:
         ///// - owner: Repositories that are owned by the authenticated user.
         ///// - collaborator: Repositories that the user has been added to as a collaborator.
         ///// - organization_member: Repositories that the user has access to through being a member of an organization. This includes every repository on every team that the user is on.
