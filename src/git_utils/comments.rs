@@ -1,6 +1,8 @@
 use std::process;
 
-use octorust::types::{IssueComment, PullsUpdateReviewRequest};
+use octorust::types::{
+    IssueComment, Order, PullRequestReviewComment, PullsUpdateReviewRequest, Sort,
+};
 use octorust::Client;
 
 use crate::git_utils::repo_info::RepoInfo;
@@ -44,6 +46,33 @@ pub async fn get_all(
             &repo_info.get_owner(),
             &repo_info.get_name(),
             number.clone(),
+            None,
+        )
+        .await;
+
+    return match list_comments {
+        Ok(c) => c.body,
+        Err(message) => {
+            eprintln!("Error: {message}");
+            process::exit(1);
+        }
+    };
+}
+pub async fn get_all_from_review(
+    github_client: &Client,
+    repo_info: &RepoInfo,
+    number: &i64,
+    sort: Sort,
+    direction: Order,
+) -> Vec<PullRequestReviewComment> {
+    let list_comments = github_client
+        .pulls()
+        .list_all_review_comments(
+            &repo_info.get_owner(),
+            &repo_info.get_name(),
+            number.clone(),
+            sort,
+            direction,
             None,
         )
         .await;
