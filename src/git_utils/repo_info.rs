@@ -221,4 +221,12 @@ mod repo_info_tests {
         );
     }
 
+    // Tests empty string
+    #[test]
+    fn empty_repo_owner() {
+        assert_eq!(
+            RepoOwner::from_str("").unwrap_err(),
+            "Repo owner cannot be empty"
+        );
+    }
 }
