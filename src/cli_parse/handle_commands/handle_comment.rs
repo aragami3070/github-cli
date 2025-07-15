@@ -14,9 +14,7 @@ pub async fn handle_comment_command(github_client: Client, subcommand: CommentCo
             handle_create(github_client, number, body).await;
         }
 
-        CommentCommand::GetAll { number } => {
-            handle_get_all_for_issue(github_client, number).await
-        }
+        CommentCommand::GetAll { number } => handle_get_all_for_issue(github_client, number).await,
     };
 }
 

@@ -242,5 +242,4 @@ mod repo_info_tests {
     repo_main_field_valid_tests!(RepoOwner, "Repo owner");
     // RepoName tests
     repo_main_field_valid_tests!(RepoName, "Repo name");
-
 }

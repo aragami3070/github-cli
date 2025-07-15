@@ -1,4 +1,4 @@
-use clap::{Subcommand};
+use clap::Subcommand;
 
 #[derive(Subcommand)]
 pub enum CommentCommand {
@@ -11,9 +11,9 @@ pub enum CommentCommand {
         #[clap(long, short, default_value = "")]
         body: String,
     },
-	
+
     /// Get all comments from issue/pull request
-    GetAll{
+    GetAll {
         /// Get all comments from issue/pull request with number
         #[clap(long, short)]
         number: i64,

@@ -10,7 +10,6 @@ use crate::git_utils::repo_info::RepoInfo;
 use crate::git_utils::repo_info::RepoName;
 use crate::git_utils::repo_info::RepoOwner;
 
-
 pub async fn handle_release_command(github_client: Client, subcommand: ReleaseCommand) {
     match subcommand {
         ReleaseCommand::Create {
