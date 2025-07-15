@@ -294,4 +294,16 @@ mod repo_info_tests {
         assert_eq!(repo_input.unwrap(), repo_current.unwrap());
     }
 
+    // Tests invalid case
+    #[rstest]
+    #[case(None, None)]
+    #[case(Some(RepoOwner("aragami3070".to_string())), None)]
+    #[case(None, Some(RepoName("github-cli".to_string())))]
+    fn invalid_new_input_repo_info(
+        #[case] owner: Option<RepoOwner>,
+        #[case] name: Option<RepoName>,
+    ) {
+        let repo_current = RepoInfo::new(Repo::Input, owner, name);
+        assert_eq!(repo_current.unwrap_err().kind(), io::ErrorKind::NotFound);
+    }
 }
