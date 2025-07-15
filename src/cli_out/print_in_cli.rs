@@ -54,6 +54,9 @@ pub fn print_repos(repos: Vec<MinimalRepository>, owner: String, owner_type: &st
 }
 
 pub fn print_comments(list_comments: Vec<IssueComment>) {
+    println!("╭────────────────────────────────────────────────────────────────────────────────────────────────");
+    println!("│Comments:");
+    println!("╰────────────────────────────────────────────────────────────────────────────────────────────────");
     for comment in list_comments {
         println!("╭────────────────────────────────────────────────────────────────────────────────────────────────");
         println!(
