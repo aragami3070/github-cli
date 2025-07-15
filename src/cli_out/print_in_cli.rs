@@ -1,6 +1,8 @@
 use std::process;
 
-use octorust::types::{IssueComment, IssueSimple, MinimalRepository, Release};
+use octorust::types::{
+    IssueComment, IssueSimple, MinimalRepository, PullRequestReviewComment, Release,
+};
 
 use crate::cli_in::set_vars::IssuesListStates;
 
@@ -65,6 +67,29 @@ pub fn print_comments(list_comments: Vec<IssueComment>) {
             }
         );
         println!("│Body: {}", comment.body);
+        println!("╰────────────────────────────────────────────────────────────────────────────────────────────────");
+    }
+}
+
+pub fn print_review_comments(list_comments: Vec<PullRequestReviewComment>) {
+    println!("╭────────────────────────────────────────────────────────────────────────────────────────────────");
+    println!("│Review comments:");
+    println!("╰────────────────────────────────────────────────────────────────────────────────────────────────");
+    for comment in list_comments {
+        println!("╭────────────────────────────────────────────────────────────────────────────────────────────────");
+        println!(
+            "│Who create: {}",
+            match comment.user {
+                Some(u) => u.login,
+                None => {
+                    eprintln!("Bad response from github");
+                    process::exit(1);
+                }
+            }
+        );
+        println!("│Body: {}", comment.body);
+        println!("│For line: {}", comment.line);
+        println!("│In file: {}", comment.path);
         println!("╰────────────────────────────────────────────────────────────────────────────────────────────────");
     }
 }
