@@ -206,14 +206,14 @@ impl RepoInfo {
 #[cfg(test)]
 mod repo_info_tests {
     use super::*;
-	use rstest::rstest;
+    use rstest::rstest;
 
     // RepoOwner tests
     // Tests valid cases
     #[rstest]
-	#[case("aragami3070", "aragami3070")]
-	#[case("SE-legacy", "SE-legacy")]
-	#[case("The Drot Team", "The Drot Team")]
+    #[case("aragami3070", "aragami3070")]
+    #[case("SE-legacy", "SE-legacy")]
+    #[case("The Drot Team", "The Drot Team")]
     fn valid_repo_owner(#[case] input: &str, #[case] expected: &str) {
         assert_eq!(
             RepoOwner::from_str(input).unwrap(),
@@ -221,12 +221,13 @@ mod repo_info_tests {
         );
     }
 
-    // Tests empty string
-    #[test]
-    fn empty_repo_owner() {
-        assert_eq!(
-            RepoOwner::from_str("").unwrap_err(),
-            "Repo owner cannot be empty"
-        );
+    // Tests invalid cases
+    #[rstest]
+    #[case("", "Repo owner cannot be empty")]
+    #[case("owner/repo", "Repo owner cannot contain '/'")]
+    #[case("/owner", "Repo owner cannot contain '/'")]
+    #[case("/owner/repo/", "Repo owner cannot contain '/'")]
+    fn invalid_repo_owner(#[case] input: &str, #[case] error: &str) {
+        assert_eq!(RepoOwner::from_str(input).unwrap_err(), error);
     }
 }
