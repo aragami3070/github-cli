@@ -66,6 +66,7 @@ impl FromStr for RepoName {
     }
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct RepoInfo {
     owner: RepoOwner,
     name: RepoName,
@@ -280,4 +281,17 @@ mod repo_info_tests {
 
     // RepoSsh valid test
     repo_links_field_valid_test!(RepoSsh, ssh, "git@github.com:", ".git");
+
+    // Tests valid case
+    #[test]
+    fn valid_new_repo_info() {
+        let repo_input = RepoInfo::new(
+            Repo::Input,
+            Some(RepoOwner("aragami3070".to_string())),
+            Some(RepoName("github-cli".to_string())),
+        );
+        let repo_current = RepoInfo::new(Repo::Current, None, None);
+        assert_eq!(repo_input.unwrap(), repo_current.unwrap());
+    }
+
 }
