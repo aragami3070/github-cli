@@ -3,7 +3,8 @@ use std::process;
 // use std::str::FromStr;
 
 use crate::cli_in::comment_command::CommentCommand;
-use crate::cli_out::print_in_cli::print_comments;
+use crate::cli_in::set_vars::CommentTarget;
+use crate::cli_out::print_in_cli::{print_comments, print_review_comments};
 use crate::git_utils::comments;
 use crate::git_utils::repo_info::{Repo, RepoInfo};
 // use crate::git_utils::repo_info::{RepoName, RepoOwner};
@@ -14,7 +15,9 @@ pub async fn handle_comment_command(github_client: Client, subcommand: CommentCo
             handle_create(github_client, number, body).await;
         }
 
-        CommentCommand::GetAll { number } => handle_get_all_for_issue(github_client, number).await,
+        CommentCommand::GetAll { number, target } => {
+            handle_get_all(github_client, number, target).await
+        }
     };
 }
 
@@ -32,7 +35,7 @@ async fn handle_create(github_client: Client, number: i64, body: String) {
     println!("{result}");
 }
 
-async fn handle_get_all_for_issue(github_client: Client, number: i64) {
+async fn handle_get_all(github_client: Client, number: i64, target: CommentTarget) {
     let repo_info: RepoInfo = match RepoInfo::new(Repo::Current, None, None) {
         Ok(rep) => rep,
         Err(message) => {
@@ -44,4 +47,21 @@ async fn handle_get_all_for_issue(github_client: Client, number: i64) {
     let result = comments::get_all(&github_client, &repo_info, &number).await;
 
     print_comments(result);
+
+    let review_comments = match target {
+        CommentTarget::PullRequest => {
+            comments::get_all_from_review(
+                &github_client,
+                &repo_info,
+                &number,
+                octorust::types::Sort::Created,
+                octorust::types::Order::Asc,
+            )
+            .await
+        }
+        CommentTarget::Issue => Vec::new(),
+    };
+    if !review_comments.is_empty() {
+        print_review_comments(review_comments);
+    }
 }
