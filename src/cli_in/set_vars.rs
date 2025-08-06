@@ -1,7 +1,9 @@
 use std::str::FromStr;
 
-use octorust::types::{IssuesListState, Order, ReposListOrgSort, ReposListUserType, State};
-use octorust::types::{ReposCreateInOrgRequestVisibility, ReposListOrgType};
+use octorust::types::{
+    IssuesListState, Order, ReposCreateInOrgRequestVisibility, ReposListOrgSort, ReposListOrgType,
+    ReposListUserType, Sort, State,
+};
 
 #[derive(Debug, Clone)]
 pub struct Orders(pub Order);
@@ -139,17 +141,32 @@ impl ToString for IssuesListStates {
 #[derive(Debug, Clone)]
 pub enum CommentTarget {
     Issue,
-	PullRequest,
+    PullRequest,
 }
 
 impl FromStr for CommentTarget {
-	type Err = String;
-    
-	fn from_str(s: &str) -> Result<Self, Self::Err> {
+    type Err = String;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
             "issue" => Ok(CommentTarget::Issue),
             "pull-request" => Ok(CommentTarget::PullRequest),
             _ => Err("Bad input. Comment target can be only 'issue' or 'pull-request'".to_string()),
         }
-	}
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct Sorts(pub Sort);
+
+impl FromStr for Sorts {
+    type Err = String;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "created" => Ok(Self(Sort::Created)),
+            "updated" => Ok(Self(Sort::Updated)),
+            _ => Err("Bad input. Sort can be only 'created' or 'updated'".to_string()),
+        }
+    }
 }

@@ -58,6 +58,8 @@ pub async fn get_all(
         }
     };
 }
+
+// Get all review Comments for pull request
 pub async fn get_all_from_review(
     github_client: &Client,
     repo_info: &RepoInfo,

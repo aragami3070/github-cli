@@ -30,6 +30,7 @@ pub fn print_issues(list_issues: Vec<IssueSimple>, state: IssuesListStates, numb
         println!("╭────────────────────────────────────────────────────────────────────────────────────────────────");
         println!("│Issue {}: {};", issue.number, issue.title);
         println!("│Body: {}", issue.body);
+        println!("│Time: {}", issue.timeline_url);
         println!("╰────────────────────────────────────────────────────────────────────────────────────────────────");
     }
 }
