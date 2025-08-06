@@ -16,6 +16,12 @@ pub async fn handle_comment_command(github_client: Client, subcommand: CommentCo
         CommentCommand::GetAll { number, target } => {
             handle_get_all(github_client, number, target).await
         }
+
+        CommentCommand::GetAllFromReview {
+            number,
+            sort,
+            order,
+        } => handle_get_all_from_review(github_client, number, sort, order).await,
     };
 }
 
