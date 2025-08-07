@@ -12,7 +12,7 @@ use crate::cli_parse::handle_commands::handle_repo::handle_repo_command;
 pub async fn handle_cli_command(args: Args, github_client: Client) -> Result<(), Box<dyn Error>> {
     match args.command {
         CliCommand::Issue { subcommand } => {
-            handle_issue_command(github_client, subcommand).await;
+            handle_issue_command(github_client, subcommand).await?;
 			Ok(())
         }
 
