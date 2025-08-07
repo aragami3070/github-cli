@@ -139,7 +139,14 @@ pub async fn close(
     comment: &String,
 ) -> String {
     if comment != "" {
-        let new_comment = comments::create(github_client, &repo_info, issue_number, comment).await;
+        let new_comment =
+            match comments::create(github_client, &repo_info, issue_number, comment).await {
+                Ok(comm) => comm,
+                Err(message) => {
+                    eprintln!("Error: {message}");
+                    process::exit(1);
+                }
+            };
         println!("{new_comment}");
     }
 
