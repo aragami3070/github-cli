@@ -25,5 +25,11 @@ async fn main() {
         Client::new("github-cli".to_string(), Credentials::Token(github_token))
             .expect("Failed to create Github client");
 
-    handle_cli_command(args, github_client).await;
+    match handle_cli_command(args, github_client).await {
+        Ok(_) => {}
+        Err(message) => {
+            eprintln!("Error: {message}");
+            process::exit(1);
+        }
+    };
 }
