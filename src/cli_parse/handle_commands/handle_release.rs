@@ -10,7 +10,10 @@ use crate::git_utils::repo_info::RepoInfo;
 use crate::git_utils::repo_info::RepoName;
 use crate::git_utils::repo_info::RepoOwner;
 
-pub async fn handle_release_command(github_client: Client, subcommand: ReleaseCommand) -> Result<(), Box<dyn Error>> {
+pub async fn handle_release_command(
+    github_client: Client,
+    subcommand: ReleaseCommand,
+) -> Result<(), Box<dyn Error>> {
     match subcommand {
         ReleaseCommand::Create {
             owner,
@@ -36,22 +39,22 @@ pub async fn handle_release_command(github_client: Client, subcommand: ReleaseCo
                 target_commitish,
             )
             .await?;
-			Ok(())
+            Ok(())
         }
 
         ReleaseCommand::GetLatest { owner, repo } => {
             handle_get_latest(github_client, owner, repo).await?;
-			Ok(())
+            Ok(())
         }
 
         ReleaseCommand::GetByTag { owner, repo, tag } => {
             handle_get_by_tag(github_client, owner, repo, tag).await?;
-			Ok(())
+            Ok(())
         }
 
         ReleaseCommand::GetById { owner, repo, id } => {
             handle_get_by_id(github_client, owner, repo, id).await?;
-			Ok(())
+            Ok(())
         }
     }
 }
@@ -84,32 +87,46 @@ async fn handle_create(
     .await?;
 
     print_url(result, "New release");
-	Ok(())
+    Ok(())
 }
 
-async fn handle_get_latest(github_client: Client, owner: RepoOwner, repo: RepoName) -> Result<(), Box<dyn Error>> {
+async fn handle_get_latest(
+    github_client: Client,
+    owner: RepoOwner,
+    repo: RepoName,
+) -> Result<(), Box<dyn Error>> {
     let repo_info: RepoInfo = RepoInfo::new(Repo::Input, Some(owner), Some(repo))?;
 
     let result = releases::get_latest(&github_client, repo_info).await?;
 
     print_release(result);
-	Ok(())
+    Ok(())
 }
 
-async fn handle_get_by_tag(github_client: Client, owner: RepoOwner, repo: RepoName, tag: String) -> Result<(), Box<dyn Error>> {
+async fn handle_get_by_tag(
+    github_client: Client,
+    owner: RepoOwner,
+    repo: RepoName,
+    tag: String,
+) -> Result<(), Box<dyn Error>> {
     let repo_info: RepoInfo = RepoInfo::new(Repo::Input, Some(owner), Some(repo))?;
 
     let result = releases::get_by_tag(&github_client, repo_info, tag).await?;
 
     print_release(result);
-	Ok(())
+    Ok(())
 }
 
-async fn handle_get_by_id(github_client: Client, owner: RepoOwner, repo: RepoName, id: i64) -> Result<(), Box<dyn Error>> {
+async fn handle_get_by_id(
+    github_client: Client,
+    owner: RepoOwner,
+    repo: RepoName,
+    id: i64,
+) -> Result<(), Box<dyn Error>> {
     let repo_info: RepoInfo = RepoInfo::new(Repo::Input, Some(owner), Some(repo))?;
 
     let result = releases::get_by_id(&github_client, repo_info, id).await?;
 
     print_release(result);
-	Ok(())
+    Ok(())
 }

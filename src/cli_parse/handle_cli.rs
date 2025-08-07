@@ -22,7 +22,7 @@ pub async fn handle_cli_command(args: Args, github_client: Client) -> Result<(),
         }
 
         CliCommand::Repo { subcommand } => {
-            handle_repo_command(github_client, subcommand).await;
+            handle_repo_command(github_client, subcommand).await?;
 			Ok(())
         }
 
