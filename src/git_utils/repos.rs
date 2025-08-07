@@ -1,4 +1,4 @@
-use std::process;
+use std::error::Error;
 
 use octorust::{
     types::{
@@ -29,7 +29,7 @@ pub async fn create_for_authenticated_user(
     license_template: &String,
     name: &String,
     private: Option<bool>,
-) -> String {
+) -> Result<String, Box<dyn Error>> {
     let request = ReposCreateRequest {
         allow_auto_merge: allow_auto_merge,
         allow_merge_commit: allow_merge_commit,
@@ -57,11 +57,8 @@ pub async fn create_for_authenticated_user(
         .await;
 
     return match new_repo {
-        Ok(_) => "Success".to_string(),
-        Err(message) => {
-            eprintln!("Error: {message}");
-            process::exit(1);
-        }
+        Ok(_) => Ok("Success".to_string()),
+        Err(er) => Err(Box::new(er)),
     };
 }
 
@@ -84,7 +81,7 @@ pub async fn create_in_org(
     license_template: &String,
     team_name: &String,
     visibility: Option<ReposCreateInOrgRequestVisibility>,
-) -> String {
+) -> Result<String, Box<dyn Error>> {
     let team = get_id(github_client, &repo_info.get_owner(), team_name).await;
 
     let team_id = team.id;
@@ -116,11 +113,8 @@ pub async fn create_in_org(
         .await;
 
     return match new_repo {
-        Ok(_) => repo_info.get_ssh(),
-        Err(message) => {
-            eprintln!("Error: {message}");
-            process::exit(1);
-        }
+        Ok(_) => Ok(repo_info.get_ssh()),
+        Err(er) => Err(Box::new(er)),
     };
 }
 
@@ -130,18 +124,15 @@ pub async fn get_all_from_org(
     order: Order,
     type_value: ReposListOrgType,
     sort_value: ReposListOrgSort,
-) -> Vec<MinimalRepository> {
+) -> Result<Vec<MinimalRepository>, Box<dyn Error>> {
     let all_repos = github_client
         .repos()
         .list_all_for_org(org.trim(), type_value, sort_value, order)
         .await;
 
     return match all_repos {
-        Ok(r) => r.body,
-        Err(message) => {
-            eprintln!("Error: {message}");
-            process::exit(1);
-        }
+        Ok(r) => Ok(r.body),
+        Err(er) => Err(Box::new(er)),
     };
 }
 
@@ -152,7 +143,7 @@ pub async fn create_using_template(
     description: &String,
     include_all_branches: Option<bool>,
     private: Option<bool>,
-) -> String {
+) -> Result<String, Box<dyn Error>> {
     let request = ReposCreateUsingTemplateRequest {
         description: description.clone(),
         include_all_branches: include_all_branches,
@@ -171,15 +162,16 @@ pub async fn create_using_template(
         .await;
 
     return match new_repo {
-        Ok(_) => repo_info.get_ssh(),
-        Err(message) => {
-            eprintln!("Error: {message}");
-            process::exit(1);
-        }
+        Ok(_) => Ok(repo_info.get_ssh()),
+        Err(er) => Err(Box::new(er)),
     };
 }
 
-pub async fn create_fork(github_client: &Client, org: &String, fork_info: RepoInfo) -> String {
+pub async fn create_fork(
+    github_client: &Client,
+    org: &String,
+    fork_info: RepoInfo,
+) -> Result<String, Box<dyn Error>> {
     let request = ReposCreateForkRequest {
         organization: org.clone(),
     };
@@ -194,11 +186,8 @@ pub async fn create_fork(github_client: &Client, org: &String, fork_info: RepoIn
         .await;
 
     return match new_fork {
-        Ok(_) => "Success".to_string(),
-        Err(message) => {
-            eprintln!("Error: {message}");
-            process::exit(1);
-        }
+        Ok(_) => Ok("Success".to_string()),
+        Err(er) => Err(Box::new(er)),
     };
 }
 
@@ -208,17 +197,14 @@ pub async fn get_all_from_user(
     type_value: ReposListUserType,
     sort_value: ReposListOrgSort,
     order: Order,
-) -> Vec<MinimalRepository> {
+) -> Result<Vec<MinimalRepository>, Box<dyn Error>> {
     let all_repos = github_client
         .repos()
         .list_all_for_user(owner.trim(), type_value, sort_value, order)
         .await;
 
     return match all_repos {
-        Ok(reps) => reps.body,
-        Err(message) => {
-            eprintln!("Error: {message}");
-            process::exit(1);
-        }
+        Ok(reps) => Ok(reps.body),
+        Err(er) => Err(Box::new(er)),
     };
 }
