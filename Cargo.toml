@@ -1,11 +1,11 @@
 [package]
 name = "github-cli"
-version = "1.10.0"
+version = "1.11.0"
 edition = "2021"
 
 [dependencies]
 octorust = "0.10.0"
 clap = { version = "4.5.39", features = ["derive"] }
 tokio = { version = "1.45.1", features = ["full"] }
-rstest = "0.25.0"
+rstest = "0.26.1"
 paste = "1.0.15"
