@@ -1,4 +1,4 @@
-use std::process;
+use std::error::Error;
 
 use octorust::{
     types::{Release, ReposCreateReleaseRequest},
@@ -17,7 +17,7 @@ pub async fn create(
     prerelease: Option<bool>,
     tag_name: &String,
     target_commitish: String,
-) -> String {
+) -> Result<String, Box<dyn Error>> {
     let request = ReposCreateReleaseRequest {
         body: body,
         discussion_category_name: discussion_category_name,
@@ -38,30 +38,31 @@ pub async fn create(
         .await;
 
     return match result {
-        Ok(_) => repo_info.get_release_url(tag_name),
-        Err(message) => {
-            eprintln!("{message}");
-            process::exit(1);
-        }
+        Ok(_) => Ok(repo_info.get_release_url(tag_name)),
+        Err(er) => Err(Box::new(er)),
     };
 }
 
-pub async fn get_latest(github_client: &Client, repo_info: RepoInfo) -> Release {
+pub async fn get_latest(
+    github_client: &Client,
+    repo_info: RepoInfo,
+) -> Result<Release, Box<dyn Error>> {
     let result = github_client
         .repos()
         .get_latest_release(&repo_info.get_owner().trim(), &repo_info.get_name().trim())
         .await;
 
     return match result {
-        Ok(r) => r.body,
-        Err(message) => {
-            eprintln!("{message}");
-            process::exit(1);
-        }
+        Ok(r) => Ok(r.body),
+        Err(er) => Err(Box::new(er)),
     };
 }
 
-pub async fn get_by_tag(github_client: &Client, repo_info: RepoInfo, tag: String) -> Release {
+pub async fn get_by_tag(
+    github_client: &Client,
+    repo_info: RepoInfo,
+    tag: String,
+) -> Result<Release, Box<dyn Error>> {
     let result = github_client
         .repos()
         .get_release_by_tag(
@@ -70,16 +71,18 @@ pub async fn get_by_tag(github_client: &Client, repo_info: RepoInfo, tag: String
             &tag,
         )
         .await;
+
     return match result {
-        Ok(r) => r.body,
-        Err(message) => {
-            eprintln!("{message}");
-            process::exit(1);
-        }
+        Ok(r) => Ok(r.body),
+        Err(er) => Err(Box::new(er)),
     };
 }
 
-pub async fn get_by_id(github_client: &Client, repo_info: RepoInfo, id: i64) -> Release {
+pub async fn get_by_id(
+    github_client: &Client,
+    repo_info: RepoInfo,
+    id: i64,
+) -> Result<Release, Box<dyn Error>> {
     let result = github_client
         .repos()
         .get_release(
@@ -88,11 +91,9 @@ pub async fn get_by_id(github_client: &Client, repo_info: RepoInfo, id: i64) -> 
             id,
         )
         .await;
+
     return match result {
-        Ok(r) => r.body,
-        Err(message) => {
-            eprintln!("{message}");
-            process::exit(1);
-        }
+        Ok(r) => Ok(r.body),
+        Err(er) => Err(Box::new(er)),
     };
 }
