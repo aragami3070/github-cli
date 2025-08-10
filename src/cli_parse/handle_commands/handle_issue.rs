@@ -1,5 +1,5 @@
 use octorust::{self, Client};
-use std::process;
+use std::error::Error;
 
 use crate::cli_in::issue_command::IssueCommand;
 use crate::cli_in::set_vars::IssuesListStates;
@@ -9,7 +9,10 @@ use crate::git_utils::issues;
 use crate::git_utils::repo_info::Repo;
 use crate::git_utils::repo_info::RepoInfo;
 
-pub async fn handle_issue_command(github_client: Client, subcommand: IssueCommand) {
+pub async fn handle_issue_command(
+    github_client: Client,
+    subcommand: IssueCommand,
+) -> Result<(), Box<dyn Error>> {
     match subcommand {
         IssueCommand::List {
             creator,
@@ -28,7 +31,8 @@ pub async fn handle_issue_command(github_client: Client, subcommand: IssueComman
                 numb_of_page,
                 iss_on_page,
             )
-            .await;
+            .await?;
+            Ok(())
         }
 
         IssueCommand::Create {
@@ -37,11 +41,13 @@ pub async fn handle_issue_command(github_client: Client, subcommand: IssueComman
             assignees,
             labels,
         } => {
-            handle_create(github_client, title, body, assignees, labels).await;
+            handle_create(github_client, title, body, assignees, labels).await?;
+            Ok(())
         }
 
         IssueCommand::Close { number, comment } => {
-            handle_close(github_client, number, comment).await;
+            handle_close(github_client, number, comment).await?;
+            Ok(())
         }
 
         IssueCommand::Update {
@@ -52,7 +58,8 @@ pub async fn handle_issue_command(github_client: Client, subcommand: IssueComman
             state,
             labels,
         } => {
-            handle_update(github_client, title, body, number, labels, assignees, state).await;
+            handle_update(github_client, title, body, number, labels, assignees, state).await?;
+            Ok(())
         }
     }
 }
@@ -65,14 +72,8 @@ async fn handle_list(
     labels: String,
     numb_of_page: i64,
     iss_on_page: i64,
-) {
-    let repo_info: RepoInfo = match RepoInfo::new(Repo::Current, None, None) {
-        Ok(rep) => rep,
-        Err(message) => {
-            eprintln!("Error: {message}");
-            process::exit(1);
-        }
-    };
+) -> Result<(), Box<dyn Error>> {
+    let repo_info: RepoInfo = RepoInfo::new(Repo::Current, None, None)?;
 
     let list_issues = issues::get_list(
         &github_client,
@@ -84,9 +85,10 @@ async fn handle_list(
         &numb_of_page,
         &iss_on_page,
     )
-    .await;
+    .await?;
 
     print_issues(list_issues, state, numb_of_page);
+    Ok(())
 }
 
 async fn handle_create(
@@ -95,14 +97,9 @@ async fn handle_create(
     body: String,
     assignees: String,
     labels: String,
-) {
-    let repo_info: RepoInfo = match RepoInfo::new(Repo::Current, None, None) {
-        Ok(rep) => rep,
-        Err(message) => {
-            eprintln!("Error: {message}");
-            process::exit(1);
-        }
-    };
+) -> Result<(), Box<dyn Error>> {
+    let repo_info: RepoInfo = RepoInfo::new(Repo::Current, None, None)?;
+
     let labels_list: Vec<String> = labels.split(",").map(|s| s.to_string()).collect();
     let assignees_list: Vec<String> = assignees.split(",").map(|s| s.to_string()).collect();
 
@@ -114,22 +111,23 @@ async fn handle_create(
         &assignees_list,
         &labels_list,
     )
-    .await;
+    .await?;
 
     println!("{result}");
+    Ok(())
 }
 
-async fn handle_close(github_client: Client, number: i64, comment: String) {
-    let repo_info: RepoInfo = match RepoInfo::new(Repo::Current, None, None) {
-        Ok(rep) => rep,
-        Err(message) => {
-            eprintln!("Error: {message}");
-            process::exit(1);
-        }
-    };
-    let result = issues::close(&github_client, repo_info, &number, &comment).await;
+async fn handle_close(
+    github_client: Client,
+    number: i64,
+    comment: String,
+) -> Result<(), Box<dyn Error>> {
+    let repo_info: RepoInfo = RepoInfo::new(Repo::Current, None, None)?;
+
+    let result = issues::close(&github_client, repo_info, &number, &comment).await?;
 
     println!("{result}");
+    Ok(())
 }
 
 async fn handle_update(
@@ -140,14 +138,8 @@ async fn handle_update(
     labels: Option<String>,
     assignees: Option<String>,
     state: States,
-) {
-    let repo_info: RepoInfo = match RepoInfo::new(Repo::Current, None, None) {
-        Ok(rep) => rep,
-        Err(message) => {
-            eprintln!("Error: {message}");
-            process::exit(1);
-        }
-    };
+) -> Result<(), Box<dyn Error>> {
+    let repo_info: RepoInfo = RepoInfo::new(Repo::Current, None, None)?;
 
     let labels_list: Vec<String> = match labels {
         Some(l) => l.split(",").map(|s| s.to_string()).collect(),
@@ -168,7 +160,8 @@ async fn handle_update(
         &labels_list,
         &state.0,
     )
-    .await;
+    .await?;
 
     println!("{result}");
+    Ok(())
 }

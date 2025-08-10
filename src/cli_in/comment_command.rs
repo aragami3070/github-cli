@@ -1,6 +1,6 @@
 use clap::Subcommand;
 
-use crate::cli_in::set_vars::CommentTarget;
+use crate::cli_in::set_vars::{CommentTarget, Orders, Sorts};
 
 #[derive(Subcommand)]
 pub enum CommentCommand {
@@ -22,5 +22,18 @@ pub enum CommentCommand {
         /// Get from issue or from pull request (can be only 'issue' or 'pull-request')
         #[clap(long, short)]
         target: CommentTarget,
+    },
+
+    /// Get all comments from issue/pull request
+    GetAllFromReview {
+        /// Get all comments from issue/pull request with number
+        #[clap(long, short)]
+        number: i64,
+        /// Can be only 'created' or 'updated' (optional)
+        #[clap(long, short, default_value = "created")]
+        sort: Sorts,
+        /// Can be only 'asc' or 'desc' (optional)
+        #[clap(long, short, default_value = "desc")]
+        order: Orders,
     },
 }

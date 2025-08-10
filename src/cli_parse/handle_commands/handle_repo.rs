@@ -1,5 +1,5 @@
 use octorust::{self, Client};
-use std::process;
+use std::error::Error;
 
 use crate::cli_in::repo_command::RepoCommand;
 use crate::cli_in::set_vars::Orders;
@@ -14,7 +14,10 @@ use crate::git_utils::repo_info::RepoInfo;
 use crate::git_utils::repo_info::{RepoName, RepoOwner};
 use crate::git_utils::repos;
 
-pub async fn handle_repo_command(github_client: Client, subcommand: RepoCommand) {
+pub async fn handle_repo_command(
+    github_client: Client,
+    subcommand: RepoCommand,
+) -> Result<(), Box<dyn Error>> {
     match subcommand {
         RepoCommand::CreateForAuthenticatedUser {
             allow_auto_merge,
@@ -53,7 +56,8 @@ pub async fn handle_repo_command(github_client: Client, subcommand: RepoCommand)
                 name,
                 private,
             )
-            .await;
+            .await?;
+            Ok(())
         }
 
         RepoCommand::CreateInOrg {
@@ -97,7 +101,8 @@ pub async fn handle_repo_command(github_client: Client, subcommand: RepoCommand)
                 team_name,
                 visibility,
             )
-            .await;
+            .await?;
+            Ok(())
         }
 
         RepoCommand::GetAllFromOrg {
@@ -106,7 +111,8 @@ pub async fn handle_repo_command(github_client: Client, subcommand: RepoCommand)
             sort_value,
             type_value,
         } => {
-            handle_get_all_from_org(github_client, org, order, type_value, sort_value).await;
+            handle_get_all_from_org(github_client, org, order, type_value, sort_value).await?;
+            Ok(())
         }
 
         RepoCommand::CreateUsingTemplate {
@@ -128,11 +134,13 @@ pub async fn handle_repo_command(github_client: Client, subcommand: RepoCommand)
                 include_all_branches,
                 private,
             )
-            .await;
+            .await?;
+            Ok(())
         }
 
         RepoCommand::CreateFork { org, name, owner } => {
-            handle_create_fork(github_client, owner, name, org).await;
+            handle_create_fork(github_client, owner, name, org).await?;
+            Ok(())
         }
 
         RepoCommand::GetAllFromUser {
@@ -141,7 +149,8 @@ pub async fn handle_repo_command(github_client: Client, subcommand: RepoCommand)
             sort_value,
             type_value,
         } => {
-            handle_get_all_from_user(github_client, owner, type_value, sort_value, order).await;
+            handle_get_all_from_user(github_client, owner, type_value, sort_value, order).await?;
+            Ok(())
         }
     }
 }
@@ -164,7 +173,7 @@ async fn handle_create_for_auth_user(
     license_template: String,
     name: String,
     private: Option<bool>,
-) {
+) -> Result<(), Box<dyn Error>> {
     let result = repos::create_for_authenticated_user(
         &github_client,
         allow_auto_merge,
@@ -184,9 +193,10 @@ async fn handle_create_for_auth_user(
         &name,
         private,
     )
-    .await;
+    .await?;
 
     println!("{result}");
+    Ok(())
 }
 
 async fn handle_create_in_org(
@@ -209,14 +219,8 @@ async fn handle_create_in_org(
     org: RepoOwner,
     team_name: String,
     visibility: Visibilities,
-) {
-    let repo_info: RepoInfo = match RepoInfo::new(Repo::Input, Some(org), Some(name)) {
-        Ok(rep) => rep,
-        Err(message) => {
-            eprintln!("Error: {message}");
-            process::exit(1);
-        }
-    };
+) -> Result<(), Box<dyn Error>> {
+    let repo_info: RepoInfo = RepoInfo::new(Repo::Input, Some(org), Some(name))?;
 
     let result = repos::create_in_org(
         &github_client,
@@ -238,9 +242,10 @@ async fn handle_create_in_org(
         &team_name,
         Some(visibility.0),
     )
-    .await;
+    .await?;
 
     print_url(result, "New repo");
+    Ok(())
 }
 
 async fn handle_get_all_from_org(
@@ -249,11 +254,12 @@ async fn handle_get_all_from_org(
     order: Orders,
     type_value: ReposListOrgTypes,
     sort_value: ReposListOrgSorts,
-) {
+) -> Result<(), Box<dyn Error>> {
     let all_repos =
-        repos::get_all_from_org(&github_client, &org, order.0, type_value.0, sort_value.0).await;
+        repos::get_all_from_org(&github_client, &org, order.0, type_value.0, sort_value.0).await?;
 
     print_repos(all_repos, org, "org");
+    Ok(())
 }
 
 async fn handle_create_using_template(
@@ -265,22 +271,10 @@ async fn handle_create_using_template(
     description: String,
     include_all_branches: Option<bool>,
     private: Option<bool>,
-) {
-    let repo_info: RepoInfo = match RepoInfo::new(Repo::Input, Some(owner), Some(name)) {
-        Ok(rep) => rep,
-        Err(message) => {
-            eprintln!("Error: {message}");
-            process::exit(1);
-        }
-    };
+) -> Result<(), Box<dyn Error>> {
+    let repo_info: RepoInfo = RepoInfo::new(Repo::Input, Some(owner), Some(name))?;
     let template_info: RepoInfo =
-        match RepoInfo::new(Repo::Input, Some(template_owner), Some(template_name)) {
-            Ok(rep) => rep,
-            Err(message) => {
-                eprintln!("Error: {message}");
-                process::exit(1);
-            }
-        };
+        RepoInfo::new(Repo::Input, Some(template_owner), Some(template_name))?;
 
     let result = repos::create_using_template(
         &github_client,
@@ -290,22 +284,23 @@ async fn handle_create_using_template(
         include_all_branches,
         private,
     )
-    .await;
+    .await?;
 
     print_url(result, "New repo");
+    Ok(())
 }
 
-async fn handle_create_fork(github_client: Client, owner: RepoOwner, name: RepoName, org: String) {
-    let fork_info: RepoInfo = match RepoInfo::new(Repo::Input, Some(owner), Some(name)) {
-        Ok(rep) => rep,
-        Err(message) => {
-            eprintln!("Error: {message}");
-            process::exit(1);
-        }
-    };
-    let result = repos::create_fork(&github_client, &org, fork_info).await;
+async fn handle_create_fork(
+    github_client: Client,
+    owner: RepoOwner,
+    name: RepoName,
+    org: String,
+) -> Result<(), Box<dyn Error>> {
+    let fork_info: RepoInfo = RepoInfo::new(Repo::Input, Some(owner), Some(name))?;
+    let result = repos::create_fork(&github_client, &org, fork_info).await?;
 
     println!("{result}");
+    Ok(())
 }
 
 async fn handle_get_all_from_user(
@@ -314,7 +309,7 @@ async fn handle_get_all_from_user(
     type_value: ReposListUserTypes,
     sort_value: ReposListOrgSorts,
     order: Orders,
-) {
+) -> Result<(), Box<dyn Error>> {
     let result = repos::get_all_from_user(
         &github_client,
         owner.clone(),
@@ -322,7 +317,8 @@ async fn handle_get_all_from_user(
         sort_value.0,
         order.0,
     )
-    .await;
+    .await?;
 
     print_repos(result, owner, "user");
+    Ok(())
 }

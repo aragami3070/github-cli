@@ -1,4 +1,4 @@
-use std::process;
+use std::error::Error;
 
 use octorust::types::{
     self, IssuesCreateRequest, IssuesCreateRequestLabelsOneOf, IssuesUpdateRequest, State,
@@ -18,7 +18,7 @@ pub async fn get_list(
     labels: &String,
     numb_of_page: &i64,
     iss_on_page: &i64,
-) -> Vec<types::IssueSimple> {
+) -> Result<Vec<types::IssueSimple>, Box<dyn Error>> {
     let sort = types::IssuesListSort::Created;
 
     let issues = github_client
@@ -41,11 +41,8 @@ pub async fn get_list(
         .await;
 
     return match issues {
-        Ok(info) => info.body,
-        Err(message) => {
-            eprintln!("Error: {message}");
-            process::exit(1);
-        }
+        Ok(info) => Ok(info.body),
+        Err(er) => Err(Box::new(er)),
     };
 }
 
@@ -83,7 +80,7 @@ pub async fn create(
     body: &String,
     assignees: &Vec<String>,
     labels: &Vec<String>,
-) -> String {
+) -> Result<String, Box<dyn Error>> {
     let request = get_create_request(title, body, assignees, labels);
 
     let new_issue = github_client
@@ -96,11 +93,8 @@ pub async fn create(
         .await;
 
     return match new_issue {
-        Ok(_) => "Success".to_string(),
-        Err(message) => {
-            eprintln!("Error: {message}");
-            process::exit(1);
-        }
+        Ok(_) => Ok("Success".to_string()),
+        Err(er) => Err(Box::new(er)),
     };
 }
 
@@ -137,9 +131,10 @@ pub async fn close(
     repo_info: RepoInfo,
     issue_number: &i64,
     comment: &String,
-) -> String {
+) -> Result<String, Box<dyn Error>> {
     if comment != "" {
-        let new_comment = comments::create(github_client, &repo_info, issue_number, comment).await;
+        let new_comment =
+            comments::create(github_client, &repo_info, issue_number, comment).await?;
         println!("{new_comment}");
     }
 
@@ -156,11 +151,8 @@ pub async fn close(
         .await;
 
     return match close {
-        Ok(_) => "Success".to_string(),
-        Err(message) => {
-            eprintln!("Error: {message}");
-            process::exit(1);
-        }
+        Ok(_) => Ok("Success".to_string()),
+        Err(er) => Err(Box::new(er)),
     };
 }
 
@@ -173,7 +165,7 @@ pub async fn update(
     assignees: &Vec<String>,
     labels: &Vec<String>,
     state: &State,
-) -> String {
+) -> Result<String, Box<dyn Error>> {
     let request = get_update_request(title, body, Some(assignees), Some(labels), state);
 
     let update_iss = github_client
@@ -187,10 +179,7 @@ pub async fn update(
         .await;
 
     return match update_iss {
-        Ok(_) => "Success".to_string(),
-        Err(message) => {
-            eprintln!("Error: {message}");
-            process::exit(1);
-        }
+        Ok(_) => Ok("Success".to_string()),
+        Err(er) => Err(Box::new(er)),
     };
 }

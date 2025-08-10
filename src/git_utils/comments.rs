@@ -1,4 +1,4 @@
-use std::process;
+use std::error::Error;
 
 use octorust::types::{
     IssueComment, Order, PullRequestReviewComment, PullsUpdateReviewRequest, Sort,
@@ -12,7 +12,7 @@ pub async fn create(
     repo_info: &RepoInfo,
     issue_number: &i64,
     body: &String,
-) -> String {
+) -> Result<String, Box<dyn Error>> {
     let request = PullsUpdateReviewRequest { body: body.clone() };
 
     let comment = github_client
@@ -26,11 +26,8 @@ pub async fn create(
         .await;
 
     return match comment {
-        Ok(_) => "Comment create successed".to_string(),
-        Err(message) => {
-            eprintln!("Error: {message}");
-            process::exit(1);
-        }
+        Ok(_) => Ok("Comment create successed".to_string()),
+        Err(er) => Err(Box::new(er)),
     };
 }
 
@@ -39,7 +36,7 @@ pub async fn get_all(
     github_client: &Client,
     repo_info: &RepoInfo,
     number: &i64,
-) -> Vec<IssueComment> {
+) -> Result<Vec<IssueComment>, Box<dyn Error>> {
     let list_comments = github_client
         .issues()
         .list_all_comments(
@@ -51,20 +48,19 @@ pub async fn get_all(
         .await;
 
     return match list_comments {
-        Ok(c) => c.body,
-        Err(message) => {
-            eprintln!("Error: {message}");
-            process::exit(1);
-        }
+        Ok(c) => Ok(c.body),
+        Err(er) => Err(Box::new(er)),
     };
 }
+
+// Get all review Comments for pull request
 pub async fn get_all_from_review(
     github_client: &Client,
     repo_info: &RepoInfo,
     number: &i64,
     sort: Sort,
     direction: Order,
-) -> Vec<PullRequestReviewComment> {
+) -> Result<Vec<PullRequestReviewComment>, Box<dyn Error>> {
     let list_comments = github_client
         .pulls()
         .list_all_review_comments(
@@ -78,10 +74,7 @@ pub async fn get_all_from_review(
         .await;
 
     return match list_comments {
-        Ok(c) => c.body,
-        Err(message) => {
-            eprintln!("Error: {message}");
-            process::exit(1);
-        }
+        Ok(c) => Ok(c.body),
+        Err(er) => Err(Box::new(er)),
     };
 }
