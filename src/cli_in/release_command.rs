@@ -15,8 +15,8 @@ pub enum ReleaseCommand {
         /// Tag name
         #[clap(long)]
         tag_name: String,
-        /// Target commit hash (only long variant of commit hash)
-        #[clap(long)]
+        /// Target commit hash (only long variant of commit hash) (optional)
+        #[clap(long, default_value = "")]
         target_commitish: String,
         /// Release name
         #[clap(long, short)]
