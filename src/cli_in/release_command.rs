@@ -6,17 +6,17 @@ use crate::git_utils::repo_info::{RepoName, RepoOwner};
 pub enum ReleaseCommand {
     /// Create new release
     Create {
-        /// Repo owner
+        /// Repo owner (optional)
         #[clap(long, short)]
         owner: RepoOwner,
-        /// Repo name
+        /// Repo name (optional)
         #[clap(long, short)]
         repo: RepoName,
         /// Tag name
         #[clap(long)]
         tag_name: String,
-        /// Target commit hash (only long variant of commit hash)
-        #[clap(long)]
+        /// Target commit hash (only long variant of commit hash) (optional)
+        #[clap(long, default_value = "")]
         target_commitish: String,
         /// Release name
         #[clap(long, short)]
@@ -37,22 +37,22 @@ pub enum ReleaseCommand {
 
     /// Get latest release
     GetLatest {
-        /// Repo owner
-        #[clap(long, short)]
-        owner: RepoOwner,
-        /// Repo name
-        #[clap(long, short)]
-        repo: RepoName,
+        /// Repo owner (optional)
+        #[clap(long, short, default_value = None)]
+        owner: Option<RepoOwner>,
+        /// Repo name (optional)
+        #[clap(long, short, default_value = None)]
+        repo: Option<RepoName>,
     },
 
     /// Get release by tag
     GetByTag {
-        /// Repo owner
-        #[clap(long, short)]
-        owner: RepoOwner,
-        /// Repo name
-        #[clap(long, short)]
-        repo: RepoName,
+        /// Repo owner (optional)
+        #[clap(long, short, default_value = None)]
+        owner: Option<RepoOwner>,
+        /// Repo name (optional)
+        #[clap(long, short, default_value = None)]
+        repo: Option<RepoName>,
         /// Release tag
         #[clap(long, short)]
         tag: String,
@@ -60,12 +60,12 @@ pub enum ReleaseCommand {
 
     /// Get release by id
     GetById {
-        /// Repo owner
-        #[clap(long, short)]
-        owner: RepoOwner,
-        /// Repo name
-        #[clap(long, short)]
-        repo: RepoName,
+        /// Repo owner (optional)
+        #[clap(long, short, default_value = None)]
+        owner: Option<RepoOwner>,
+        /// Repo name (optional)
+        #[clap(long, short, default_value = None)]
+        repo: Option<RepoName>,
         /// Release id
         #[clap(long, short)]
         id: i64,

@@ -8,6 +8,7 @@ use crate::cli_out::print_in_cli::print_issues;
 use crate::git_utils::issues;
 use crate::git_utils::repo_info::Repo;
 use crate::git_utils::repo_info::RepoInfo;
+use crate::git_utils::repo_info::{RepoName, RepoOwner};
 
 pub async fn handle_issue_command(
     github_client: Client,
@@ -15,6 +16,8 @@ pub async fn handle_issue_command(
 ) -> Result<(), Box<dyn Error>> {
     match subcommand {
         IssueCommand::List {
+            owner,
+            repo,
             creator,
             assignee,
             state,
@@ -24,6 +27,8 @@ pub async fn handle_issue_command(
         } => {
             handle_list(
                 github_client,
+                owner,
+                repo,
                 creator,
                 assignee,
                 state,
@@ -36,21 +41,30 @@ pub async fn handle_issue_command(
         }
 
         IssueCommand::Create {
+            owner,
+            repo,
             title,
             body,
             assignees,
             labels,
         } => {
-            handle_create(github_client, title, body, assignees, labels).await?;
+            handle_create(github_client, owner, repo, title, body, assignees, labels).await?;
             Ok(())
         }
 
-        IssueCommand::Close { number, comment } => {
-            handle_close(github_client, number, comment).await?;
+        IssueCommand::Close {
+            owner,
+            repo,
+            number,
+            comment,
+        } => {
+            handle_close(github_client, owner, repo, number, comment).await?;
             Ok(())
         }
 
         IssueCommand::Update {
+            owner,
+            repo,
             number,
             title,
             body,
@@ -58,7 +72,18 @@ pub async fn handle_issue_command(
             state,
             labels,
         } => {
-            handle_update(github_client, title, body, number, labels, assignees, state).await?;
+            handle_update(
+                github_client,
+                owner,
+                repo,
+                title,
+                body,
+                number,
+                labels,
+                assignees,
+                state,
+            )
+            .await?;
             Ok(())
         }
     }
@@ -66,6 +91,8 @@ pub async fn handle_issue_command(
 
 async fn handle_list(
     github_client: Client,
+    owner: Option<RepoOwner>,
+    repo: Option<RepoName>,
     creator: String,
     assignee: String,
     state: IssuesListStates,
@@ -73,7 +100,10 @@ async fn handle_list(
     numb_of_page: i64,
     iss_on_page: i64,
 ) -> Result<(), Box<dyn Error>> {
-    let repo_info: RepoInfo = RepoInfo::new(Repo::Current, None, None)?;
+    let repo_info = match owner {
+        Some(_) => RepoInfo::new(Repo::Input, owner, repo)?,
+        None => RepoInfo::new(Repo::Current, None, None)?,
+    };
 
     let list_issues = issues::get_list(
         &github_client,
@@ -93,12 +123,17 @@ async fn handle_list(
 
 async fn handle_create(
     github_client: Client,
+    owner: Option<RepoOwner>,
+    repo: Option<RepoName>,
     title: String,
     body: String,
     assignees: String,
     labels: String,
 ) -> Result<(), Box<dyn Error>> {
-    let repo_info: RepoInfo = RepoInfo::new(Repo::Current, None, None)?;
+    let repo_info = match owner {
+        Some(_) => RepoInfo::new(Repo::Input, owner, repo)?,
+        None => RepoInfo::new(Repo::Current, None, None)?,
+    };
 
     let labels_list: Vec<String> = labels.split(",").map(|s| s.to_string()).collect();
     let assignees_list: Vec<String> = assignees.split(",").map(|s| s.to_string()).collect();
@@ -119,10 +154,15 @@ async fn handle_create(
 
 async fn handle_close(
     github_client: Client,
+    owner: Option<RepoOwner>,
+    repo: Option<RepoName>,
     number: i64,
     comment: String,
 ) -> Result<(), Box<dyn Error>> {
-    let repo_info: RepoInfo = RepoInfo::new(Repo::Current, None, None)?;
+    let repo_info = match owner {
+        Some(_) => RepoInfo::new(Repo::Input, owner, repo)?,
+        None => RepoInfo::new(Repo::Current, None, None)?,
+    };
 
     let result = issues::close(&github_client, repo_info, &number, &comment).await?;
 
@@ -132,14 +172,19 @@ async fn handle_close(
 
 async fn handle_update(
     github_client: Client,
-    title: String,
-    body: String,
+    owner: Option<RepoOwner>,
+    repo: Option<RepoName>,
+    title: Option<String>,
+    body: Option<String>,
     number: i64,
     labels: Option<String>,
     assignees: Option<String>,
     state: States,
 ) -> Result<(), Box<dyn Error>> {
-    let repo_info: RepoInfo = RepoInfo::new(Repo::Current, None, None)?;
+    let repo_info = match owner {
+        Some(_) => RepoInfo::new(Repo::Input, owner, repo)?,
+        None => RepoInfo::new(Repo::Current, None, None)?,
+    };
 
     let labels_list: Vec<String> = match labels {
         Some(l) => l.split(",").map(|s| s.to_string()).collect(),
@@ -154,8 +199,8 @@ async fn handle_update(
         &github_client,
         repo_info,
         &number,
-        Some(title),
-        Some(body),
+        title,
+        body,
         &assignees_list,
         &labels_list,
         &state.0,

@@ -1,3 +1,4 @@
+use crate::git_utils::repo_info::{RepoName, RepoOwner};
 use clap::Subcommand;
 
 use crate::cli_in::set_vars::{IssuesListStates, States};
@@ -6,6 +7,12 @@ use crate::cli_in::set_vars::{IssuesListStates, States};
 pub enum IssueCommand {
     /// Get list of issues
     List {
+        /// Repo owner (optional)
+        #[clap(long, short, default_value = None)]
+        owner: Option<RepoOwner>,
+        /// Repo name (optional)
+        #[clap(long, short, default_value = None)]
+        repo: Option<RepoName>,
         /// The user that created the issues (optional)
         #[clap(long, short, default_value = "")]
         creator: String,
@@ -28,6 +35,12 @@ pub enum IssueCommand {
 
     /// Create issue
     Create {
+        /// Repo owner (optional)
+        #[clap(long, short, default_value = None)]
+        owner: Option<RepoOwner>,
+        /// Repo name (optional)
+        #[clap(long, short, default_value = None)]
+        repo: Option<RepoName>,
         /// Issue title
         #[clap(long, short)]
         title: String,
@@ -44,15 +57,21 @@ pub enum IssueCommand {
 
     /// Update issue
     Update {
+        /// Repo owner (optional)
+        #[clap(long, short, default_value = None)]
+        owner: Option<RepoOwner>,
+        /// Repo name (optional)
+        #[clap(long, short, default_value = None)]
+        repo: Option<RepoName>,
         /// Update issue with number
         #[clap(long, short)]
         number: i64,
         /// Issue title
-        #[clap(long, short, default_value = "None")]
-        title: String,
+        #[clap(long, short, default_value = None)]
+        title: Option<String>,
         /// Issue body (optional)
-        #[clap(long, short, default_value = "None")]
-        body: String,
+        #[clap(long, short, default_value = None)]
+        body: Option<String>,
         /// A list of comma separated assignee names. Example: `aragami3070,danilasar` (optional)
         #[clap(long, short, default_value = None)]
         assignees: Option<String>,
@@ -66,6 +85,12 @@ pub enum IssueCommand {
 
     /// Close issue
     Close {
+        /// Repo owner (optional)
+        #[clap(long, short, default_value = None)]
+        owner: Option<RepoOwner>,
+        /// Repo name (optional)
+        #[clap(long, short, default_value = None)]
+        repo: Option<RepoName>,
         /// Close issue with number
         #[clap(long, short)]
         number: i64,
