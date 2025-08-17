@@ -52,8 +52,13 @@ pub async fn handle_issue_command(
             Ok(())
         }
 
-        IssueCommand::Close { number, comment } => {
-            handle_close(github_client, number, comment).await?;
+        IssueCommand::Close {
+            owner,
+            repo,
+            number,
+            comment,
+        } => {
+            handle_close(github_client, owner, repo, number, comment).await?;
             Ok(())
         }
 
@@ -136,10 +141,15 @@ async fn handle_create(
 
 async fn handle_close(
     github_client: Client,
+    owner: Option<RepoOwner>,
+    repo: Option<RepoName>,
     number: i64,
     comment: String,
 ) -> Result<(), Box<dyn Error>> {
-    let repo_info: RepoInfo = RepoInfo::new(Repo::Current, None, None)?;
+    let repo_info = match owner {
+        Some(_) => RepoInfo::new(Repo::Input, owner, repo)?,
+        None => RepoInfo::new(Repo::Current, None, None)?,
+    };
 
     let result = issues::close(&github_client, repo_info, &number, &comment).await?;
 

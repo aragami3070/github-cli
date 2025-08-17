@@ -79,6 +79,12 @@ pub enum IssueCommand {
 
     /// Close issue
     Close {
+        /// Repo owner
+        #[clap(long, short, default_value = None)]
+        owner: Option<RepoOwner>,
+        /// Repo name
+        #[clap(long, short, default_value = None)]
+        repo: Option<RepoName>,
         /// Close issue with number
         #[clap(long, short)]
         number: i64,
