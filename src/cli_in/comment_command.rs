@@ -23,6 +23,12 @@ pub enum CommentCommand {
 
     /// Get all comments from issue/pull request
     GetAll {
+        /// Repo owner
+        #[clap(long, short, default_value = None)]
+        owner: Option<RepoOwner>,
+        /// Repo name
+        #[clap(long, short, default_value = None)]
+        repo: Option<RepoName>,
         /// Get all comments from issue/pull request with number
         #[clap(long, short)]
         number: i64,

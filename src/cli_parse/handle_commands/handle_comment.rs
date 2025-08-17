@@ -22,8 +22,11 @@ pub async fn handle_comment_command(
             Ok(())
         }
 
-        CommentCommand::GetAll { number, target } => {
-            handle_get_all(github_client, number, target).await?;
+        CommentCommand::GetAll { 
+            owner,
+            repo,
+			number, target } => {
+            handle_get_all(github_client, owner, repo, number, target).await?;
             Ok(())
         }
 
@@ -57,10 +60,15 @@ async fn handle_create(
 
 async fn handle_get_all(
     github_client: Client,
+    owner: Option<RepoOwner>,
+    repo: Option<RepoName>,
     number: i64,
     target: CommentTarget,
 ) -> Result<(), Box<dyn Error>> {
-    let repo_info: RepoInfo = RepoInfo::new(Repo::Current, None, None)?;
+    let repo_info = match owner {
+        Some(_) => RepoInfo::new(Repo::Input, owner, repo)?,
+        None => RepoInfo::new(Repo::Current, None, None)?,
+    };
 
     let result = comments::get_all(&github_client, &repo_info, &number).await?;
 
