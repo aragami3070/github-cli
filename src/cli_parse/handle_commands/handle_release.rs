@@ -113,9 +113,9 @@ async fn handle_get_by_tag(
     tag: String,
 ) -> Result<(), Box<dyn Error>> {
     let repo_info = match owner {
-		Some(_) => RepoInfo::new(Repo::Input, owner, repo)?,
-		None => RepoInfo::new(Repo::Current, None, None)?
-	};
+        Some(_) => RepoInfo::new(Repo::Input, owner, repo)?,
+        None => RepoInfo::new(Repo::Current, None, None)?,
+    };
 
     let result = releases::get_by_tag(&github_client, repo_info, tag).await?;
 
@@ -130,9 +130,9 @@ async fn handle_get_by_id(
     id: i64,
 ) -> Result<(), Box<dyn Error>> {
     let repo_info = match owner {
-		Some(_) => RepoInfo::new(Repo::Input, owner, repo)?,
-		None => RepoInfo::new(Repo::Current, None, None)?
-	};
+        Some(_) => RepoInfo::new(Repo::Input, owner, repo)?,
+        None => RepoInfo::new(Repo::Current, None, None)?,
+    };
 
     let result = releases::get_by_id(&github_client, repo_info, id).await?;
 

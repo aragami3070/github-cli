@@ -1,3 +1,4 @@
+use crate::git_utils::repo_info::{RepoName, RepoOwner};
 use clap::Subcommand;
 
 use crate::cli_in::set_vars::{CommentTarget, Orders, Sorts};
@@ -6,6 +7,12 @@ use crate::cli_in::set_vars::{CommentTarget, Orders, Sorts};
 pub enum CommentCommand {
     /// Create new comment for issue/pull request
     Create {
+        /// Repo owner
+        #[clap(long, short, default_value = None)]
+        owner: Option<RepoOwner>,
+        /// Repo name
+        #[clap(long, short, default_value = None)]
+        repo: Option<RepoName>,
         /// Create comment for issue/pull request with number
         #[clap(long, short)]
         number: i64,

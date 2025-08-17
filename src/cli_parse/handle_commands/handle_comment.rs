@@ -5,15 +5,20 @@ use crate::cli_in::comment_command::CommentCommand;
 use crate::cli_in::set_vars::{CommentTarget, Orders, Sorts};
 use crate::cli_out::print_in_cli::{print_comments, print_review_comments};
 use crate::git_utils::comments;
-use crate::git_utils::repo_info::{Repo, RepoInfo};
+use crate::git_utils::repo_info::{Repo, RepoInfo, RepoName, RepoOwner};
 
 pub async fn handle_comment_command(
     github_client: Client,
     subcommand: CommentCommand,
 ) -> Result<(), Box<dyn Error>> {
     match subcommand {
-        CommentCommand::Create { number, body } => {
-            handle_create(github_client, number, body).await?;
+        CommentCommand::Create {
+            owner,
+            repo,
+            number,
+            body,
+        } => {
+            handle_create(github_client, owner, repo, number, body).await?;
             Ok(())
         }
 
@@ -35,10 +40,15 @@ pub async fn handle_comment_command(
 
 async fn handle_create(
     github_client: Client,
+    owner: Option<RepoOwner>,
+    repo: Option<RepoName>,
     number: i64,
     body: String,
 ) -> Result<(), Box<dyn Error>> {
-    let repo_info: RepoInfo = RepoInfo::new(Repo::Current, None, None)?;
+    let repo_info = match owner {
+        Some(_) => RepoInfo::new(Repo::Input, owner, repo)?,
+        None => RepoInfo::new(Repo::Current, None, None)?,
+    };
     let result = comments::create(&github_client, &repo_info, &number, &body).await?;
 
     println!("{result}");
@@ -87,5 +97,5 @@ async fn handle_get_all_from_review(
         comments::get_all_from_review(&github_client, &repo_info, &number, sort.0, order.0).await?;
 
     print_review_comments(result);
-	Ok(())
+    Ok(())
 }
