@@ -35,6 +35,12 @@ pub enum IssueCommand {
 
     /// Create issue
     Create {
+        /// Repo owner
+        #[clap(long, short, default_value = None)]
+        owner: Option<RepoOwner>,
+        /// Repo name
+        #[clap(long, short, default_value = None)]
+        repo: Option<RepoName>,
         /// Issue title
         #[clap(long, short)]
         title: String,

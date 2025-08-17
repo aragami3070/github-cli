@@ -41,12 +41,14 @@ pub async fn handle_issue_command(
         }
 
         IssueCommand::Create {
+            owner,
+            repo,
             title,
             body,
             assignees,
             labels,
         } => {
-            handle_create(github_client, title, body, assignees, labels).await?;
+            handle_create(github_client, owner, repo, title, body, assignees, labels).await?;
             Ok(())
         }
 
@@ -103,12 +105,17 @@ async fn handle_list(
 
 async fn handle_create(
     github_client: Client,
+    owner: Option<RepoOwner>,
+    repo: Option<RepoName>,
     title: String,
     body: String,
     assignees: String,
     labels: String,
 ) -> Result<(), Box<dyn Error>> {
-    let repo_info: RepoInfo = RepoInfo::new(Repo::Current, None, None)?;
+    let repo_info = match owner {
+        Some(_) => RepoInfo::new(Repo::Input, owner, repo)?,
+        None => RepoInfo::new(Repo::Current, None, None)?,
+    };
 
     let labels_list: Vec<String> = labels.split(",").map(|s| s.to_string()).collect();
     let assignees_list: Vec<String> = assignees.split(",").map(|s| s.to_string()).collect();
