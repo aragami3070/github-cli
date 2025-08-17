@@ -108,11 +108,14 @@ async fn handle_get_latest(
 
 async fn handle_get_by_tag(
     github_client: Client,
-    owner: RepoOwner,
-    repo: RepoName,
+    owner: Option<RepoOwner>,
+    repo: Option<RepoName>,
     tag: String,
 ) -> Result<(), Box<dyn Error>> {
-    let repo_info: RepoInfo = RepoInfo::new(Repo::Input, Some(owner), Some(repo))?;
+    let repo_info = match owner {
+		Some(_) => RepoInfo::new(Repo::Input, owner, repo)?,
+		None => RepoInfo::new(Repo::Current, None, None)?
+	};
 
     let result = releases::get_by_tag(&github_client, repo_info, tag).await?;
 
