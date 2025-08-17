@@ -31,11 +31,13 @@ pub async fn handle_comment_command(
         }
 
         CommentCommand::GetAllFromReview {
+            owner,
+            repo,
             number,
             sort,
             order,
         } => {
-            handle_get_all_from_review(github_client, number, sort, order).await?;
+            handle_get_all_from_review(github_client, owner, repo, number, sort, order).await?;
             Ok(())
         }
     }
@@ -95,11 +97,16 @@ async fn handle_get_all(
 
 async fn handle_get_all_from_review(
     github_client: Client,
+    owner: Option<RepoOwner>,
+    repo: Option<RepoName>,
     number: i64,
     sort: Sorts,
     order: Orders,
 ) -> Result<(), Box<dyn Error>> {
-    let repo_info: RepoInfo = RepoInfo::new(Repo::Current, None, None)?;
+    let repo_info = match owner {
+        Some(_) => RepoInfo::new(Repo::Input, owner, repo)?,
+        None => RepoInfo::new(Repo::Current, None, None)?,
+    };
 
     let result =
         comments::get_all_from_review(&github_client, &repo_info, &number, sort.0, order.0).await?;

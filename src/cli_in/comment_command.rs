@@ -39,6 +39,12 @@ pub enum CommentCommand {
 
     /// Get all comments from issue/pull request
     GetAllFromReview {
+        /// Repo owner
+        #[clap(long, short, default_value = None)]
+        owner: Option<RepoOwner>,
+        /// Repo name
+        #[clap(long, short, default_value = None)]
+        repo: Option<RepoName>,
         /// Get all comments from issue/pull request with number
         #[clap(long, short)]
         number: i64,
@@ -46,7 +52,7 @@ pub enum CommentCommand {
         #[clap(long, short, default_value = "created")]
         sort: Sorts,
         /// Can be only 'asc' or 'desc' (optional)
-        #[clap(long, short, default_value = "desc")]
+        #[clap(long, default_value = "desc")]
         order: Orders,
     },
 }
