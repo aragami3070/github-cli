@@ -8,6 +8,7 @@ use crate::cli_out::print_in_cli::print_issues;
 use crate::git_utils::issues;
 use crate::git_utils::repo_info::Repo;
 use crate::git_utils::repo_info::RepoInfo;
+use crate::git_utils::repo_info::{RepoName, RepoOwner};
 
 pub async fn handle_issue_command(
     github_client: Client,
@@ -15,6 +16,8 @@ pub async fn handle_issue_command(
 ) -> Result<(), Box<dyn Error>> {
     match subcommand {
         IssueCommand::List {
+            owner,
+            repo,
             creator,
             assignee,
             state,
@@ -24,6 +27,8 @@ pub async fn handle_issue_command(
         } => {
             handle_list(
                 github_client,
+                owner,
+                repo,
                 creator,
                 assignee,
                 state,
@@ -66,6 +71,8 @@ pub async fn handle_issue_command(
 
 async fn handle_list(
     github_client: Client,
+    owner: Option<RepoOwner>,
+    repo: Option<RepoName>,
     creator: String,
     assignee: String,
     state: IssuesListStates,
@@ -73,7 +80,10 @@ async fn handle_list(
     numb_of_page: i64,
     iss_on_page: i64,
 ) -> Result<(), Box<dyn Error>> {
-    let repo_info: RepoInfo = RepoInfo::new(Repo::Current, None, None)?;
+    let repo_info = match owner {
+        Some(_) => RepoInfo::new(Repo::Input, owner, repo)?,
+        None => RepoInfo::new(Repo::Current, None, None)?,
+    };
 
     let list_issues = issues::get_list(
         &github_client,

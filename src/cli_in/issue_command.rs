@@ -1,3 +1,4 @@
+use crate::git_utils::repo_info::{RepoName, RepoOwner};
 use clap::Subcommand;
 
 use crate::cli_in::set_vars::{IssuesListStates, States};
@@ -6,6 +7,12 @@ use crate::cli_in::set_vars::{IssuesListStates, States};
 pub enum IssueCommand {
     /// Get list of issues
     List {
+        /// Repo owner
+        #[clap(long, short, default_value = None)]
+        owner: Option<RepoOwner>,
+        /// Repo name
+        #[clap(long, short, default_value = None)]
+        repo: Option<RepoName>,
         /// The user that created the issues (optional)
         #[clap(long, short, default_value = "")]
         creator: String,
