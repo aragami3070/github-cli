@@ -63,6 +63,8 @@ pub async fn handle_issue_command(
         }
 
         IssueCommand::Update {
+            owner,
+            repo,
             number,
             title,
             body,
@@ -70,7 +72,18 @@ pub async fn handle_issue_command(
             state,
             labels,
         } => {
-            handle_update(github_client, title, body, number, labels, assignees, state).await?;
+            handle_update(
+                github_client,
+                owner,
+                repo,
+                title,
+                body,
+                number,
+                labels,
+                assignees,
+                state,
+            )
+            .await?;
             Ok(())
         }
     }
@@ -159,14 +172,19 @@ async fn handle_close(
 
 async fn handle_update(
     github_client: Client,
-    title: String,
-    body: String,
+    owner: Option<RepoOwner>,
+    repo: Option<RepoName>,
+    title: Option<String>,
+    body: Option<String>,
     number: i64,
     labels: Option<String>,
     assignees: Option<String>,
     state: States,
 ) -> Result<(), Box<dyn Error>> {
-    let repo_info: RepoInfo = RepoInfo::new(Repo::Current, None, None)?;
+    let repo_info = match owner {
+        Some(_) => RepoInfo::new(Repo::Input, owner, repo)?,
+        None => RepoInfo::new(Repo::Current, None, None)?,
+    };
 
     let labels_list: Vec<String> = match labels {
         Some(l) => l.split(",").map(|s| s.to_string()).collect(),
@@ -181,8 +199,8 @@ async fn handle_update(
         &github_client,
         repo_info,
         &number,
-        Some(title),
-        Some(body),
+        title,
+        body,
         &assignees_list,
         &labels_list,
         &state.0,

@@ -105,7 +105,10 @@ fn get_update_request(
     labels: Option<&Vec<String>>,
     state: &State,
 ) -> IssuesUpdateRequest {
-    let new_title = title.map(|t| TitleOneOf::String(t.to_string()));
+    let new_title = match title {
+		Some(t) => Some(TitleOneOf::String(t.to_string())),
+		None => None
+	};
 
     let new_labels = match labels {
         Some(l) => l

@@ -57,15 +57,21 @@ pub enum IssueCommand {
 
     /// Update issue
     Update {
+        /// Repo owner
+        #[clap(long, short, default_value = None)]
+        owner: Option<RepoOwner>,
+        /// Repo name
+        #[clap(long, short, default_value = None)]
+        repo: Option<RepoName>,
         /// Update issue with number
         #[clap(long, short)]
         number: i64,
         /// Issue title
-        #[clap(long, short, default_value = "None")]
-        title: String,
+        #[clap(long, short, default_value = None)]
+        title: Option<String>,
         /// Issue body (optional)
-        #[clap(long, short, default_value = "None")]
-        body: String,
+        #[clap(long, short, default_value = None)]
+        body: Option<String>,
         /// A list of comma separated assignee names. Example: `aragami3070,danilasar` (optional)
         #[clap(long, short, default_value = None)]
         assignees: Option<String>,
