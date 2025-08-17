@@ -7,10 +7,10 @@ use crate::cli_in::set_vars::{CommentTarget, Orders, Sorts};
 pub enum CommentCommand {
     /// Create new comment for issue/pull request
     Create {
-        /// Repo owner
+        /// Repo owner (optional)
         #[clap(long, short, default_value = None)]
         owner: Option<RepoOwner>,
-        /// Repo name
+        /// Repo name (optional)
         #[clap(long, short, default_value = None)]
         repo: Option<RepoName>,
         /// Create comment for issue/pull request with number
@@ -23,10 +23,10 @@ pub enum CommentCommand {
 
     /// Get all comments from issue/pull request
     GetAll {
-        /// Repo owner
+        /// Repo owner (optional)
         #[clap(long, short, default_value = None)]
         owner: Option<RepoOwner>,
-        /// Repo name
+        /// Repo name (optional)
         #[clap(long, short, default_value = None)]
         repo: Option<RepoName>,
         /// Get all comments from issue/pull request with number
@@ -39,10 +39,10 @@ pub enum CommentCommand {
 
     /// Get all comments from issue/pull request
     GetAllFromReview {
-        /// Repo owner
+        /// Repo owner (optional)
         #[clap(long, short, default_value = None)]
         owner: Option<RepoOwner>,
-        /// Repo name
+        /// Repo name (optional)
         #[clap(long, short, default_value = None)]
         repo: Option<RepoName>,
         /// Get all comments from issue/pull request with number

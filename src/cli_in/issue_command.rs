@@ -7,10 +7,10 @@ use crate::cli_in::set_vars::{IssuesListStates, States};
 pub enum IssueCommand {
     /// Get list of issues
     List {
-        /// Repo owner
+        /// Repo owner (optional)
         #[clap(long, short, default_value = None)]
         owner: Option<RepoOwner>,
-        /// Repo name
+        /// Repo name (optional)
         #[clap(long, short, default_value = None)]
         repo: Option<RepoName>,
         /// The user that created the issues (optional)
@@ -35,10 +35,10 @@ pub enum IssueCommand {
 
     /// Create issue
     Create {
-        /// Repo owner
+        /// Repo owner (optional)
         #[clap(long, short, default_value = None)]
         owner: Option<RepoOwner>,
-        /// Repo name
+        /// Repo name (optional)
         #[clap(long, short, default_value = None)]
         repo: Option<RepoName>,
         /// Issue title
@@ -57,10 +57,10 @@ pub enum IssueCommand {
 
     /// Update issue
     Update {
-        /// Repo owner
+        /// Repo owner (optional)
         #[clap(long, short, default_value = None)]
         owner: Option<RepoOwner>,
-        /// Repo name
+        /// Repo name (optional)
         #[clap(long, short, default_value = None)]
         repo: Option<RepoName>,
         /// Update issue with number
@@ -85,10 +85,10 @@ pub enum IssueCommand {
 
     /// Close issue
     Close {
-        /// Repo owner
+        /// Repo owner (optional)
         #[clap(long, short, default_value = None)]
         owner: Option<RepoOwner>,
-        /// Repo name
+        /// Repo name (optional)
         #[clap(long, short, default_value = None)]
         repo: Option<RepoName>,
         /// Close issue with number

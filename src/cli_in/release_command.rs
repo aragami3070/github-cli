@@ -6,10 +6,10 @@ use crate::git_utils::repo_info::{RepoName, RepoOwner};
 pub enum ReleaseCommand {
     /// Create new release
     Create {
-        /// Repo owner
+        /// Repo owner (optional)
         #[clap(long, short)]
         owner: RepoOwner,
-        /// Repo name
+        /// Repo name (optional)
         #[clap(long, short)]
         repo: RepoName,
         /// Tag name
@@ -37,20 +37,20 @@ pub enum ReleaseCommand {
 
     /// Get latest release
     GetLatest {
-        /// Repo owner
+        /// Repo owner (optional)
         #[clap(long, short, default_value = None)]
         owner: Option<RepoOwner>,
-        /// Repo name
+        /// Repo name (optional)
         #[clap(long, short, default_value = None)]
         repo: Option<RepoName>,
     },
 
     /// Get release by tag
     GetByTag {
-        /// Repo owner
+        /// Repo owner (optional)
         #[clap(long, short, default_value = None)]
         owner: Option<RepoOwner>,
-        /// Repo name
+        /// Repo name (optional)
         #[clap(long, short, default_value = None)]
         repo: Option<RepoName>,
         /// Release tag
@@ -60,10 +60,10 @@ pub enum ReleaseCommand {
 
     /// Get release by id
     GetById {
-        /// Repo owner
+        /// Repo owner (optional)
         #[clap(long, short, default_value = None)]
         owner: Option<RepoOwner>,
-        /// Repo name
+        /// Repo name (optional)
         #[clap(long, short, default_value = None)]
         repo: Option<RepoName>,
         /// Release id
