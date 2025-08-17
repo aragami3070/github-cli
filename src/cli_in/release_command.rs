@@ -38,11 +38,11 @@ pub enum ReleaseCommand {
     /// Get latest release
     GetLatest {
         /// Repo owner
-        #[clap(long, short)]
-        owner: RepoOwner,
+        #[clap(long, short, default_value = None)]
+        owner: Option<RepoOwner>,
         /// Repo name
-        #[clap(long, short)]
-        repo: RepoName,
+        #[clap(long, short, default_value = None)]
+        repo: Option<RepoName>,
     },
 
     /// Get release by tag
