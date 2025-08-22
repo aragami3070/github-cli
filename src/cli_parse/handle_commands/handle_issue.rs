@@ -4,9 +4,11 @@ use std::error::Error;
 use crate::cli_in::issue_command::IssueCommand;
 use crate::cli_in::set_vars::IssuesListStates;
 use crate::cli_in::set_vars::States;
+use crate::cli_out::fuzzy_select::choose_issue;
 use crate::cli_out::print_in_cli::print_comments;
 use crate::cli_out::print_in_cli::print_issue;
 use crate::cli_out::print_in_cli::print_issues;
+use crate::cli_out::print_in_cli::print_simple_issue;
 use crate::git_utils::comments;
 use crate::git_utils::issues;
 use crate::git_utils::repo_info::Repo;
@@ -150,6 +152,48 @@ async fn handle_get(
 
     print_issue(result);
     print_comments(list_comments)?;
+    Ok(())
+}
+
+async fn handle_get_form_list(
+    github_client: Client,
+    owner: Option<RepoOwner>,
+    repo: Option<RepoName>,
+    creator: String,
+    assignee: String,
+    state: IssuesListStates,
+    labels: String,
+    numb_of_page: i64,
+    iss_on_page: i64,
+) -> Result<(), Box<dyn Error>> {
+    let repo_info = match owner {
+        Some(_) => RepoInfo::new(Repo::Input, owner, repo)?,
+        None => RepoInfo::new(Repo::Current, None, None)?,
+    };
+
+    let list_issues = issues::get_list(
+        &github_client,
+        &repo_info,
+        &creator,
+        &assignee,
+        &state.0,
+        &labels,
+        &numb_of_page,
+        &iss_on_page,
+    )
+    .await?;
+
+    let choosed_issue = choose_issue(list_issues)?;
+
+    if let Some(ch_i) = choosed_issue {
+        let list_comments = comments::get_all(&github_client, &repo_info, &ch_i.number).await?;
+
+        print_simple_issue(ch_i);
+        print_comments(list_comments)?;
+    } else {
+        println!("Issue not choosed or not find");
+    }
+
     Ok(())
 }
 
