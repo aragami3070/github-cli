@@ -22,10 +22,12 @@ pub async fn handle_comment_command(
             Ok(())
         }
 
-        CommentCommand::GetAll { 
+        CommentCommand::GetAll {
             owner,
             repo,
-			number, target } => {
+            number,
+            target,
+        } => {
             handle_get_all(github_client, owner, repo, number, target).await?;
             Ok(())
         }
@@ -74,7 +76,7 @@ async fn handle_get_all(
 
     let result = comments::get_all(&github_client, &repo_info, &number).await?;
 
-    print_comments(result);
+    print_comments(result)?;
 
     let review_comments = match target {
         CommentTarget::PullRequest => {
@@ -90,7 +92,7 @@ async fn handle_get_all(
         CommentTarget::Issue => Vec::new(),
     };
     if !review_comments.is_empty() {
-        print_review_comments(review_comments);
+        print_review_comments(review_comments)?;
     }
     Ok(())
 }
@@ -111,6 +113,6 @@ async fn handle_get_all_from_review(
     let result =
         comments::get_all_from_review(&github_client, &repo_info, &number, sort.0, order.0).await?;
 
-    print_review_comments(result);
+    print_review_comments(result)?;
     Ok(())
 }

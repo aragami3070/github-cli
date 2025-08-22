@@ -1,4 +1,35 @@
-use std::process;
+use std::error::Error;
+use std::fmt;
+
+/// Errors returned by the tried print result
+#[derive(Debug, PartialEq, Eq)]
+pub struct PrintError {
+    kind: PrintErrorKind,
+    description: String,
+}
+
+/// Type of PrintError
+#[derive(Debug, PartialEq, Eq)]
+enum PrintErrorKind {
+    /// Github response was wrong
+    BadResponse,
+}
+
+impl Error for PrintError {}
+
+impl fmt::Display for PrintError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match &self.kind {
+            PrintErrorKind::BadResponse => {
+                write!(
+                    f,
+                    "tried print, but the github response turned out to be invalid.\nDescription: {}",
+                    &self.description
+                )
+            }
+        }
+    }
+}
 
 use octorust::types::{
     Issue, IssueComment, IssueSimple, MinimalRepository, PullRequestReviewComment, Release,
@@ -87,7 +118,7 @@ pub fn print_repos(repos: Vec<MinimalRepository>, owner: String, owner_type: &st
     }
 }
 
-pub fn print_comments(list_comments: Vec<IssueComment>) {
+pub fn print_comments(list_comments: Vec<IssueComment>) -> Result<(), Box<dyn Error>> {
     println!("╭────────────────────────────────────────────────────────────────────────────────────────────────");
     println!("│Comments:");
     println!("╰────────────────────────────────────────────────────────────────────────────────────────────────");
@@ -98,17 +129,22 @@ pub fn print_comments(list_comments: Vec<IssueComment>) {
             match comment.user {
                 Some(u) => u.login,
                 None => {
-                    eprintln!("Bad response from github");
-                    process::exit(1);
+                    return Err(Box::new(PrintError {
+                        kind: PrintErrorKind::BadResponse,
+                        description: "User who create comment not find".to_string(),
+                    }));
                 }
             }
         );
         println!("│Body: {}", comment.body);
         println!("╰────────────────────────────────────────────────────────────────────────────────────────────────");
     }
+    Ok(())
 }
 
-pub fn print_review_comments(list_comments: Vec<PullRequestReviewComment>) {
+pub fn print_review_comments(
+    list_comments: Vec<PullRequestReviewComment>,
+) -> Result<(), Box<dyn Error>> {
     println!("╭────────────────────────────────────────────────────────────────────────────────────────────────");
     println!("│Review comments:");
     println!("╰────────────────────────────────────────────────────────────────────────────────────────────────");
@@ -119,8 +155,10 @@ pub fn print_review_comments(list_comments: Vec<PullRequestReviewComment>) {
             match comment.user {
                 Some(u) => u.login,
                 None => {
-                    eprintln!("Bad response from github");
-                    process::exit(1);
+                    return Err(Box::new(PrintError {
+                        kind: PrintErrorKind::BadResponse,
+                        description: "User who create comment not find".to_string(),
+                    }));
                 }
             }
         );
@@ -129,4 +167,5 @@ pub fn print_review_comments(list_comments: Vec<PullRequestReviewComment>) {
         println!("│In file: {}", comment.path);
         println!("╰────────────────────────────────────────────────────────────────────────────────────────────────");
     }
+    Ok(())
 }
