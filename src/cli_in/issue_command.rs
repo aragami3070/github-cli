@@ -33,6 +33,19 @@ pub enum IssueCommand {
         iss_on_page: i64,
     },
 
+	/// Get issue by number
+	Get {
+        /// Repo owner (optional)
+        #[clap(long, short, default_value = None)]
+        owner: Option<RepoOwner>,
+        /// Repo name (optional)
+        #[clap(long, short, default_value = None)]
+        repo: Option<RepoName>,
+        /// Update issue with number
+        #[clap(long, short)]
+        number: i64,
+	},
+
     /// Create issue
     Create {
         /// Repo owner (optional)
