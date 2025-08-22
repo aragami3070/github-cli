@@ -1,7 +1,7 @@
 use std::process;
 
 use octorust::types::{
-    IssueComment, IssueSimple, MinimalRepository, PullRequestReviewComment, Release,
+    Issue, IssueComment, IssueSimple, MinimalRepository, PullRequestReviewComment, Release,
 };
 
 use crate::cli_in::set_vars::IssuesListStates;
@@ -33,6 +33,30 @@ pub fn print_issues(list_issues: Vec<IssueSimple>, state: IssuesListStates, numb
         println!("│Time: {}", issue.timeline_url);
         println!("╰────────────────────────────────────────────────────────────────────────────────────────────────");
     }
+}
+
+pub fn print_issue(issue: Issue) {
+    println!("╭────────────────────────────────────────────────────────────────────────────────────────────────");
+    println!("│Issue {}: {};", issue.number, issue.title);
+    println!("│State: {}", issue.state);
+    println!("│labels:");
+    for label in issue.labels {
+        match label.labels_data() {
+            Some(data) => {
+                println!("│  Name: {}", data.name);
+                println!("│  Description: {}", data.description);
+            }
+            None => {}
+        }
+    }
+    println!("│Body: {}", issue.body);
+    match issue.created_at {
+        Some(time) => {
+            println!("│Created at: {}", time);
+        }
+        None => {}
+    };
+    println!("╰────────────────────────────────────────────────────────────────────────────────────────────────");
 }
 
 pub fn print_url(result: String, description: &str) {
