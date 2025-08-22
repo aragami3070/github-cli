@@ -1,13 +1,26 @@
 use std::error::Error;
 
 use octorust::types::{
-    self, IssuesCreateRequest, IssuesCreateRequestLabelsOneOf, IssuesUpdateRequest, State,
+    self, Issue, IssuesCreateRequest, IssuesCreateRequestLabelsOneOf, IssuesUpdateRequest, State,
     TitleOneOf,
 };
 use octorust::Client;
 
 use crate::git_utils::comments;
 use crate::git_utils::repo_info::RepoInfo;
+
+pub async fn get(
+    github_client: &Client,
+    repo_info: &RepoInfo,
+    issue_number: i64,
+) -> Result<Issue, Box<dyn Error>> {
+    let issue = github_client
+        .issues()
+        .get(&repo_info.get_owner(), &repo_info.get_name(), issue_number)
+        .await?;
+
+    Ok(issue.body)
+}
 
 pub async fn get_list(
     github_client: &Client,
@@ -106,9 +119,9 @@ fn get_update_request(
     state: &State,
 ) -> IssuesUpdateRequest {
     let new_title = match title {
-		Some(t) => Some(TitleOneOf::String(t.to_string())),
-		None => None
-	};
+        Some(t) => Some(TitleOneOf::String(t.to_string())),
+        None => None,
+    };
 
     let new_labels = match labels {
         Some(l) => l
