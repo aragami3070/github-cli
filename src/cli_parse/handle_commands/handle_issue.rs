@@ -4,7 +4,10 @@ use std::error::Error;
 use crate::cli_in::issue_command::IssueCommand;
 use crate::cli_in::set_vars::IssuesListStates;
 use crate::cli_in::set_vars::States;
+use crate::cli_out::print_in_cli::print_comments;
+use crate::cli_out::print_in_cli::print_issue;
 use crate::cli_out::print_in_cli::print_issues;
+use crate::git_utils::comments;
 use crate::git_utils::issues;
 use crate::git_utils::repo_info::Repo;
 use crate::git_utils::repo_info::RepoInfo;
@@ -37,6 +40,15 @@ pub async fn handle_issue_command(
                 iss_on_page,
             )
             .await?;
+            Ok(())
+        }
+
+        IssueCommand::Get {
+            owner,
+            repo,
+            number,
+        } => {
+            handle_get(github_client, owner, repo, number).await?;
             Ok(())
         }
 
@@ -118,6 +130,26 @@ async fn handle_list(
     .await?;
 
     print_issues(list_issues, state, numb_of_page);
+    Ok(())
+}
+
+async fn handle_get(
+    github_client: Client,
+    owner: Option<RepoOwner>,
+    repo: Option<RepoName>,
+    number: i64,
+) -> Result<(), Box<dyn Error>> {
+    let repo_info = match owner {
+        Some(_) => RepoInfo::new(Repo::Input, owner, repo)?,
+        None => RepoInfo::new(Repo::Current, None, None)?,
+    };
+
+    let result = issues::get(&github_client, &repo_info, number).await?;
+
+    let list_comments = comments::get_all(&github_client, &repo_info, &number).await?;
+
+    print_issue(result);
+    print_comments(list_comments)?;
     Ok(())
 }
 
