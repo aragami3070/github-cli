@@ -39,13 +39,13 @@ use crate::cli_in::set_vars::IssuesListStates;
 
 pub fn print_release(result: Release) {
     println!("╭────────────────────────────────────────────────────────────────────────────────────────────────");
-    println!("│Release tag: {}", result.tag_name);
-    println!("│Release id: {}", result.id);
-    println!("│Release title: {}", result.name);
-    println!("│Release body: {}", result.body);
-    println!("│Release tag_commit: {}", result.target_commitish);
-    println!("│Release url: {}", result.url);
-    println!("│Release upload_url: {}", result.upload_url);
+    println!(" Release tag: {}", result.tag_name);
+    println!(" Release id: {}", result.id);
+    println!(" Release title: {}", result.name);
+    println!(" Release body: {}", result.body);
+    println!(" Release tag_commit: {}", result.target_commitish);
+    println!(" Release url: {}", result.url);
+    println!(" Release upload_url: {}", result.upload_url);
     println!("╰────────────────────────────────────────────────────────────────────────────────────────────────");
 }
 
@@ -59,15 +59,15 @@ pub fn print_issues(list_issues: Vec<IssueSimple>, state: IssuesListStates, numb
     println!();
     for issue in list_issues {
         println!("╭────────────────────────────────────────────────────────────────────────────────────────────────");
-        println!("│Issue {}: {};", issue.number, issue.title);
-        println!("│Body: {}", issue.body);
-        println!("│labels:");
+        println!(" Issue {}: {};", issue.number, issue.title);
+        println!(" Body: {}", issue.body);
+        println!(" labels:");
         for label in issue.labels {
-            println!("│  {}: {}", label.name, label.description);
+            println!("   {}: {}", label.name, label.description);
         }
         match issue.created_at {
             Some(time) => {
-                println!("│Created at: {}", time);
+                println!(" Created at: {}", time);
             }
             None => {}
         };
@@ -77,22 +77,22 @@ pub fn print_issues(list_issues: Vec<IssueSimple>, state: IssuesListStates, numb
 
 pub fn print_issue(issue: Issue) {
     println!("╭────────────────────────────────────────────────────────────────────────────────────────────────");
-    println!("│Issue {}: {};", issue.number, issue.title);
-    println!("│State: {}", issue.state);
-    println!("│Body: {}", issue.body);
-    println!("│labels:");
+    println!(" Issue {}: {};", issue.number, issue.title);
+    println!(" State: {}", issue.state);
+    println!(" Body: {}", issue.body);
+    println!(" labels:");
     for label in issue.labels {
         match label.labels_data() {
             Some(data) => {
-                println!("│  Name: {}", data.name);
-                println!("│  Description: {}", data.description);
+                println!("   Name: {}", data.name);
+                println!("   Description: {}", data.description);
             }
             None => {}
         }
     }
     match issue.created_at {
         Some(time) => {
-            println!("│Created at: {}", time);
+            println!(" Created at: {}", time);
         }
         None => {}
     };
@@ -101,7 +101,7 @@ pub fn print_issue(issue: Issue) {
 
 pub fn print_url(result: String, description: &str) {
     println!("╭────────────────────────────────────────────────────────────────────────────────────────────────");
-    println!("│{} : {}", description, result.replace(" ", "-"));
+    println!(" {} : {}", description, result.replace(" ", "-"));
     println!("╰────────────────────────────────────────────────────────────────────────────────────────────────");
 }
 
@@ -110,22 +110,22 @@ pub fn print_repos(repos: Vec<MinimalRepository>, owner: String, owner_type: &st
 
     for repo in repos {
         println!("╭────────────────────────────────────────────────────────────────────────────────────────────────");
-        println!("│Repo {}: {}", repo.id, repo.full_name);
-        println!("│Language: {}", repo.language);
-        println!("│Url: {}", repo.url);
-        println!("│Description: {}", repo.description);
+        println!(" Repo {}: {}", repo.id, repo.full_name);
+        println!(" Language: {}", repo.language);
+        println!(" Url: {}", repo.url);
+        println!(" Description: {}", repo.description);
         println!("╰────────────────────────────────────────────────────────────────────────────────────────────────");
     }
 }
 
 pub fn print_comments(list_comments: Vec<IssueComment>) -> Result<(), Box<dyn Error>> {
     println!("╭────────────────────────────────────────────────────────────────────────────────────────────────");
-    println!("│Comments:");
+    println!(" Comments:");
     println!("╰────────────────────────────────────────────────────────────────────────────────────────────────");
     for comment in list_comments {
         println!("╭────────────────────────────────────────────────────────────────────────────────────────────────");
         println!(
-            "│Who create: {}",
+            " Who create: {}",
             match comment.user {
                 Some(u) => u.login,
                 None => {
@@ -136,7 +136,7 @@ pub fn print_comments(list_comments: Vec<IssueComment>) -> Result<(), Box<dyn Er
                 }
             }
         );
-        println!("│Body: {}", comment.body);
+        println!(" Body: {}", comment.body);
         println!("╰────────────────────────────────────────────────────────────────────────────────────────────────");
     }
     Ok(())
@@ -146,12 +146,12 @@ pub fn print_review_comments(
     list_comments: Vec<PullRequestReviewComment>,
 ) -> Result<(), Box<dyn Error>> {
     println!("╭────────────────────────────────────────────────────────────────────────────────────────────────");
-    println!("│Review comments:");
+    println!(" Review comments:");
     println!("╰────────────────────────────────────────────────────────────────────────────────────────────────");
     for comment in list_comments {
         println!("╭────────────────────────────────────────────────────────────────────────────────────────────────");
         println!(
-            "│Who create: {}",
+            " Who create: {}",
             match comment.user {
                 Some(u) => u.login,
                 None => {
@@ -162,9 +162,9 @@ pub fn print_review_comments(
                 }
             }
         );
-        println!("│Body: {}", comment.body);
-        println!("│For line: {}", comment.line);
-        println!("│In file: {}", comment.path);
+        println!(" Body: {}", comment.body);
+        println!(" For line: {}", comment.line);
+        println!(" In file: {}", comment.path);
         println!("╰────────────────────────────────────────────────────────────────────────────────────────────────");
     }
     Ok(())
