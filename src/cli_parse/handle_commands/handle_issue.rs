@@ -54,6 +54,31 @@ pub async fn handle_issue_command(
             Ok(())
         }
 
+        IssueCommand::GetFromList {
+            owner,
+            repo,
+            creator,
+            assignee,
+            state,
+            labels,
+            numb_of_page,
+            iss_on_page,
+        } => {
+            handle_get_form_list(
+                github_client,
+                owner,
+                repo,
+                creator,
+                assignee,
+                state,
+                labels,
+                numb_of_page,
+                iss_on_page,
+            )
+            .await?;
+            Ok(())
+        }
+
         IssueCommand::Create {
             owner,
             repo,
