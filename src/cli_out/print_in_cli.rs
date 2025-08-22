@@ -30,7 +30,16 @@ pub fn print_issues(list_issues: Vec<IssueSimple>, state: IssuesListStates, numb
         println!("╭────────────────────────────────────────────────────────────────────────────────────────────────");
         println!("│Issue {}: {};", issue.number, issue.title);
         println!("│Body: {}", issue.body);
-        println!("│Time: {}", issue.timeline_url);
+        println!("│labels:");
+        for label in issue.labels {
+            println!("│  {}: {}", label.name, label.description);
+        }
+        match issue.created_at {
+            Some(time) => {
+                println!("│Created at: {}", time);
+            }
+            None => {}
+        };
         println!("╰────────────────────────────────────────────────────────────────────────────────────────────────");
     }
 }
@@ -39,6 +48,7 @@ pub fn print_issue(issue: Issue) {
     println!("╭────────────────────────────────────────────────────────────────────────────────────────────────");
     println!("│Issue {}: {};", issue.number, issue.title);
     println!("│State: {}", issue.state);
+    println!("│Body: {}", issue.body);
     println!("│labels:");
     for label in issue.labels {
         match label.labels_data() {
@@ -49,7 +59,6 @@ pub fn print_issue(issue: Issue) {
             None => {}
         }
     }
-    println!("│Body: {}", issue.body);
     match issue.created_at {
         Some(time) => {
             println!("│Created at: {}", time);
