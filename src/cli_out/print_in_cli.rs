@@ -13,6 +13,8 @@ pub struct PrintError {
 enum PrintErrorKind {
     /// Github response was wrong
     BadResponse,
+    /// Trying get pull request data from issue command
+    NotIssue,
 }
 
 impl Error for PrintError {}
@@ -25,6 +27,12 @@ impl fmt::Display for PrintError {
                     f,
                     "tried print, but the github response turned out to be invalid.\nDescription: {}",
                     &self.description
+                )
+            }
+            PrintErrorKind::NotIssue => {
+                write!(
+                    f,
+                    "you tried get pull request from issue command.\n Please use pull request commands"
                 )
             }
         }
@@ -58,6 +66,9 @@ pub fn print_issues(list_issues: Vec<IssueSimple>, state: IssuesListStates, numb
     );
     println!();
     for issue in list_issues {
+        if issue.pull_request != None {
+            continue;
+        }
         println!("╭────────────────────────────────────────────────────────────────────────────────────────────────");
         println!(" Issue {}: {};", issue.number, issue.title);
         println!(" Body: {}", issue.body);
@@ -75,7 +86,13 @@ pub fn print_issues(list_issues: Vec<IssueSimple>, state: IssuesListStates, numb
     }
 }
 
-pub fn print_simple_issue(issue: IssueSimple) {
+pub fn print_simple_issue(issue: IssueSimple) -> Result<(), Box<dyn Error>> {
+    if issue.pull_request != None {
+        return Err(Box::new(PrintError {
+            kind: PrintErrorKind::NotIssue,
+            description: "Trying get pull request from issue command".to_string(),
+        }));
+    }
     println!("╭────────────────────────────────────────────────────────────────────────────────────────────────");
     println!(" Issue {}: {};", issue.number, issue.title);
     println!(" State: {}", issue.state);
@@ -91,9 +108,16 @@ pub fn print_simple_issue(issue: IssueSimple) {
         None => {}
     };
     println!("╰────────────────────────────────────────────────────────────────────────────────────────────────");
+    Ok(())
 }
 
-pub fn print_issue(issue: Issue) {
+pub fn print_issue(issue: Issue) -> Result<(), Box<dyn Error>> {
+    if issue.pull_request != None {
+        return Err(Box::new(PrintError {
+            kind: PrintErrorKind::NotIssue,
+            description: "Trying get pull request from issue command".to_string(),
+        }));
+    }
     println!("╭────────────────────────────────────────────────────────────────────────────────────────────────");
     println!(" Issue {}: {};", issue.number, issue.title);
     println!(" State: {}", issue.state);
@@ -114,6 +138,7 @@ pub fn print_issue(issue: Issue) {
         None => {}
     };
     println!("╰────────────────────────────────────────────────────────────────────────────────────────────────");
+    Ok(())
 }
 
 pub fn print_url(result: String, description: &str) {

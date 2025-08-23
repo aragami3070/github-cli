@@ -175,7 +175,7 @@ async fn handle_get(
 
     let list_comments = comments::get_all(&github_client, &repo_info, &number).await?;
 
-    print_issue(result);
+    print_issue(result)?;
     print_comments(list_comments)?;
     Ok(())
 }
@@ -213,7 +213,7 @@ async fn handle_get_form_list(
     if let Some(ch_i) = choosed_issue {
         let list_comments = comments::get_all(&github_client, &repo_info, &ch_i.number).await?;
 
-        print_simple_issue(ch_i);
+        print_simple_issue(ch_i)?;
         print_comments(list_comments)?;
     } else {
         println!("Issue not choosed or not find");
