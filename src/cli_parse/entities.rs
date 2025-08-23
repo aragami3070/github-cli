@@ -36,7 +36,17 @@ pub struct CreateRepoArgs {
 }
 
 pub struct CreateRepoFromTemplateArgs {
-	pub description: String,
-	pub include_all_branches: Option<bool>,
-	pub private: Option<bool>,
+    pub description: String,
+    pub include_all_branches: Option<bool>,
+    pub private: Option<bool>,
+}
+
+pub struct CreateReleaseArgs {
+    pub body: String,
+    pub name: String,
+    pub discussion_category_name: String,
+    pub tag_name: String,
+    pub draft: Option<bool>,
+    pub prerelease: Option<bool>,
+    pub target_commitish: String,
 }
