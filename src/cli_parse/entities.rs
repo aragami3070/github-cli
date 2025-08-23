@@ -1,4 +1,3 @@
-
 pub struct CreateRepoArgs {
     pub allow_auto_merge: Option<bool>,
     pub allow_merge_commit: Option<bool>,

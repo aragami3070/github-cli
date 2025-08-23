@@ -13,6 +13,7 @@ use crate::git_utils::repo_info::Repo;
 use crate::git_utils::repo_info::RepoInfo;
 use crate::git_utils::repo_info::{RepoName, RepoOwner};
 use crate::git_utils::repos;
+use crate::cli_parse::entities::CreateRepoArgs;
 
 pub async fn handle_repo_command(
     github_client: Client,
@@ -37,24 +38,28 @@ pub async fn handle_repo_command(
             name,
             private,
         } => {
-            handle_create_for_auth_user(
-                github_client,
+            let command_args = CreateRepoArgs {
                 allow_auto_merge,
                 allow_merge_commit,
                 allow_rebase_merge,
                 allow_squash_merge,
                 auto_init,
                 delete_branch_on_merge,
-                description,
-                gitignore_template,
                 has_issues,
                 has_projects,
                 has_wiki,
-                homepage,
                 is_template,
+                private,
+                description,
+                gitignore_template,
+                homepage,
                 license_template,
                 name,
-                private,
+            };
+
+            handle_create_for_auth_user(
+                github_client,
+				command_args
             )
             .await?;
             Ok(())
@@ -157,41 +162,11 @@ pub async fn handle_repo_command(
 
 async fn handle_create_for_auth_user(
     github_client: Client,
-    allow_auto_merge: Option<bool>,
-    allow_merge_commit: Option<bool>,
-    allow_rebase_merge: Option<bool>,
-    allow_squash_merge: Option<bool>,
-    auto_init: Option<bool>,
-    delete_branch_on_merge: Option<bool>,
-    description: String,
-    gitignore_template: String,
-    has_issues: Option<bool>,
-    has_projects: Option<bool>,
-    has_wiki: Option<bool>,
-    homepage: String,
-    is_template: Option<bool>,
-    license_template: String,
-    name: String,
-    private: Option<bool>,
+	command_args: CreateRepoArgs,
 ) -> Result<(), Box<dyn Error>> {
     let result = repos::create_for_authenticated_user(
         &github_client,
-        allow_auto_merge,
-        allow_merge_commit,
-        allow_rebase_merge,
-        allow_squash_merge,
-        auto_init,
-        delete_branch_on_merge,
-        &description,
-        &gitignore_template,
-        has_issues,
-        has_projects,
-        has_wiki,
-        &homepage,
-        is_template,
-        &license_template,
-        &name,
-        private,
+		command_args,
     )
     .await?;
 
