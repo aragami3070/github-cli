@@ -42,6 +42,17 @@ pub async fn handle_comment_command(
             handle_get_all_from_review(github_client, owner, repo, number, sort, order).await?;
             Ok(())
         }
+
+        CommentCommand::Update {
+            owner,
+            repo,
+            comment_id,
+            body,
+        } => {
+            handle_update(github_client, owner, repo, comment_id, body).await?;
+
+            Ok(())
+        }
     }
 }
 
@@ -121,16 +132,15 @@ async fn handle_update(
     github_client: Client,
     owner: Option<RepoOwner>,
     repo: Option<RepoName>,
-    number: i64,
+    comment_id: i64,
     body: String,
 ) -> Result<(), Box<dyn Error>> {
     let repo_info = match owner {
         Some(_) => RepoInfo::new(Repo::Input, owner, repo)?,
         None => RepoInfo::new(Repo::Current, None, None)?,
     };
-    let result = comments::update(&github_client, &repo_info, &number, &body).await?;
+    let result = comments::update(&github_client, &repo_info, &comment_id, &body).await?;
 
     println!("{result}");
     Ok(())
 }
-

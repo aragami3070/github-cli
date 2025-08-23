@@ -55,4 +55,20 @@ pub enum CommentCommand {
         #[clap(long, default_value = "desc")]
         order: Orders,
     },
+
+    /// Update comment for issue/pull request by comment id
+    Update {
+        /// Repo owner (optional)
+        #[clap(long, short, default_value = None)]
+        owner: Option<RepoOwner>,
+        /// Repo name (optional)
+        #[clap(long, short, default_value = None)]
+        repo: Option<RepoName>,
+        /// Update comment from issue/pull request by id
+        #[clap(long, short)]
+        comment_id: i64,
+        /// Comment body (optional)
+        #[clap(long, short, default_value = "")]
+        body: String,
+    },
 }
