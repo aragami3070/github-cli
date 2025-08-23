@@ -66,7 +66,7 @@ pub fn print_issues(list_issues: Vec<IssueSimple>, state: IssuesListStates, numb
     );
     println!();
     for issue in list_issues {
-        if issue.pull_request != None {
+        if issue.pull_request.is_some() {
             continue;
         }
         println!("╭────────────────────────────────────────────────────────────────────────────────────────────────");
@@ -76,18 +76,16 @@ pub fn print_issues(list_issues: Vec<IssueSimple>, state: IssuesListStates, numb
         for label in issue.labels {
             println!("   {}: {}", label.name, label.description);
         }
-        match issue.created_at {
-            Some(time) => {
-                println!(" Created at: {}", time);
-            }
-            None => {}
+
+        if let Some(time) = issue.created_at {
+            println!(" Created at: {time}");
         };
         println!("╰────────────────────────────────────────────────────────────────────────────────────────────────");
     }
 }
 
 pub fn print_simple_issue(issue: IssueSimple) -> Result<(), Box<dyn Error>> {
-    if issue.pull_request != None {
+    if issue.pull_request.is_some() {
         return Err(Box::new(PrintError {
             kind: PrintErrorKind::NotIssue,
             description: "Trying get pull request from issue command".to_string(),
@@ -101,41 +99,35 @@ pub fn print_simple_issue(issue: IssueSimple) -> Result<(), Box<dyn Error>> {
     for label in issue.labels {
         println!("   {}: {}", label.name, label.description);
     }
-    match issue.created_at {
-        Some(time) => {
-            println!(" Created at: {}", time);
-        }
-        None => {}
+
+    if let Some(time) = issue.created_at {
+        println!(" Created at: {time}");
     };
     println!("╰────────────────────────────────────────────────────────────────────────────────────────────────");
     Ok(())
 }
 
 pub fn print_issue(issue: Issue) -> Result<(), Box<dyn Error>> {
-    if issue.pull_request != None {
+    if issue.pull_request.is_some() {
         return Err(Box::new(PrintError {
             kind: PrintErrorKind::NotIssue,
             description: "Trying get pull request from issue command".to_string(),
         }));
     }
+
     println!("╭────────────────────────────────────────────────────────────────────────────────────────────────");
     println!(" Issue {}: {};", issue.number, issue.title);
     println!(" State: {}", issue.state);
     println!(" Body: {}", issue.body);
     println!(" labels:");
     for label in issue.labels {
-        match label.labels_data() {
-            Some(data) => {
-                println!("   {}: {}", data.name, data.description);
-            }
-            None => {}
+        if let Some(data) = label.labels_data() {
+            println!("   {}: {}", data.name, data.description);
         }
     }
-    match issue.created_at {
-        Some(time) => {
-            println!(" Created at: {}", time);
-        }
-        None => {}
+
+    if let Some(time) = issue.created_at {
+        println!(" Created at: {time}");
     };
     println!("╰────────────────────────────────────────────────────────────────────────────────────────────────");
     Ok(())

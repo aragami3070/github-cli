@@ -1,17 +1,19 @@
-use std::process;
+use std::error::Error;
 
 use octorust::{types::FullTeam, Client};
 
-pub async fn get_id(github_client: &Client, org: &String, name: &String) -> FullTeam {
+pub async fn get_id(
+    github_client: &Client,
+    org: &str,
+    name: &str,
+) -> Result<FullTeam, Box<dyn Error>> {
     let team = github_client
         .teams()
-        .get_by_name(org.trim(), name.trim())
+        .get_by_name(org, name)
         .await;
-    return match team {
-        Ok(t) => t.body,
-        Err(message) => {
-            eprintln!("Error: {message}");
-            process::exit(1);
-        }
-    };
+
+    match team {
+        Ok(t) => Ok(t.body),
+        Err(err) => Err(Box::new(err)),
+    }
 }

@@ -42,20 +42,20 @@ pub async fn create_for_authenticated_user(
         .create_for_authenticated_user(&request)
         .await;
 
-    return match new_repo {
+    match new_repo {
         Ok(_) => Ok("Success".to_string()),
         Err(er) => Err(Box::new(er)),
-    };
+    }
 }
 
 pub async fn create_in_org(
     github_client: &Client,
     repo_info: RepoInfo,
-	command_args: CreateRepoArgs,
-    team_name: &String,
+    command_args: CreateRepoArgs,
+    team_name: &str,
     visibility: Option<ReposCreateInOrgRequestVisibility>,
 ) -> Result<String, Box<dyn Error>> {
-    let team = get_id(github_client, &repo_info.get_owner(), team_name).await;
+    let team = get_id(github_client, &repo_info.get_owner(), team_name).await?;
 
     let team_id = team.id;
 
@@ -76,8 +76,8 @@ pub async fn create_in_org(
         license_template: command_args.license_template.clone(),
         name: repo_info.get_name(),
         private: None,
-        team_id: team_id,
-        visibility: visibility,
+        team_id,
+        visibility,
     };
 
     let new_repo = github_client
@@ -85,15 +85,15 @@ pub async fn create_in_org(
         .create_in_org(repo_info.get_owner().trim(), &request)
         .await;
 
-    return match new_repo {
+    match new_repo {
         Ok(_) => Ok(repo_info.get_ssh()),
         Err(er) => Err(Box::new(er)),
-    };
+    }
 }
 
 pub async fn get_all_from_org(
     github_client: &Client,
-    org: &String,
+    org: &str,
     order: Order,
     type_value: ReposListOrgType,
     sort_value: ReposListOrgSort,
@@ -103,65 +103,61 @@ pub async fn get_all_from_org(
         .list_all_for_org(org.trim(), type_value, sort_value, order)
         .await;
 
-    return match all_repos {
+    match all_repos {
         Ok(r) => Ok(r.body),
         Err(er) => Err(Box::new(er)),
-    };
+    }
 }
 
 pub async fn create_using_template(
     github_client: &Client,
     template_info: RepoInfo,
     repo_info: RepoInfo,
-    description: &String,
+    description: &str,
     include_all_branches: Option<bool>,
     private: Option<bool>,
 ) -> Result<String, Box<dyn Error>> {
     let request = ReposCreateUsingTemplateRequest {
-        description: description.clone(),
-        include_all_branches: include_all_branches,
+        description: description.to_owned(),
+        include_all_branches,
         name: repo_info.get_name(),
         owner: repo_info.get_owner(),
-        private: private,
+        private,
     };
 
     let new_repo = github_client
         .repos()
         .create_using_template(
-            &template_info.get_owner().trim(),
-            &template_info.get_name().trim(),
+            &template_info.get_owner(),
+            &template_info.get_name(),
             &request,
         )
         .await;
 
-    return match new_repo {
+    match new_repo {
         Ok(_) => Ok(repo_info.get_ssh()),
         Err(er) => Err(Box::new(er)),
-    };
+    }
 }
 
 pub async fn create_fork(
     github_client: &Client,
-    org: &String,
+    org: &str,
     fork_info: RepoInfo,
 ) -> Result<String, Box<dyn Error>> {
     let request = ReposCreateForkRequest {
-        organization: org.clone(),
+        organization: org.to_owned(),
     };
 
     let new_fork = github_client
         .repos()
-        .create_fork(
-            &fork_info.get_owner().trim(),
-            &fork_info.get_name().trim(),
-            &request,
-        )
+        .create_fork(&fork_info.get_owner(), &fork_info.get_name(), &request)
         .await;
 
-    return match new_fork {
+    match new_fork {
         Ok(_) => Ok("Success".to_string()),
         Err(er) => Err(Box::new(er)),
-    };
+    }
 }
 
 pub async fn get_all_from_user(
@@ -176,8 +172,8 @@ pub async fn get_all_from_user(
         .list_all_for_user(owner.trim(), type_value, sort_value, order)
         .await;
 
-    return match all_repos {
+    match all_repos {
         Ok(reps) => Ok(reps.body),
         Err(er) => Err(Box::new(er)),
-    };
+    }
 }
