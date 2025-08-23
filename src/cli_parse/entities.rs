@@ -1,3 +1,14 @@
+use crate::cli_in::set_vars::IssuesListStates;
+
+
+pub struct ListIssueArgs {
+    pub creator: String,
+    pub assignee: String,
+    pub state: IssuesListStates,
+    pub labels: String,
+    pub numb_of_page: i64,
+    pub iss_on_page: i64,
+}
 pub struct CreateRepoArgs {
     pub allow_auto_merge: Option<bool>,
     pub allow_merge_commit: Option<bool>,
