@@ -6,6 +6,7 @@ use octorust::types::{
 };
 use octorust::Client;
 
+use crate::cli_parse::entities::ListIssueArgs;
 use crate::git_utils::comments;
 use crate::git_utils::repo_info::RepoInfo;
 
@@ -25,12 +26,7 @@ pub async fn get(
 pub async fn get_list(
     github_client: &Client,
     repo_info: &RepoInfo,
-    creator: &str,
-    assignee: &str,
-    state: &types::IssuesListState,
-    labels: &str,
-    numb_of_page: &i64,
-    iss_on_page: &i64,
+    command_args: &ListIssueArgs,
 ) -> Result<Vec<types::IssueSimple>, Box<dyn Error>> {
     let sort = types::IssuesListSort::Created;
 
@@ -40,16 +36,16 @@ pub async fn get_list(
             &repo_info.get_owner(),
             &repo_info.get_name(),
             "",
-            state.to_owned(),
-            assignee,
-            creator,
+            command_args.state.0.to_owned(),
+            &command_args.assignee,
+            &command_args.creator,
             "",
-            labels,
+            &command_args.labels,
             sort,
             types::Order::Noop,
             None,
-            *iss_on_page,
-            *numb_of_page,
+            command_args.iss_on_page,
+            command_args.numb_of_page,
         )
         .await;
 
