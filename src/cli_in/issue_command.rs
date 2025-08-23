@@ -33,8 +33,8 @@ pub enum IssueCommand {
         iss_on_page: i64,
     },
 
-	/// Get issue by number
-	Get {
+    /// Get issue by number
+    Get {
         /// Repo owner (optional)
         #[clap(long, short, default_value = None)]
         owner: Option<RepoOwner>,
@@ -44,10 +44,10 @@ pub enum IssueCommand {
         /// Get issue with number
         #[clap(long, short)]
         number: i64,
-	},
+    },
 
-	/// Get issue with comment from issues list
-	GetFromList {
+    /// Get issue with comment from issues list
+    GetFromList {
         /// Repo owner (optional)
         #[clap(long, short, default_value = None)]
         owner: Option<RepoOwner>,
@@ -72,7 +72,7 @@ pub enum IssueCommand {
         /// Results on page (max 100) (optional)
         #[clap(long, short, default_value = "30", value_parser = clap::value_parser!(i64).range(1..=100))]
         iss_on_page: i64,
-	},
+    },
 
     /// Create issue
     Create {

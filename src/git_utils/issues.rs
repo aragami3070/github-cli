@@ -6,6 +6,7 @@ use octorust::types::{
 };
 use octorust::Client;
 
+use crate::cli_parse::entities::{ListIssueArgs, UpdateIssueArgs};
 use crate::git_utils::comments;
 use crate::git_utils::repo_info::RepoInfo;
 
@@ -25,61 +26,56 @@ pub async fn get(
 pub async fn get_list(
     github_client: &Client,
     repo_info: &RepoInfo,
-    creator: &String,
-    assignee: &String,
-    state: &types::IssuesListState,
-    labels: &String,
-    numb_of_page: &i64,
-    iss_on_page: &i64,
+    command_args: &ListIssueArgs,
 ) -> Result<Vec<types::IssueSimple>, Box<dyn Error>> {
     let sort = types::IssuesListSort::Created;
 
     let issues = github_client
         .issues()
         .list_for_repo(
-            &repo_info.get_owner().trim(),
-            &repo_info.get_name().trim(),
+            &repo_info.get_owner(),
+            &repo_info.get_name(),
             "",
-            state.clone(),
-            assignee,
-            creator,
+            command_args.state.0.to_owned(),
+            &command_args.assignee,
+            &command_args.creator,
             "",
-            labels,
+            &command_args.labels,
             sort,
             types::Order::Noop,
             None,
-            iss_on_page.clone(),
-            numb_of_page.clone(),
+            command_args.iss_on_page,
+            command_args.numb_of_page,
         )
         .await;
 
-    return match issues {
+    match issues {
         Ok(info) => Ok(info.body),
         Err(er) => Err(Box::new(er)),
-    };
+    }
 }
 
 fn get_create_request(
-    title: &String,
-    body: &String,
-    assignees: &Vec<String>,
-    labels: &Vec<String>,
+    title: &str,
+    body: &str,
+    assignees: &[String],
+    labels: &[String],
 ) -> IssuesCreateRequest {
-    let new_title = TitleOneOf::String(title.clone());
+    let new_title = TitleOneOf::String(title.to_owned());
 
     let new_labels = labels
-        .into_iter()
+        .iter()
         .map(|s| IssuesCreateRequestLabelsOneOf::String(s.into()))
         .collect();
 
     IssuesCreateRequest {
         title: new_title,
-        body: body.clone(),
+        body: body.to_owned(),
         assignee: String::new(),
         assignees: if assignees.is_empty() {
             Vec::new()
         } else {
-            assignees.clone()
+            assignees.to_owned()
         },
         labels: new_labels,
         milestone: None,
@@ -89,39 +85,32 @@ fn get_create_request(
 pub async fn create(
     github_client: &Client,
     repo_info: RepoInfo,
-    title: &String,
-    body: &String,
-    assignees: &Vec<String>,
-    labels: &Vec<String>,
+    title: &str,
+    body: &str,
+    assignees: &[String],
+    labels: &[String],
 ) -> Result<String, Box<dyn Error>> {
     let request = get_create_request(title, body, assignees, labels);
 
     let new_issue = github_client
         .issues()
-        .create(
-            &repo_info.get_owner().trim(),
-            &repo_info.get_name().trim(),
-            &request,
-        )
+        .create(&repo_info.get_owner(), &repo_info.get_name(), &request)
         .await;
 
-    return match new_issue {
+    match new_issue {
         Ok(_) => Ok("Success".to_string()),
         Err(er) => Err(Box::new(er)),
-    };
+    }
 }
 
 fn get_update_request(
     title: Option<String>,
     body: Option<String>,
-    assignees: Option<&Vec<String>>,
-    labels: Option<&Vec<String>>,
+    assignees: Option<&[String]>,
+    labels: Option<&[String]>,
     state: &State,
 ) -> IssuesUpdateRequest {
-    let new_title = match title {
-        Some(t) => Some(TitleOneOf::String(t.to_string())),
-        None => None,
-    };
+    let new_title = title.map(|t| TitleOneOf::String(t.to_string()));
 
     let new_labels = match labels {
         Some(l) => l
@@ -146,9 +135,9 @@ pub async fn close(
     github_client: &Client,
     repo_info: RepoInfo,
     issue_number: &i64,
-    comment: &String,
+    comment: &str,
 ) -> Result<String, Box<dyn Error>> {
-    if comment != "" {
+    if comment.is_empty() {
         let new_comment =
             comments::create(github_client, &repo_info, issue_number, comment).await?;
         println!("{new_comment}");
@@ -159,43 +148,46 @@ pub async fn close(
     let close = github_client
         .issues()
         .update(
-            &repo_info.get_owner().trim(),
-            &repo_info.get_name().trim(),
-            issue_number.clone(),
+            &repo_info.get_owner(),
+            &repo_info.get_name(),
+            *issue_number,
             &request,
         )
         .await;
 
-    return match close {
+    match close {
         Ok(_) => Ok("Success".to_string()),
         Err(er) => Err(Box::new(er)),
-    };
+    }
 }
 
 pub async fn update(
     github_client: &Client,
     repo_info: RepoInfo,
-    issue_number: &i64,
-    title: Option<String>,
-    body: Option<String>,
-    assignees: &Vec<String>,
-    labels: &Vec<String>,
-    state: &State,
+    command_args: UpdateIssueArgs,
+    assignees: &[String],
+    labels: &[String],
 ) -> Result<String, Box<dyn Error>> {
-    let request = get_update_request(title, body, Some(assignees), Some(labels), state);
+    let request = get_update_request(
+        command_args.title,
+        command_args.body,
+        Some(assignees),
+        Some(labels),
+        &command_args.state.0,
+    );
 
     let update_iss = github_client
         .issues()
         .update(
-            &repo_info.get_owner().trim(),
-            &repo_info.get_name().trim(),
-            issue_number.clone(),
+            &repo_info.get_owner(),
+            &repo_info.get_name(),
+            command_args.number,
             &request,
         )
         .await;
 
-    return match update_iss {
+    match update_iss {
         Ok(_) => Ok("Success".to_string()),
         Err(er) => Err(Box::new(er)),
-    };
+    }
 }

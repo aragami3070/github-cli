@@ -9,45 +9,31 @@ use octorust::{
     Client,
 };
 
+use crate::cli_parse::entities::{CreateRepoArgs, CreateRepoFromTemplateArgs};
 use crate::git_utils::{repo_info::RepoInfo, teams::get_id};
 
 pub async fn create_for_authenticated_user(
     github_client: &Client,
-    allow_auto_merge: Option<bool>,
-    allow_merge_commit: Option<bool>,
-    allow_rebase_merge: Option<bool>,
-    allow_squash_merge: Option<bool>,
-    auto_init: Option<bool>,
-    delete_branch_on_merge: Option<bool>,
-    description: &String,
-    gitignore_template: &String,
-    has_issues: Option<bool>,
-    has_projects: Option<bool>,
-    has_wiki: Option<bool>,
-    homepage: &String,
-    is_template: Option<bool>,
-    license_template: &String,
-    name: &String,
-    private: Option<bool>,
+    command_args: CreateRepoArgs,
 ) -> Result<String, Box<dyn Error>> {
     let request = ReposCreateRequest {
-        allow_auto_merge: allow_auto_merge,
-        allow_merge_commit: allow_merge_commit,
-        allow_rebase_merge: allow_rebase_merge,
-        allow_squash_merge: allow_squash_merge,
-        auto_init: auto_init,
-        delete_branch_on_merge: delete_branch_on_merge,
-        description: description.clone(),
-        gitignore_template: gitignore_template.clone(),
+        allow_auto_merge: command_args.allow_auto_merge,
+        allow_merge_commit: command_args.allow_merge_commit,
+        allow_rebase_merge: command_args.allow_rebase_merge,
+        allow_squash_merge: command_args.allow_squash_merge,
+        auto_init: command_args.auto_init,
+        delete_branch_on_merge: command_args.delete_branch_on_merge,
+        description: command_args.description.clone(),
+        gitignore_template: command_args.gitignore_template.clone(),
         has_downloads: None,
-        has_issues: has_issues,
-        has_projects: has_projects,
-        has_wiki: has_wiki,
-        homepage: homepage.clone(),
-        is_template: is_template,
-        license_template: license_template.clone(),
-        name: name.clone(),
-        private: private,
+        has_issues: command_args.has_issues,
+        has_projects: command_args.has_projects,
+        has_wiki: command_args.has_wiki,
+        homepage: command_args.homepage.clone(),
+        is_template: command_args.is_template,
+        license_template: command_args.license_template.clone(),
+        name: command_args.name.clone(),
+        private: command_args.private,
         team_id: 1,
     };
 
@@ -56,55 +42,42 @@ pub async fn create_for_authenticated_user(
         .create_for_authenticated_user(&request)
         .await;
 
-    return match new_repo {
+    match new_repo {
         Ok(_) => Ok("Success".to_string()),
         Err(er) => Err(Box::new(er)),
-    };
+    }
 }
 
 pub async fn create_in_org(
     github_client: &Client,
     repo_info: RepoInfo,
-    allow_auto_merge: Option<bool>,
-    allow_merge_commit: Option<bool>,
-    allow_rebase_merge: Option<bool>,
-    allow_squash_merge: Option<bool>,
-    auto_init: Option<bool>,
-    delete_branch_on_merge: Option<bool>,
-    description: &String,
-    gitignore_template: &String,
-    has_issues: Option<bool>,
-    has_projects: Option<bool>,
-    has_wiki: Option<bool>,
-    homepage: &String,
-    is_template: Option<bool>,
-    license_template: &String,
-    team_name: &String,
+    command_args: CreateRepoArgs,
+    team_name: &str,
     visibility: Option<ReposCreateInOrgRequestVisibility>,
 ) -> Result<String, Box<dyn Error>> {
-    let team = get_id(github_client, &repo_info.get_owner(), team_name).await;
+    let team = get_id(github_client, &repo_info.get_owner(), team_name).await?;
 
     let team_id = team.id;
 
     let request = ReposCreateInOrgRequest {
-        allow_auto_merge: allow_auto_merge,
-        allow_merge_commit: allow_merge_commit,
-        allow_rebase_merge: allow_rebase_merge,
-        allow_squash_merge: allow_squash_merge,
-        auto_init: auto_init,
-        delete_branch_on_merge: delete_branch_on_merge,
-        description: description.clone(),
-        gitignore_template: gitignore_template.clone(),
-        has_issues: has_issues,
-        has_projects: has_projects,
-        has_wiki: has_wiki,
-        homepage: homepage.clone(),
-        is_template: is_template,
-        license_template: license_template.clone(),
+        allow_auto_merge: command_args.allow_auto_merge,
+        allow_merge_commit: command_args.allow_merge_commit,
+        allow_rebase_merge: command_args.allow_rebase_merge,
+        allow_squash_merge: command_args.allow_squash_merge,
+        auto_init: command_args.auto_init,
+        delete_branch_on_merge: command_args.delete_branch_on_merge,
+        description: command_args.description.clone(),
+        gitignore_template: command_args.gitignore_template.clone(),
+        has_issues: command_args.has_issues,
+        has_projects: command_args.has_projects,
+        has_wiki: command_args.has_wiki,
+        homepage: command_args.homepage.clone(),
+        is_template: command_args.is_template,
+        license_template: command_args.license_template.clone(),
         name: repo_info.get_name(),
         private: None,
-        team_id: team_id,
-        visibility: visibility,
+        team_id,
+        visibility,
     };
 
     let new_repo = github_client
@@ -112,15 +85,15 @@ pub async fn create_in_org(
         .create_in_org(repo_info.get_owner().trim(), &request)
         .await;
 
-    return match new_repo {
+    match new_repo {
         Ok(_) => Ok(repo_info.get_ssh()),
         Err(er) => Err(Box::new(er)),
-    };
+    }
 }
 
 pub async fn get_all_from_org(
     github_client: &Client,
-    org: &String,
+    org: &str,
     order: Order,
     type_value: ReposListOrgType,
     sort_value: ReposListOrgSort,
@@ -130,65 +103,59 @@ pub async fn get_all_from_org(
         .list_all_for_org(org.trim(), type_value, sort_value, order)
         .await;
 
-    return match all_repos {
+    match all_repos {
         Ok(r) => Ok(r.body),
         Err(er) => Err(Box::new(er)),
-    };
+    }
 }
 
 pub async fn create_using_template(
     github_client: &Client,
     template_info: RepoInfo,
     repo_info: RepoInfo,
-    description: &String,
-    include_all_branches: Option<bool>,
-    private: Option<bool>,
+    command_args: CreateRepoFromTemplateArgs,
 ) -> Result<String, Box<dyn Error>> {
     let request = ReposCreateUsingTemplateRequest {
-        description: description.clone(),
-        include_all_branches: include_all_branches,
+        description: command_args.description,
+        include_all_branches: command_args.include_all_branches,
         name: repo_info.get_name(),
         owner: repo_info.get_owner(),
-        private: private,
+        private: command_args.private,
     };
 
     let new_repo = github_client
         .repos()
         .create_using_template(
-            &template_info.get_owner().trim(),
-            &template_info.get_name().trim(),
+            &template_info.get_owner(),
+            &template_info.get_name(),
             &request,
         )
         .await;
 
-    return match new_repo {
+    match new_repo {
         Ok(_) => Ok(repo_info.get_ssh()),
         Err(er) => Err(Box::new(er)),
-    };
+    }
 }
 
 pub async fn create_fork(
     github_client: &Client,
-    org: &String,
+    org: &str,
     fork_info: RepoInfo,
 ) -> Result<String, Box<dyn Error>> {
     let request = ReposCreateForkRequest {
-        organization: org.clone(),
+        organization: org.to_owned(),
     };
 
     let new_fork = github_client
         .repos()
-        .create_fork(
-            &fork_info.get_owner().trim(),
-            &fork_info.get_name().trim(),
-            &request,
-        )
+        .create_fork(&fork_info.get_owner(), &fork_info.get_name(), &request)
         .await;
 
-    return match new_fork {
+    match new_fork {
         Ok(_) => Ok("Success".to_string()),
         Err(er) => Err(Box::new(er)),
-    };
+    }
 }
 
 pub async fn get_all_from_user(
@@ -203,8 +170,8 @@ pub async fn get_all_from_user(
         .list_all_for_user(owner.trim(), type_value, sort_value, order)
         .await;
 
-    return match all_repos {
+    match all_repos {
         Ok(reps) => Ok(reps.body),
         Err(er) => Err(Box::new(er)),
-    };
+    }
 }

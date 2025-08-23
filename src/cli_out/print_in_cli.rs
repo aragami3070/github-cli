@@ -13,6 +13,8 @@ pub struct PrintError {
 enum PrintErrorKind {
     /// Github response was wrong
     BadResponse,
+    /// Trying get pull request data from issue command
+    NotIssue,
 }
 
 impl Error for PrintError {}
@@ -25,6 +27,12 @@ impl fmt::Display for PrintError {
                     f,
                     "tried print, but the github response turned out to be invalid.\nDescription: {}",
                     &self.description
+                )
+            }
+            PrintErrorKind::NotIssue => {
+                write!(
+                    f,
+                    "you tried get pull request from issue command.\n Please use pull request commands"
                 )
             }
         }
@@ -58,6 +66,9 @@ pub fn print_issues(list_issues: Vec<IssueSimple>, state: IssuesListStates, numb
     );
     println!();
     for issue in list_issues {
+        if issue.pull_request.is_some() {
+            continue;
+        }
         println!("╭────────────────────────────────────────────────────────────────────────────────────────────────");
         println!(" Issue {}: {};", issue.number, issue.title);
         println!(" Body: {}", issue.body);
@@ -65,17 +76,21 @@ pub fn print_issues(list_issues: Vec<IssueSimple>, state: IssuesListStates, numb
         for label in issue.labels {
             println!("   {}: {}", label.name, label.description);
         }
-        match issue.created_at {
-            Some(time) => {
-                println!(" Created at: {}", time);
-            }
-            None => {}
+
+        if let Some(time) = issue.created_at {
+            println!(" Created at: {time}");
         };
         println!("╰────────────────────────────────────────────────────────────────────────────────────────────────");
     }
 }
 
-pub fn print_simple_issue(issue: IssueSimple) {
+pub fn print_simple_issue(issue: IssueSimple) -> Result<(), Box<dyn Error>> {
+    if issue.pull_request.is_some() {
+        return Err(Box::new(PrintError {
+            kind: PrintErrorKind::NotIssue,
+            description: "Trying get pull request from issue command".to_string(),
+        }));
+    }
     println!("╭────────────────────────────────────────────────────────────────────────────────────────────────");
     println!(" Issue {}: {};", issue.number, issue.title);
     println!(" State: {}", issue.state);
@@ -84,36 +99,38 @@ pub fn print_simple_issue(issue: IssueSimple) {
     for label in issue.labels {
         println!("   {}: {}", label.name, label.description);
     }
-    match issue.created_at {
-        Some(time) => {
-            println!(" Created at: {}", time);
-        }
-        None => {}
+
+    if let Some(time) = issue.created_at {
+        println!(" Created at: {time}");
     };
     println!("╰────────────────────────────────────────────────────────────────────────────────────────────────");
+    Ok(())
 }
 
-pub fn print_issue(issue: Issue) {
+pub fn print_issue(issue: Issue) -> Result<(), Box<dyn Error>> {
+    if issue.pull_request.is_some() {
+        return Err(Box::new(PrintError {
+            kind: PrintErrorKind::NotIssue,
+            description: "Trying get pull request from issue command".to_string(),
+        }));
+    }
+
     println!("╭────────────────────────────────────────────────────────────────────────────────────────────────");
     println!(" Issue {}: {};", issue.number, issue.title);
     println!(" State: {}", issue.state);
     println!(" Body: {}", issue.body);
     println!(" labels:");
     for label in issue.labels {
-        match label.labels_data() {
-            Some(data) => {
-                println!("   {}: {}", data.name, data.description);
-            }
-            None => {}
+        if let Some(data) = label.labels_data() {
+            println!("   {}: {}", data.name, data.description);
         }
     }
-    match issue.created_at {
-        Some(time) => {
-            println!(" Created at: {}", time);
-        }
-        None => {}
+
+    if let Some(time) = issue.created_at {
+        println!(" Created at: {time}");
     };
     println!("╰────────────────────────────────────────────────────────────────────────────────────────────────");
+    Ok(())
 }
 
 pub fn print_url(result: String, description: &str) {

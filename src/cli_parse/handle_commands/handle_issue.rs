@@ -2,13 +2,13 @@ use octorust::{self, Client};
 use std::error::Error;
 
 use crate::cli_in::issue_command::IssueCommand;
-use crate::cli_in::set_vars::IssuesListStates;
-use crate::cli_in::set_vars::States;
 use crate::cli_out::fuzzy_select::choose_issue;
 use crate::cli_out::print_in_cli::print_comments;
 use crate::cli_out::print_in_cli::print_issue;
 use crate::cli_out::print_in_cli::print_issues;
 use crate::cli_out::print_in_cli::print_simple_issue;
+use crate::cli_parse::entities::ListIssueArgs;
+use crate::cli_parse::entities::UpdateIssueArgs;
 use crate::git_utils::comments;
 use crate::git_utils::issues;
 use crate::git_utils::repo_info::Repo;
@@ -30,18 +30,15 @@ pub async fn handle_issue_command(
             numb_of_page,
             iss_on_page,
         } => {
-            handle_list(
-                github_client,
-                owner,
-                repo,
+            let command_args = ListIssueArgs {
                 creator,
                 assignee,
                 state,
                 labels,
                 numb_of_page,
                 iss_on_page,
-            )
-            .await?;
+            };
+            handle_list(github_client, owner, repo, command_args).await?;
             Ok(())
         }
 
@@ -64,18 +61,15 @@ pub async fn handle_issue_command(
             numb_of_page,
             iss_on_page,
         } => {
-            handle_get_form_list(
-                github_client,
-                owner,
-                repo,
+            let command_args = ListIssueArgs {
                 creator,
                 assignee,
                 state,
                 labels,
                 numb_of_page,
                 iss_on_page,
-            )
-            .await?;
+            };
+            handle_get_form_list(github_client, owner, repo, command_args).await?;
             Ok(())
         }
 
@@ -111,18 +105,13 @@ pub async fn handle_issue_command(
             state,
             labels,
         } => {
-            handle_update(
-                github_client,
-                owner,
-                repo,
+            let command_args = UpdateIssueArgs {
                 title,
                 body,
                 number,
-                labels,
-                assignees,
                 state,
-            )
-            .await?;
+            };
+            handle_update(github_client, owner, repo, labels, assignees, command_args).await?;
             Ok(())
         }
     }
@@ -132,31 +121,16 @@ async fn handle_list(
     github_client: Client,
     owner: Option<RepoOwner>,
     repo: Option<RepoName>,
-    creator: String,
-    assignee: String,
-    state: IssuesListStates,
-    labels: String,
-    numb_of_page: i64,
-    iss_on_page: i64,
+    command_args: ListIssueArgs,
 ) -> Result<(), Box<dyn Error>> {
     let repo_info = match owner {
         Some(_) => RepoInfo::new(Repo::Input, owner, repo)?,
         None => RepoInfo::new(Repo::Current, None, None)?,
     };
 
-    let list_issues = issues::get_list(
-        &github_client,
-        &repo_info,
-        &creator,
-        &assignee,
-        &state.0,
-        &labels,
-        &numb_of_page,
-        &iss_on_page,
-    )
-    .await?;
+    let list_issues = issues::get_list(&github_client, &repo_info, &command_args).await?;
 
-    print_issues(list_issues, state, numb_of_page);
+    print_issues(list_issues, command_args.state, command_args.numb_of_page);
     Ok(())
 }
 
@@ -175,7 +149,7 @@ async fn handle_get(
 
     let list_comments = comments::get_all(&github_client, &repo_info, &number).await?;
 
-    print_issue(result);
+    print_issue(result)?;
     print_comments(list_comments)?;
     Ok(())
 }
@@ -184,36 +158,21 @@ async fn handle_get_form_list(
     github_client: Client,
     owner: Option<RepoOwner>,
     repo: Option<RepoName>,
-    creator: String,
-    assignee: String,
-    state: IssuesListStates,
-    labels: String,
-    numb_of_page: i64,
-    iss_on_page: i64,
+    command_args: ListIssueArgs,
 ) -> Result<(), Box<dyn Error>> {
     let repo_info = match owner {
         Some(_) => RepoInfo::new(Repo::Input, owner, repo)?,
         None => RepoInfo::new(Repo::Current, None, None)?,
     };
 
-    let list_issues = issues::get_list(
-        &github_client,
-        &repo_info,
-        &creator,
-        &assignee,
-        &state.0,
-        &labels,
-        &numb_of_page,
-        &iss_on_page,
-    )
-    .await?;
+    let list_issues = issues::get_list(&github_client, &repo_info, &command_args).await?;
 
     let choosed_issue = choose_issue(list_issues)?;
 
     if let Some(ch_i) = choosed_issue {
         let list_comments = comments::get_all(&github_client, &repo_info, &ch_i.number).await?;
 
-        print_simple_issue(ch_i);
+        print_simple_issue(ch_i)?;
         print_comments(list_comments)?;
     } else {
         println!("Issue not choosed or not find");
@@ -275,12 +234,9 @@ async fn handle_update(
     github_client: Client,
     owner: Option<RepoOwner>,
     repo: Option<RepoName>,
-    title: Option<String>,
-    body: Option<String>,
-    number: i64,
     labels: Option<String>,
     assignees: Option<String>,
-    state: States,
+    command_args: UpdateIssueArgs,
 ) -> Result<(), Box<dyn Error>> {
     let repo_info = match owner {
         Some(_) => RepoInfo::new(Repo::Input, owner, repo)?,
@@ -299,12 +255,9 @@ async fn handle_update(
     let result = issues::update(
         &github_client,
         repo_info,
-        &number,
-        title,
-        body,
+        command_args,
         &assignees_list,
         &labels_list,
-        &state.0,
     )
     .await?;
 

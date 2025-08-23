@@ -16,13 +16,13 @@ pub struct RepoSsh(String);
 
 impl RepoOwner {
     pub fn trim(&self) -> &str {
-        return self.0.trim();
+        self.0.trim()
     }
 }
 
 impl RepoName {
     pub fn trim(&self) -> &str {
-        return self.0.trim();
+        self.0.trim()
     }
 }
 
@@ -84,12 +84,12 @@ impl RepoInfo {
         if parts.len() > 2 {
             let owner = parts[parts.len() - 2];
             let repo = parts[parts.len() - 1];
-            return Ok((RepoOwner(owner.to_string()), RepoName(repo.to_string())));
+            Ok((RepoOwner(owner.to_string()), RepoName(repo.to_string())))
         } else {
-            return Err(io::Error::new(
+            Err(io::Error::new(
                 io::ErrorKind::InvalidData,
                 "Can't parse string",
-            ));
+            ))
         }
     }
 
@@ -97,13 +97,12 @@ impl RepoInfo {
     fn get_current_repo(mut self) -> Result<Self, io::Error> {
         // Creating a command to search for a link to a remote repository
         let git_link = Command::new("git")
-            .args(&["remote", "get-url", "origin"])
+            .args(["remote", "get-url", "origin"])
             .output()?;
 
         // Git repository was not found in this directory
         if !git_link.status.success() {
-            return Err(io::Error::new(
-                io::ErrorKind::Other,
+            return Err(io::Error::other(
                 "Git repository not found in this directory",
             ));
         }
@@ -116,7 +115,7 @@ impl RepoInfo {
         Self::set_url(&mut self);
         Self::set_ssh(&mut self);
 
-        return Ok(self);
+        Ok(self)
     }
 
     fn set_url(&mut self) {
@@ -136,22 +135,22 @@ impl RepoInfo {
     }
 
     pub fn get_owner(&self) -> String {
-        return self.owner.clone().0;
+        self.owner.clone().0
     }
 
     pub fn get_name(&self) -> String {
-        return self.name.clone().0;
+        self.name.clone().0
     }
 
-    pub fn get_release_url(&self, tag: &String) -> String {
+    pub fn get_release_url(&self, tag: &str) -> String {
         let mut release_url = self.url.clone();
         release_url.push_str("releases/tag/");
         release_url.push_str(tag.trim());
-        return release_url.0;
+        release_url.0
     }
 
     pub fn get_ssh(&self) -> String {
-        return self.ssh.clone().0;
+        self.ssh.clone().0
     }
 
     fn create_repo_info(
@@ -159,15 +158,15 @@ impl RepoInfo {
         name: Option<RepoName>,
     ) -> Result<RepoInfo, io::Error> {
         if owner.is_none() {
-            return Err(io::Error::new(
+            Err(io::Error::new(
                 io::ErrorKind::NotFound,
                 "Not found repo owner",
-            ));
+            ))
         } else if name.is_none() {
-            return Err(io::Error::new(
+            Err(io::Error::new(
                 io::ErrorKind::NotFound,
                 "Not found repo name",
-            ));
+            ))
         } else {
             let mut new_repo = RepoInfo {
                 owner: RepoOwner(owner.unwrap().0.trim().to_string()),
@@ -178,7 +177,7 @@ impl RepoInfo {
             Self::set_url(&mut new_repo);
             Self::set_ssh(&mut new_repo);
 
-            return Ok(new_repo);
+            Ok(new_repo)
         }
     }
 
@@ -195,11 +194,9 @@ impl RepoInfo {
                     url: RepoUrl(String::new()),
                     ssh: RepoSsh(String::new()),
                 };
-                return Self::get_current_repo(new_repo);
+                Self::get_current_repo(new_repo)
             }
-            Repo::Input => {
-                return Self::create_repo_info(owner, name);
-            }
+            Repo::Input => Self::create_repo_info(owner, name),
         }
     }
 }

@@ -1,4 +1,4 @@
-use std::str::FromStr;
+use std::{fmt::Display, str::FromStr};
 
 use octorust::types::{
     IssuesListState, Order, ReposCreateInOrgRequestVisibility, ReposListOrgSort, ReposListOrgType,
@@ -127,13 +127,13 @@ impl FromStr for IssuesListStates {
     }
 }
 
-impl ToString for IssuesListStates {
-    fn to_string(&self) -> String {
+impl Display for IssuesListStates {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self.0 {
-            IssuesListState::Open => String::from("open"),
-            IssuesListState::Closed => String::from("closed"),
-            IssuesListState::All => String::from("all"),
-            IssuesListState::FallthroughString => String::from("FallthroughString"),
+            IssuesListState::Open => write!(f, "open"),
+            IssuesListState::Closed => write!(f, "closed"),
+            IssuesListState::All => write!(f, "all"),
+            IssuesListState::FallthroughString => write!(f, "FallthroughString"),
         }
     }
 }

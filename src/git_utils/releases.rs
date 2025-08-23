@@ -5,42 +5,32 @@ use octorust::{
     Client,
 };
 
-use crate::git_utils::repo_info::RepoInfo;
+use crate::{cli_parse::entities::CreateReleaseArgs, git_utils::repo_info::RepoInfo};
 
 pub async fn create(
     github_client: &Client,
     repo_info: RepoInfo,
-    body: String,
-    discussion_category_name: String,
-    draft: Option<bool>,
-    name: &String,
-    prerelease: Option<bool>,
-    tag_name: &String,
-    target_commitish: String,
+    command_args: CreateReleaseArgs,
 ) -> Result<String, Box<dyn Error>> {
     let request = ReposCreateReleaseRequest {
-        body: body,
-        discussion_category_name: discussion_category_name,
-        draft: draft,
-        name: name.clone(),
-        prerelease: prerelease,
-        tag_name: tag_name.clone(),
-        target_commitish: target_commitish,
+        body: command_args.body,
+        discussion_category_name: command_args.discussion_category_name,
+        draft: command_args.draft,
+        name: command_args.name,
+        prerelease: command_args.prerelease,
+        tag_name: command_args.tag_name,
+        target_commitish: command_args.target_commitish.to_owned(),
     };
 
     let result = github_client
         .repos()
-        .create_release(
-            repo_info.get_owner().trim(),
-            repo_info.get_name().trim(),
-            &request,
-        )
+        .create_release(&repo_info.get_owner(), &repo_info.get_name(), &request)
         .await;
 
-    return match result {
-        Ok(_) => Ok(repo_info.get_release_url(tag_name)),
+    match result {
+        Ok(_) => Ok(repo_info.get_release_url(&command_args.target_commitish)),
         Err(er) => Err(Box::new(er)),
-    };
+    }
 }
 
 pub async fn get_latest(
@@ -49,13 +39,13 @@ pub async fn get_latest(
 ) -> Result<Release, Box<dyn Error>> {
     let result = github_client
         .repos()
-        .get_latest_release(&repo_info.get_owner().trim(), &repo_info.get_name().trim())
+        .get_latest_release(&repo_info.get_owner(), &repo_info.get_name())
         .await;
 
-    return match result {
+    match result {
         Ok(r) => Ok(r.body),
         Err(er) => Err(Box::new(er)),
-    };
+    }
 }
 
 pub async fn get_by_tag(
@@ -65,17 +55,13 @@ pub async fn get_by_tag(
 ) -> Result<Release, Box<dyn Error>> {
     let result = github_client
         .repos()
-        .get_release_by_tag(
-            &repo_info.get_owner().trim(),
-            &repo_info.get_name().trim(),
-            &tag,
-        )
+        .get_release_by_tag(&repo_info.get_owner(), &repo_info.get_name(), &tag)
         .await;
 
-    return match result {
+    match result {
         Ok(r) => Ok(r.body),
         Err(er) => Err(Box::new(er)),
-    };
+    }
 }
 
 pub async fn get_by_id(
@@ -85,15 +71,11 @@ pub async fn get_by_id(
 ) -> Result<Release, Box<dyn Error>> {
     let result = github_client
         .repos()
-        .get_release(
-            &repo_info.get_owner().trim(),
-            &repo_info.get_name().trim(),
-            id,
-        )
+        .get_release(&repo_info.get_owner(), &repo_info.get_name(), id)
         .await;
 
-    return match result {
+    match result {
         Ok(r) => Ok(r.body),
         Err(er) => Err(Box::new(er)),
-    };
+    }
 }

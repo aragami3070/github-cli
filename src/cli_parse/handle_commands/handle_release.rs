@@ -4,6 +4,7 @@ use std::error::Error;
 use crate::cli_in::release_command::ReleaseCommand;
 use crate::cli_out::print_in_cli::print_release;
 use crate::cli_out::print_in_cli::print_url;
+use crate::cli_parse::entities::CreateReleaseArgs;
 use crate::git_utils::releases;
 use crate::git_utils::repo_info::Repo;
 use crate::git_utils::repo_info::RepoInfo;
@@ -26,19 +27,16 @@ pub async fn handle_release_command(
             tag_name,
             target_commitish,
         } => {
-            handle_create(
-                github_client,
-                owner,
-                repo,
+            let command_args = CreateReleaseArgs {
                 body,
-                discussion_category_name,
                 name,
-                draft,
-                prerelease,
                 tag_name,
                 target_commitish,
-            )
-            .await?;
+                discussion_category_name,
+                draft,
+                prerelease,
+            };
+            handle_create(github_client, owner, repo, command_args).await?;
             Ok(())
         }
 
@@ -63,28 +61,11 @@ async fn handle_create(
     github_client: Client,
     owner: RepoOwner,
     repo: RepoName,
-    body: String,
-    discussion_category_name: String,
-    name: String,
-    draft: Option<bool>,
-    prerelease: Option<bool>,
-    tag_name: String,
-    target_commitish: String,
+    command_args: CreateReleaseArgs,
 ) -> Result<(), Box<dyn Error>> {
     let repo_info: RepoInfo = RepoInfo::new(Repo::Input, Some(owner), Some(repo))?;
 
-    let result = releases::create(
-        &github_client,
-        repo_info,
-        body,
-        discussion_category_name,
-        draft,
-        &name,
-        prerelease,
-        &tag_name,
-        target_commitish,
-    )
-    .await?;
+    let result = releases::create(&github_client, repo_info, command_args).await?;
 
     print_url(result, "New release");
     Ok(())
