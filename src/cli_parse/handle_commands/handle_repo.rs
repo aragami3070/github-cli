@@ -9,12 +9,12 @@ use crate::cli_in::set_vars::ReposListUserTypes;
 use crate::cli_in::set_vars::Visibilities;
 use crate::cli_out::print_in_cli::print_repos;
 use crate::cli_out::print_in_cli::print_url;
+use crate::cli_parse::entities::CreateRepoArgs;
 use crate::cli_parse::entities::CreateRepoFromTemplateArgs;
 use crate::git_utils::repo_info::Repo;
 use crate::git_utils::repo_info::RepoInfo;
 use crate::git_utils::repo_info::{RepoName, RepoOwner};
 use crate::git_utils::repos;
-use crate::cli_parse::entities::CreateRepoArgs;
 
 pub async fn handle_repo_command(
     github_client: Client,
@@ -58,11 +58,7 @@ pub async fn handle_repo_command(
                 name,
             };
 
-            handle_create_for_auth_user(
-                github_client,
-				command_args
-            )
-            .await?;
+            handle_create_for_auth_user(github_client, command_args).await?;
             Ok(())
         }
 
@@ -107,7 +103,7 @@ pub async fn handle_repo_command(
 
             handle_create_in_org(
                 github_client,
-				command_args,
+                command_args,
                 name,
                 org,
                 team_name,
@@ -136,18 +132,18 @@ pub async fn handle_repo_command(
             private,
             include_all_branches,
         } => {
-			let command_args = CreateRepoFromTemplateArgs {
-				description,
-				private,
-				include_all_branches
-			};
+            let command_args = CreateRepoFromTemplateArgs {
+                description,
+                private,
+                include_all_branches,
+            };
             handle_create_using_template(
                 github_client,
                 owner,
                 name,
                 template_owner,
                 template_name,
-				command_args
+                command_args,
             )
             .await?;
             Ok(())
@@ -172,13 +168,9 @@ pub async fn handle_repo_command(
 
 async fn handle_create_for_auth_user(
     github_client: Client,
-	command_args: CreateRepoArgs,
+    command_args: CreateRepoArgs,
 ) -> Result<(), Box<dyn Error>> {
-    let result = repos::create_for_authenticated_user(
-        &github_client,
-		command_args,
-    )
-    .await?;
+    let result = repos::create_for_authenticated_user(&github_client, command_args).await?;
 
     println!("{result}");
     Ok(())
@@ -186,7 +178,7 @@ async fn handle_create_for_auth_user(
 
 async fn handle_create_in_org(
     github_client: Client,
-	command_args: CreateRepoArgs,
+    command_args: CreateRepoArgs,
     name: RepoName,
     org: RepoOwner,
     team_name: String,
@@ -197,7 +189,7 @@ async fn handle_create_in_org(
     let result = repos::create_in_org(
         &github_client,
         repo_info,
-		command_args,
+        command_args,
         &team_name,
         Some(visibility.0),
     )
@@ -227,19 +219,15 @@ async fn handle_create_using_template(
     name: RepoName,
     template_owner: RepoOwner,
     template_name: RepoName,
-	command_args: CreateRepoFromTemplateArgs
+    command_args: CreateRepoFromTemplateArgs,
 ) -> Result<(), Box<dyn Error>> {
     let repo_info: RepoInfo = RepoInfo::new(Repo::Input, Some(owner), Some(name))?;
     let template_info: RepoInfo =
         RepoInfo::new(Repo::Input, Some(template_owner), Some(template_name))?;
 
-    let result = repos::create_using_template(
-        &github_client,
-        template_info,
-        repo_info,
-		command_args
-    )
-    .await?;
+    let result =
+        repos::create_using_template(&github_client, template_info, repo_info, command_args)
+            .await?;
 
     print_url(result, "New repo");
     Ok(())

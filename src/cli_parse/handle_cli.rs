@@ -13,22 +13,22 @@ pub async fn handle_cli_command(args: Args, github_client: Client) -> Result<(),
     match args.command {
         CliCommand::Issue { subcommand } => {
             handle_issue_command(github_client, subcommand).await?;
-			Ok(())
+            Ok(())
         }
 
         CliCommand::Comment { subcommand } => {
             handle_comment_command(github_client, subcommand).await?;
-			Ok(())
+            Ok(())
         }
 
         CliCommand::Repo { subcommand } => {
             handle_repo_command(github_client, subcommand).await?;
-			Ok(())
+            Ok(())
         }
 
         CliCommand::Release { subcommand } => {
             handle_release_command(github_client, subcommand).await?;
-			Ok(())
+            Ok(())
         }
     }
 }

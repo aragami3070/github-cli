@@ -7,10 +7,7 @@ pub async fn get_id(
     org: &str,
     name: &str,
 ) -> Result<FullTeam, Box<dyn Error>> {
-    let team = github_client
-        .teams()
-        .get_by_name(org, name)
-        .await;
+    let team = github_client.teams().get_by_name(org, name).await;
 
     match team {
         Ok(t) => Ok(t.body),

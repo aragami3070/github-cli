@@ -128,7 +128,7 @@ impl FromStr for IssuesListStates {
 }
 
 impl Display for IssuesListStates {
-	fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self.0 {
             IssuesListState::Open => write!(f, "open"),
             IssuesListState::Closed => write!(f, "closed"),

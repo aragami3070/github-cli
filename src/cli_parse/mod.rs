@@ -1,3 +1,3 @@
-pub mod handle_cli;
 pub mod entities;
+pub mod handle_cli;
 mod handle_commands;
