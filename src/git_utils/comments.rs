@@ -78,3 +78,28 @@ pub async fn get_all_from_review(
         Err(er) => Err(Box::new(er)),
     };
 }
+
+
+pub async fn update(
+    github_client: &Client,
+    repo_info: &RepoInfo,
+    comment_id: &i64,
+    body: &String,
+) -> Result<String, Box<dyn Error>> {
+    let request = PullsUpdateReviewRequest { body: body.clone() };
+
+    let comment = github_client
+        .issues()
+        .update_comment(
+            &repo_info.get_owner().trim(),
+            &repo_info.get_name().trim(),
+            comment_id.clone(),
+            &request,
+        )
+        .await;
+
+    return match comment {
+        Ok(_) => Ok("Comment update successed".to_string()),
+        Err(er) => Err(Box::new(er)),
+    };
+}
