@@ -9,7 +9,7 @@ use octorust::{
     Client,
 };
 
-use crate::cli_parse::entities::CreateRepoArgs;
+use crate::cli_parse::entities::{CreateRepoArgs, CreateRepoFromTemplateArgs};
 use crate::git_utils::{repo_info::RepoInfo, teams::get_id};
 
 pub async fn create_for_authenticated_user(
@@ -113,16 +113,14 @@ pub async fn create_using_template(
     github_client: &Client,
     template_info: RepoInfo,
     repo_info: RepoInfo,
-    description: &str,
-    include_all_branches: Option<bool>,
-    private: Option<bool>,
+    command_args: CreateRepoFromTemplateArgs,
 ) -> Result<String, Box<dyn Error>> {
     let request = ReposCreateUsingTemplateRequest {
-        description: description.to_owned(),
-        include_all_branches,
+        description: command_args.description,
+        include_all_branches: command_args.include_all_branches,
         name: repo_info.get_name(),
         owner: repo_info.get_owner(),
-        private,
+        private: command_args.private,
     };
 
     let new_repo = github_client

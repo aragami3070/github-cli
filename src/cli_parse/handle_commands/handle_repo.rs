@@ -9,6 +9,7 @@ use crate::cli_in::set_vars::ReposListUserTypes;
 use crate::cli_in::set_vars::Visibilities;
 use crate::cli_out::print_in_cli::print_repos;
 use crate::cli_out::print_in_cli::print_url;
+use crate::cli_parse::entities::CreateRepoFromTemplateArgs;
 use crate::git_utils::repo_info::Repo;
 use crate::git_utils::repo_info::RepoInfo;
 use crate::git_utils::repo_info::{RepoName, RepoOwner};
@@ -135,15 +136,18 @@ pub async fn handle_repo_command(
             private,
             include_all_branches,
         } => {
+			let command_args = CreateRepoFromTemplateArgs {
+				description,
+				private,
+				include_all_branches
+			};
             handle_create_using_template(
                 github_client,
                 owner,
                 name,
                 template_owner,
                 template_name,
-                description,
-                include_all_branches,
-                private,
+				command_args
             )
             .await?;
             Ok(())
@@ -223,9 +227,7 @@ async fn handle_create_using_template(
     name: RepoName,
     template_owner: RepoOwner,
     template_name: RepoName,
-    description: String,
-    include_all_branches: Option<bool>,
-    private: Option<bool>,
+	command_args: CreateRepoFromTemplateArgs
 ) -> Result<(), Box<dyn Error>> {
     let repo_info: RepoInfo = RepoInfo::new(Repo::Input, Some(owner), Some(name))?;
     let template_info: RepoInfo =
@@ -235,9 +237,7 @@ async fn handle_create_using_template(
         &github_client,
         template_info,
         repo_info,
-        &description,
-        include_all_branches,
-        private,
+		command_args
     )
     .await?;
 
