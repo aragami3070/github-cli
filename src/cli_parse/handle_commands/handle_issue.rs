@@ -2,13 +2,13 @@ use octorust::{self, Client};
 use std::error::Error;
 
 use crate::cli_in::issue_command::IssueCommand;
-use crate::cli_in::set_vars::States;
 use crate::cli_out::fuzzy_select::choose_issue;
 use crate::cli_out::print_in_cli::print_comments;
 use crate::cli_out::print_in_cli::print_issue;
 use crate::cli_out::print_in_cli::print_issues;
 use crate::cli_out::print_in_cli::print_simple_issue;
 use crate::cli_parse::entities::ListIssueArgs;
+use crate::cli_parse::entities::UpdateIssueArgs;
 use crate::git_utils::comments;
 use crate::git_utils::issues;
 use crate::git_utils::repo_info::Repo;
@@ -105,18 +105,13 @@ pub async fn handle_issue_command(
             state,
             labels,
         } => {
-            handle_update(
-                github_client,
-                owner,
-                repo,
+            let command_args = UpdateIssueArgs {
                 title,
                 body,
                 number,
-                labels,
-                assignees,
                 state,
-            )
-            .await?;
+            };
+            handle_update(github_client, owner, repo, labels, assignees, command_args).await?;
             Ok(())
         }
     }
@@ -239,12 +234,9 @@ async fn handle_update(
     github_client: Client,
     owner: Option<RepoOwner>,
     repo: Option<RepoName>,
-    title: Option<String>,
-    body: Option<String>,
-    number: i64,
     labels: Option<String>,
     assignees: Option<String>,
-    state: States,
+    command_args: UpdateIssueArgs,
 ) -> Result<(), Box<dyn Error>> {
     let repo_info = match owner {
         Some(_) => RepoInfo::new(Repo::Input, owner, repo)?,
@@ -263,12 +255,9 @@ async fn handle_update(
     let result = issues::update(
         &github_client,
         repo_info,
-        &number,
-        title,
-        body,
+        command_args,
         &assignees_list,
         &labels_list,
-        &state.0,
     )
     .await?;
 

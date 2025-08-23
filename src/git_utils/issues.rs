@@ -6,7 +6,7 @@ use octorust::types::{
 };
 use octorust::Client;
 
-use crate::cli_parse::entities::ListIssueArgs;
+use crate::cli_parse::entities::{ListIssueArgs, UpdateIssueArgs};
 use crate::git_utils::comments;
 use crate::git_utils::repo_info::RepoInfo;
 
@@ -164,21 +164,24 @@ pub async fn close(
 pub async fn update(
     github_client: &Client,
     repo_info: RepoInfo,
-    issue_number: &i64,
-    title: Option<String>,
-    body: Option<String>,
+    command_args: UpdateIssueArgs,
     assignees: &[String],
     labels: &[String],
-    state: &State,
 ) -> Result<String, Box<dyn Error>> {
-    let request = get_update_request(title, body, Some(assignees), Some(labels), state);
+    let request = get_update_request(
+        command_args.title,
+        command_args.body,
+        Some(assignees),
+        Some(labels),
+        &command_args.state.0,
+    );
 
     let update_iss = github_client
         .issues()
         .update(
             &repo_info.get_owner(),
             &repo_info.get_name(),
-            *issue_number,
+            command_args.number,
             &request,
         )
         .await;
