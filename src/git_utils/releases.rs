@@ -18,8 +18,8 @@ pub async fn create(
         draft: command_args.draft,
         name: command_args.name,
         prerelease: command_args.prerelease,
-        tag_name: command_args.tag_name,
-        target_commitish: command_args.target_commitish.to_owned(),
+        tag_name: command_args.tag_name.to_owned(),
+        target_commitish: command_args.target_commitish,
     };
 
     let result = github_client
@@ -28,7 +28,7 @@ pub async fn create(
         .await;
 
     match result {
-        Ok(_) => Ok(repo_info.get_release_url(&command_args.target_commitish)),
+        Ok(_) => Ok(repo_info.get_release_url(&command_args.tag_name)),
         Err(er) => Err(Box::new(er)),
     }
 }
