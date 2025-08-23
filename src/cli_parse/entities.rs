@@ -34,3 +34,9 @@ pub struct CreateRepoArgs {
     pub license_template: String,
     pub name: String,
 }
+
+pub struct CreateRepoFromTemplateArgs {
+	pub description: String,
+	pub include_all_branches: Option<bool>,
+	pub private: Option<bool>,
+}
