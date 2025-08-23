@@ -116,3 +116,21 @@ async fn handle_get_all_from_review(
     print_review_comments(result)?;
     Ok(())
 }
+
+async fn handle_update(
+    github_client: Client,
+    owner: Option<RepoOwner>,
+    repo: Option<RepoName>,
+    number: i64,
+    body: String,
+) -> Result<(), Box<dyn Error>> {
+    let repo_info = match owner {
+        Some(_) => RepoInfo::new(Repo::Input, owner, repo)?,
+        None => RepoInfo::new(Repo::Current, None, None)?,
+    };
+    let result = comments::update(&github_client, &repo_info, &number, &body).await?;
+
+    println!("{result}");
+    Ok(())
+}
+
