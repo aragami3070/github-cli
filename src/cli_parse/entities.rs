@@ -1,5 +1,4 @@
-use crate::cli_in::set_vars::IssuesListStates;
-
+use crate::cli_in::set_vars::{IssuesListStates, States};
 
 pub struct ListIssueArgs {
     pub creator: String,
@@ -9,6 +8,14 @@ pub struct ListIssueArgs {
     pub numb_of_page: i64,
     pub iss_on_page: i64,
 }
+
+pub struct UpdateIssueArgs {
+    pub title: Option<String>,
+    pub body: Option<String>,
+    pub number: i64,
+    pub state: States,
+}
+
 pub struct CreateRepoArgs {
     pub allow_auto_merge: Option<bool>,
     pub allow_merge_commit: Option<bool>,
@@ -27,4 +34,3 @@ pub struct CreateRepoArgs {
     pub license_template: String,
     pub name: String,
 }
-
