@@ -5,27 +5,21 @@ use octorust::{
     Client,
 };
 
-use crate::git_utils::repo_info::RepoInfo;
+use crate::{cli_parse::entities::CreateReleaseArgs, git_utils::repo_info::RepoInfo};
 
 pub async fn create(
     github_client: &Client,
     repo_info: RepoInfo,
-    body: String,
-    discussion_category_name: String,
-    draft: Option<bool>,
-    name: &str,
-    prerelease: Option<bool>,
-    tag_name: &str,
-    target_commitish: String,
+    command_args: CreateReleaseArgs,
 ) -> Result<String, Box<dyn Error>> {
     let request = ReposCreateReleaseRequest {
-        body,
-        discussion_category_name,
-        draft,
-        name: name.to_owned(),
-        prerelease,
-        tag_name: tag_name.to_owned(),
-        target_commitish,
+        body: command_args.body,
+        discussion_category_name: command_args.discussion_category_name,
+        draft: command_args.draft,
+        name: command_args.name,
+        prerelease: command_args.prerelease,
+        tag_name: command_args.tag_name,
+        target_commitish: command_args.target_commitish.to_owned(),
     };
 
     let result = github_client
@@ -34,7 +28,7 @@ pub async fn create(
         .await;
 
     match result {
-        Ok(_) => Ok(repo_info.get_release_url(tag_name)),
+        Ok(_) => Ok(repo_info.get_release_url(&command_args.target_commitish)),
         Err(er) => Err(Box::new(er)),
     }
 }
