@@ -71,4 +71,17 @@ pub enum CommentCommand {
         #[clap(long, short, default_value = "")]
         body: String,
     },
+
+    /// Delete comment for issue/pull request by comment id
+    Delete {
+        /// Repo owner (optional)
+        #[clap(long, short, default_value = None)]
+        owner: Option<RepoOwner>,
+        /// Repo name (optional)
+        #[clap(long, short, default_value = None)]
+        repo: Option<RepoName>,
+        /// Delete comment from issue/pull request by id
+        #[clap(long, short)]
+        comment_id: i64,
+    },
 }

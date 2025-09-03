@@ -55,7 +55,7 @@ github-cli release --help
 - [x] Сделать получение комментариев для issue/pull request
 - [x] Сделать получение review комментариев для pull request
 - [x] Сделать редактирование комментария для issue/pull request
-- [ ] Сделать удаление комментария для issue/pull request
+- [x] Сделать удаление комментария для issue/pull request
 
 ### issue
 - [x] Сделать автораспознование гит репозитория
@@ -68,7 +68,7 @@ github-cli release --help
 
 ### pull request
 - [ ] Сделать получение всех pull requests
-- [ ] Сделать выбор pull request через fzf или аналоги из списка всех pull requests
+- [ ] Сделать выбор pull request через fzf из списка всех pull requests
 - [ ] Сделать создание pull request
 - [ ] Сделать апрув pull request
 - [ ] Сделать merge pull request
