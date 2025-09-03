@@ -139,7 +139,25 @@ async fn handle_update(
         Some(_) => RepoInfo::new(Repo::Input, owner, repo)?,
         None => RepoInfo::new(Repo::Current, None, None)?,
     };
+
     let result = comments::update(&github_client, &repo_info, &comment_id, &body).await?;
+
+    println!("{result}");
+    Ok(())
+}
+
+async fn handle_delete(
+    github_client: Client,
+    owner: Option<RepoOwner>,
+    repo: Option<RepoName>,
+    comment_id: i64,
+) -> Result<(), Box<dyn Error>> {
+    let repo_info = match owner {
+        Some(_) => RepoInfo::new(Repo::Input, owner, repo)?,
+        None => RepoInfo::new(Repo::Current, None, None)?,
+    };
+
+    let result = comments::delete(&github_client, &repo_info, &comment_id).await?;
 
     println!("{result}");
     Ok(())
