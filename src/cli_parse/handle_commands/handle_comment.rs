@@ -50,6 +50,14 @@ pub async fn handle_comment_command(
             body,
         } => {
             handle_update(github_client, owner, repo, comment_id, body).await?;
+            Ok(())
+        }
+        CommentCommand::Delete {
+            owner,
+            repo,
+            comment_id,
+        } => {
+            handle_delete(github_client, owner, repo, comment_id).await?;
 
             Ok(())
         }
