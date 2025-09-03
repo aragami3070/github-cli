@@ -101,3 +101,23 @@ pub async fn update(
         Err(er) => Err(Box::new(er)),
     }
 }
+
+pub async fn delete(
+    github_client: &Client,
+    repo_info: &RepoInfo,
+    comment_id: &i64,
+) -> Result<String, Box<dyn Error>> {
+    let comment = github_client
+        .issues()
+        .delete_comment(
+            &repo_info.get_owner(),
+            &repo_info.get_name(),
+            *comment_id,
+        )
+        .await;
+
+    match comment {
+        Ok(_) => Ok("Comment deleted successed".to_string()),
+        Err(er) => Err(Box::new(er)),
+    }
+}
